@@ -1,4 +1,5 @@
 const ASSET_BASE = new URL('./', import.meta.url);
+const STORAGE_KEY = 'bp-adopt-params';
 
 const USE_MODES = [
   { id: 'maintenance', label: 'After code change', note: 'Paste git diff into the prompt.' },
@@ -32,6 +33,118 @@ function byId(workflows, id) {
   return workflows.find((w) => w.id === id);
 }
 
+function readForm(form) {
+  const data = new FormData(form);
+  const template = String(data.get('template') || 'arc42');
+  return {
+    appName: String(data.get('appName') || '').trim(),
+    template,
+    customTemplate: String(data.get('customTemplate') || '').trim(),
+    purpose: String(data.get('purpose') || '').trim(),
+    stack: String(data.get('stack') || '').trim(),
+    docRoot: String(data.get('docRoot') || 'docs/architecture/').trim().replace(/\/?$/, '/'),
+    sourceRoot: String(data.get('sourceRoot') || '').trim(),
+    externalSystems: String(data.get('externalSystems') || '').trim(),
+  };
+}
+
+function resolvedTemplate(params) {
+  if (params.template === 'custom') {
+    return params.customTemplate || 'custom';
+  }
+  return params.template;
+}
+
+function buildParameterBlock(params) {
+  const template = resolvedTemplate(params);
+  const lines = [
+    '## Adoption parameters (from architect — do not re-interview if already set)',
+    '',
+    `- Application: ${params.appName}`,
+    `- Documentation template: ${template}`,
+  ];
+  if (params.purpose) lines.push(`- Purpose / domain: ${params.purpose}`);
+  if (params.stack) lines.push(`- Stack: ${params.stack}`);
+  if (params.docRoot !== 'docs/architecture/') {
+    lines.push(`- Documentation root: ${params.docRoot}`);
+  }
+  if (params.sourceRoot) lines.push(`- Primary source path: ${params.sourceRoot}`);
+  if (params.externalSystems) lines.push(`- External systems: ${params.externalSystems}`);
+  lines.push('');
+  lines.push('Use these values in always-on.md and entry-point.md. Create the template folder for the selected documentation template. Interview only for missing facts (source map detail, team conventions).');
+  lines.push('');
+  return lines.join('\n');
+}
+
+function buildAdoptPrompt(base, params) {
+  const block = buildParameterBlock(params);
+  const anchor = 'Role: bootstrap\n\n';
+  if (base.includes(anchor)) {
+    return base.replace(anchor, `${anchor}${block}`);
+  }
+  return `${block}\n${base}`;
+}
+
+function saveParams(params) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(params));
+  } catch {
+    /* ignore */
+  }
+}
+
+function loadParams() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function applyParams(form, params) {
+  if (!params) return;
+  for (const [key, value] of Object.entries(params)) {
+    const el = form.elements.namedItem(key);
+    if (el && value != null) el.value = value;
+  }
+  toggleCustomField(form);
+}
+
+function toggleCustomField(form) {
+  const custom = form.querySelector('.field-custom');
+  const template = form.elements.namedItem('template');
+  if (custom && template) {
+    custom.hidden = template.value !== 'custom';
+  }
+}
+
+function initAdoptForm(adoptBase) {
+  const form = document.getElementById('adopt-form');
+  if (!form) return;
+
+  applyParams(form, loadParams());
+
+  form.elements.namedItem('template')?.addEventListener('change', () => {
+    toggleCustomField(form);
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const params = readForm(form);
+    if (!params.appName) {
+      form.elements.namedItem('appName')?.focus();
+      return;
+    }
+    if (params.template === 'custom' && !params.customTemplate) {
+      form.elements.namedItem('customTemplate')?.focus();
+      return;
+    }
+    saveParams(params);
+    copy(buildAdoptPrompt(adoptBase, params));
+  });
+}
+
 function initTabs() {
   const tabs = document.querySelectorAll('.phase-tab');
   const panels = {
@@ -51,15 +164,6 @@ function initTabs() {
         panel.hidden = !on;
         panel.classList.toggle('active', on);
       });
-    });
-  });
-}
-
-function initStaticCopy() {
-  document.querySelectorAll('[data-copy]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const el = document.querySelector(btn.dataset.copy);
-      if (el) copy(el.textContent.trim());
     });
   });
 }
@@ -119,13 +223,12 @@ async function loadAdoptPrompt() {
 
 async function main() {
   initTabs();
-  initStaticCopy();
 
   let workflows;
-  let adoptPrompt = '';
+  let adoptBase = '';
 
   try {
-    [workflows, adoptPrompt] = await Promise.all([
+    [workflows, adoptBase] = await Promise.all([
       loadWorkflows(),
       loadAdoptPrompt(),
     ]);
@@ -137,8 +240,7 @@ async function main() {
     return;
   }
 
-  document.getElementById('copy-adopt')?.addEventListener('click', () => copy(adoptPrompt));
-
+  initAdoptForm(adoptBase);
   initCreatePhase(workflows);
   initUsePhase(workflows);
 }

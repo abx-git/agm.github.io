@@ -119,13 +119,13 @@
     "steps": [
       "If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.",
       "Execute Phase A–C in prompts/reference/adopt-procedure.md: write all files directly — no git clone, zip, curl, or bp-workflow.sh.",
-      "Interview the human briefly. Write docs/architecture/context/always-on.md.",
+      "If an **Adoption parameters** block is present below, use it for always-on.md and entry-point.md; interview only for missing facts.",
       "Remind the human to install prompts/core/system-prompt.md in IDE rules (once).",
-      "Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — template selection, blueprint.md, entry-point.md, interfaces/, first evidence-based section.",
+      "Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — use the selected documentation template, create blueprint.md, entry-point.md, interfaces/, first evidence-based section.",
       "Verify relative links. Append a session log entry to blueprint.md."
     ],
     "placeholders": [],
-    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. Execute this session like a setup script: write the documentation scaffold, configure application context, then run bootstrap.\n\nPrerequisites: application repository open in the IDE; human available for a short interview.\n\nInstructions:\n1. If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Execute Phase A–C in prompts/reference/adopt-procedure.md: write all files directly — no git clone, zip, curl, or bp-workflow.sh.\n3. Interview the human briefly. Write docs/architecture/context/always-on.md.\n4. Remind the human to install prompts/core/system-prompt.md in IDE rules (once).\n5. Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — template selection, blueprint.md, entry-point.md, interfaces/, first evidence-based section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. Execute this session like a setup script: write the documentation scaffold, configure application context, then run bootstrap.\n\nPrerequisites: application repository open in the IDE; human available for a short interview.\n\nInstructions:\n1. If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Execute Phase A–C in prompts/reference/adopt-procedure.md: write all files directly — no git clone, zip, curl, or bp-workflow.sh.\n3. If an **Adoption parameters** block is present below, use it for always-on.md and entry-point.md; interview only for missing facts.\n4. Remind the human to install prompts/core/system-prompt.md in IDE rules (once).\n5. Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — use the selected documentation template, create blueprint.md, entry-point.md, interfaces/, first evidence-based section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",
@@ -250,7 +250,7 @@
     "id": "review-milestone",
     "role": "review",
     "group": "Review",
-    "when": "After Bootstrap milestone",
+    "when": "After Bootstrap milestone — close creation",
     "prerequisite": "",
     "freshChat": true,
     "freshNote": "**Required**",
@@ -263,12 +263,14 @@
     ],
     "steps": [
       "Review Blueprint Pattern documentation for this application.",
-      "Review type: milestone",
-      "Cross-check the full docs/architecture/ graph for consistency and stale content.",
+      "Review type: milestone (bootstrap close)",
+      "1. Validate docs/architecture/blueprint.md — phase states, WRK registry, session log, and open items match the actual documentation graph.",
+      "2. Cross-check the full docs/architecture/ graph for consistency, stale content, and broken relative links.",
+      "3. From bootstrap follow-up sessions: find insights still only in work/ files or the session log that belong in template sections (arc42, c4-light, etc.). Recommend where to link or summarize them — report-only; do not rewrite architecture docs in this session.",
       "Report-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews."
     ],
     "placeholders": [],
-    "prompt": "Blueprint Pattern — Review (milestone).\nWorkflow: review-milestone\nRole: review\n\nReview Blueprint Pattern documentation for this application.\nReview type: milestone\n\nCross-check the full docs/architecture/ graph for consistency and stale content.\nReport-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Review (milestone).\nWorkflow: review-milestone\nRole: review\n\nReview Blueprint Pattern documentation for this application.\nReview type: milestone (bootstrap close)\n\nFocus:\n1. Validate docs/architecture/blueprint.md — phase states, WRK registry, session log, and open items match the actual documentation graph.\n2. Cross-check the full docs/architecture/ graph for consistency, stale content, and broken relative links.\n3. From bootstrap follow-up sessions: find insights still only in work/ files or the session log that belong in template sections (arc42, c4-light, etc.). Recommend where to link or summarize them — report-only; do not rewrite architecture docs in this session.\n\nReport-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-phase",

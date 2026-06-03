@@ -7,13 +7,13 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=9" />
+  <link rel="stylesheet" href="app.css?v=10" />
 </head>
 <body>
   <main class="app">
     <header class="head">
       <h1>Blueprint Pattern</h1>
-      <p class="tagline">One prompt to adopt. Copy a session prompt for every chat after.</p>
+      <p class="tagline">Configure adoption, copy one prompt, start documenting.</p>
     </header>
 
     <nav class="phase-nav" role="tablist">
@@ -22,16 +22,76 @@
     </nav>
 
     <section id="phase-create" class="phase active" role="tabpanel">
+      <details class="glossary" open>
+        <summary>Key files (read once)</summary>
+        <dl>
+          <dt><code>always-on.md</code></dt>
+          <dd>Stable application context the agent reads every session: name, purpose, stack, source map, doc paths. Not the architecture itself — facts that rarely change.</dd>
+          <dt><code>blueprint.md</code></dt>
+          <dd>Session backlog and reference state: phase checklist, open work items (WRK), reviews, session log. Tracks progress — not a substitute for arc42 (or your template) chapters.</dd>
+        </dl>
+      </details>
+
       <ol class="steps">
         <li class="step step-hero">
           <div class="step-head">
             <span class="step-n">1</span>
             <div>
-              <strong>Run the adoption prompt</strong>
-              <p>Open your app repo in the IDE. New chat → paste prompt. The agent writes the scaffold, <code>always-on.md</code>, <code>blueprint.md</code>, and the first documentation section — no download, no checkout script.</p>
+              <strong>Configure and run adoption</strong>
+              <p>Set parameters below. New chat in your app repo → paste the generated prompt. The agent writes the scaffold, fills <code>always-on.md</code>, creates <code>blueprint.md</code>, and starts the first doc section.</p>
             </div>
           </div>
-          <button type="button" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
+
+          <form id="adopt-form" class="adopt-form">
+            <label class="field">
+              <span>Application name <em>(required)</em></span>
+              <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
+            </label>
+
+            <label class="field">
+              <span>Documentation template</span>
+              <select name="template">
+                <option value="arc42">arc42 (default)</option>
+                <option value="c4-light">c4-light</option>
+                <option value="adr-first">adr-first</option>
+                <option value="lean-service">lean-service</option>
+                <option value="custom">custom</option>
+              </select>
+            </label>
+
+            <label class="field field-custom" hidden>
+              <span>Custom template name</span>
+              <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
+            </label>
+
+            <label class="field">
+              <span>Purpose / domain</span>
+              <input type="text" name="purpose" placeholder="One sentence — what the system does" />
+            </label>
+
+            <label class="field">
+              <span>Stack</span>
+              <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
+            </label>
+
+            <details class="field-advanced">
+              <summary>More parameters</summary>
+              <label class="field">
+                <span>Documentation root</span>
+                <input type="text" name="docRoot" value="docs/architecture/" />
+              </label>
+              <label class="field">
+                <span>Primary source path</span>
+                <input type="text" name="sourceRoot" placeholder="e.g. src/main/kotlin" />
+              </label>
+              <label class="field">
+                <span>External systems</span>
+                <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
+              </label>
+            </details>
+          </form>
+
+          <button type="submit" form="adopt-form" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
         </li>
 
         <li class="step" data-workflow="bootstrap-continue">
@@ -39,7 +99,7 @@
             <span class="step-n">2</span>
             <div>
               <strong>Follow-up sessions</strong>
-              <p>Work through <code>blueprint.md</code>. New chat → copy prompt. Repeat until bootstrap is complete.</p>
+              <p>Work through open phases in <code>blueprint.md</code> (the session backlog). New chat → copy prompt → repeat until bootstrap phases are done.</p>
             </div>
           </div>
           <div class="cmd-row">
@@ -52,7 +112,7 @@
             <span class="step-n">3</span>
             <div>
               <strong>Close creation</strong>
-              <p>Review session (new chat, report-only).</p>
+              <p>New chat, report-only. Validates <code>blueprint.md</code> against the doc graph, checks links, and recommends where to move insights from follow-up sessions into template sections (references, not duplicates).</p>
             </div>
           </div>
           <div class="cmd-row">
@@ -75,13 +135,13 @@
     </section>
 
     <footer class="foot">
-      <span class="deploy-id">Prompt-only · 2026-06-03</span>
+      <span class="deploy-id">Params · 2026-06-03</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/prompts/adopt-standalone.md">Adoption prompt source</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=9" type="module"></script>
+  <script src="app.js?v=10" type="module"></script>
 </body>
 </html>
