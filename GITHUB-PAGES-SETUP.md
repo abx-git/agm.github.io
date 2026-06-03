@@ -48,6 +48,34 @@ When green, open **https://abx-git.github.io/blueprint-pattern.github.io/** (aft
 
 Every push to `main` that changes `docs/assistant/` or `prompts/workflows/` triggers a new deploy.
 
+## Local link to the Pages repository
+
+This clone should have **two** remotes:
+
+| Remote | Repository |
+|--------|------------|
+| `origin` | `abx-git/blueprint-pattern` (source, CI, docs) |
+| `pages` | `abx-git/blueprint-pattern.github.io` (GitHub Pages site) |
+
+One-time setup from **blueprint-pattern** root:
+
+```bash
+git remote add pages https://github.com/abx-git/blueprint-pattern.github.io.git
+git remote -v
+```
+
+If `pages` already exists, check the URL with `git remote get-url pages`.
+
+### Manual deploy from your machine
+
+Requires write access to **blueprint-pattern.github.io** (SSH key or HTTPS credentials):
+
+```bash
+./scripts/push-assistant-to-pages.sh
+```
+
+This syncs `workflows.json`, splits `docs/assistant/` with `git subtree`, and pushes to `pages` → `main`. CI deploy (section 3) is the usual path; use the script for ad-hoc fixes without Actions.
+
 ## Local preview (no token needed)
 
 From **blueprint-pattern** repository root:
