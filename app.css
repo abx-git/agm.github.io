@@ -107,6 +107,25 @@ body {
   font-size: 0.85em;
 }
 
+.step-hero {
+  padding-bottom: 1.25rem;
+}
+
+.step-hero .btn-adopt {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.cell-note {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.cell-note a { color: var(--accent); }
+
 .cmd-row {
   display: flex;
   flex-wrap: wrap;

@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=6" />
+  <link rel="stylesheet" href="app.css?v=7" />
 </head>
 <body>
   <main class="app">
     <header class="head">
       <h1>Blueprint Pattern</h1>
-      <p class="tagline">Architecture documentation in Git — two phases, copy and run.</p>
+      <p class="tagline">One prompt to adopt. Checkout + prompt for every session after.</p>
     </header>
 
     <nav class="phase-nav" role="tablist">
@@ -20,51 +20,21 @@
 
     <section id="phase-create" class="phase active" role="tabpanel">
       <ol class="steps">
-        <li class="step">
+        <li class="step step-hero">
           <div class="step-head">
             <span class="step-n">1</span>
             <div>
-              <strong>Download and unpack</strong>
-              <p>At the root of your application repository. Creates <code>docs/architecture/</code>, <code>prompts/</code>, <code>scripts/</code>.</p>
+              <strong>Run the adoption prompt</strong>
+              <p>Open your app repo in the IDE. New chat → paste prompt. The agent downloads templates, writes <code>always-on.md</code>, creates <code>blueprint.md</code>, and starts documentation.</p>
             </div>
           </div>
-          <div class="cmd-row">
-            <a class="btn primary" href="https://github.com/abx-git/blueprint-pattern/releases/latest/download/blueprint-pattern-adopt.zip">Download kit</a>
-          </div>
-          <div class="cmd-row" style="margin-top:0.5rem">
-            <code id="cmd-unzip">unzip blueprint-pattern-adopt.zip</code>
-            <button type="button" class="btn" data-copy="#cmd-unzip">Copy</button>
-          </div>
-        </li>
-
-        <li class="step">
-          <div class="step-head">
-            <span class="step-n">2</span>
-            <div>
-              <strong>Configure</strong>
-              <p>Edit <code>docs/architecture/context/always-on.md</code>. Copy <code>ide/cursor/*.mdc</code> to <code>.cursor/rules/</code>. See <code>ADOPT.md</code> in the kit.</p>
-            </div>
-          </div>
-        </li>
-
-        <li class="step" data-workflow="bootstrap-init">
-          <div class="step-head">
-            <span class="step-n">3</span>
-            <div>
-              <strong>First session</strong>
-              <p>Creates <code>blueprint.md</code> (work file) and initial documentation.</p>
-            </div>
-          </div>
-          <div class="cmd-row">
-            <code class="checkout"></code>
-            <button type="button" class="btn btn-checkout">Copy checkout</button>
-            <button type="button" class="btn primary btn-prompt">Copy prompt</button>
-          </div>
+          <button type="button" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
+          <p class="cell-note"><a href="https://github.com/abx-git/blueprint-pattern/releases/latest/download/blueprint-pattern-adopt.zip">Manual zip</a> if the agent cannot run shell commands.</p>
         </li>
 
         <li class="step" data-workflow="bootstrap-continue">
           <div class="step-head">
-            <span class="step-n">4</span>
+            <span class="step-n">2</span>
             <div>
               <strong>Follow-up sessions</strong>
               <p>Work through <code>blueprint.md</code>. Repeat until bootstrap is complete.</p>
@@ -79,7 +49,7 @@
 
         <li class="step" data-workflow="review-milestone">
           <div class="step-head">
-            <span class="step-n">5</span>
+            <span class="step-n">3</span>
             <div>
               <strong>Close creation</strong>
               <p>Review session (new chat, report-only).</p>
@@ -109,12 +79,12 @@
     </section>
 
     <footer class="foot">
-      <a href="https://github.com/abx-git/blueprint-pattern/releases">Releases</a>
+      <a href="https://github.com/abx-git/blueprint-pattern/blob/main/prompts/adopt-standalone.md">Adoption prompt source</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=6" type="module"></script>
+  <script src="app.js?v=7" type="module"></script>
 </body>
 </html>

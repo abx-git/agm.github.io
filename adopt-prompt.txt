@@ -1,0 +1,22 @@
+Blueprint Pattern — Adopt (standalone session).
+Workflow: bootstrap-adopt
+Role: bootstrap
+
+Adopt the Blueprint Pattern into this application repository. Execute this session like a setup script: scaffold tooling and templates, configure application context, then begin architecture documentation bootstrap.
+
+Prerequisites: application repository open in the IDE; network access for GitHub releases; run shell commands only with explicit human approval.
+
+Instructions:
+1. If docs/architecture/blueprint.md already exists, stop and tell the human to use bootstrap-continue instead.
+2. Download and extract the adoption kit at the repository root:
+   curl -fsSL -o /tmp/blueprint-pattern-adopt.zip \
+     https://github.com/abx-git/blueprint-pattern/releases/latest/download/blueprint-pattern-adopt.zip
+   unzip -o /tmp/blueprint-pattern-adopt.zip -d .
+   Verify docs/architecture/, prompts/core/, prompts/workflows/, and scripts/bp-workflow.sh exist.
+3. If download fails, instruct the human to fetch the zip from GitHub releases, unzip at repo root, then continue.
+4. Interview the human briefly (application name, purpose, tech stack, key paths, external systems). Write docs/architecture/context/always-on.md.
+5. If .cursor/rules/ exists, copy files from ide/cursor/ into it. Remind the human to install prompts/core/system-prompt.md in IDE rules when not already present.
+6. Bootstrap documentation: follow docs/architecture/prompts/role-bootstrap.md — select template, create blueprint.md and entry-point.md, interfaces/, populate the first high-value section from evidence only.
+7. Verify relative links. Append a session log entry to blueprint.md.
+
+Output [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop.

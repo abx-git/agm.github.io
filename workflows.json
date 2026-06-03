@@ -102,6 +102,33 @@
     "prompt": "Blueprint Pattern — Architecture Work (query).\nWorkflow: architecture-work-query\nRole: architecture-work\n\nQuestion: <your question here>\n\nInstructions:\n1. Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.\n2. Traverse the Markdown link graph only; follow imports/exports, arc42, and ops links.\n3. Do not scan raw source unless a link leads there.\n4. Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).\n5. Register the item in blueprint.md under ## Architecture work (next WRK-NNN).\n6. Verify all links resolve.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
+    "id": "bootstrap-adopt",
+    "role": "bootstrap",
+    "group": "Bootstrap",
+    "when": "First-time adoption; no `docs/architecture/blueprint.md` yet — prompt-driven setup",
+    "prerequisite": "",
+    "freshChat": true,
+    "freshNote": "Required",
+    "anchors": [
+      "CHANGED_FILES",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "PHASE_STATUS",
+      "TEMPLATE_SELECTED"
+    ],
+    "steps": [
+      "If docs/architecture/blueprint.md already exists, stop and tell the human to use bootstrap-continue instead.",
+      "Download and extract the adoption kit at the repository root: curl -fsSL -o /tmp/blueprint-pattern-adopt.zip \\ https://github.com/abx-git/blueprint-pattern/releases/latest/download/blueprint-pattern-adopt.zip unzip -o /tmp/blueprint-pattern-adopt.zip -d . Verify docs/architecture/, prompts/core/, prompts/workflows/, and scripts/bp-workflow.sh exist.",
+      "If download fails, instruct the human to fetch the zip from GitHub releases, unzip at repo root, then continue.",
+      "Interview the human briefly (application name, purpose, tech stack, key paths, external systems). Write docs/architecture/context/always-on.md.",
+      "If .cursor/rules/ exists, copy files from ide/cursor/ into it. Remind the human to install prompts/core/system-prompt.md in IDE rules when not already present.",
+      "Bootstrap documentation: follow docs/architecture/prompts/role-bootstrap.md — select template, create blueprint.md and entry-point.md, interfaces/, populate the first high-value section from evidence only.",
+      "Verify relative links. Append a session log entry to blueprint.md."
+    ],
+    "placeholders": [],
+    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. Execute this session like a setup script: scaffold tooling and templates, configure application context, then begin architecture documentation bootstrap.\n\nPrerequisites: application repository open in the IDE; network access for GitHub releases; run shell commands only with explicit human approval.\n\nInstructions:\n1. If docs/architecture/blueprint.md already exists, stop and tell the human to use bootstrap-continue instead.\n2. Download and extract the adoption kit at the repository root:\n   curl -fsSL -o /tmp/blueprint-pattern-adopt.zip \\\n     https://github.com/abx-git/blueprint-pattern/releases/latest/download/blueprint-pattern-adopt.zip\n   unzip -o /tmp/blueprint-pattern-adopt.zip -d .\n   Verify docs/architecture/, prompts/core/, prompts/workflows/, and scripts/bp-workflow.sh exist.\n3. If download fails, instruct the human to fetch the zip from GitHub releases, unzip at repo root, then continue.\n4. Interview the human briefly (application name, purpose, tech stack, key paths, external systems). Write docs/architecture/context/always-on.md.\n5. If .cursor/rules/ exists, copy files from ide/cursor/ into it. Remind the human to install prompts/core/system-prompt.md in IDE rules when not already present.\n6. Bootstrap documentation: follow docs/architecture/prompts/role-bootstrap.md — select template, create blueprint.md and entry-point.md, interfaces/, populate the first high-value section from evidence only.\n7. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
     "id": "bootstrap-continue",
     "role": "bootstrap",
     "group": "Bootstrap",

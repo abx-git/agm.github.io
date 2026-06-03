@@ -125,20 +125,33 @@ function initUsePhase(workflows) {
   });
 }
 
+async function loadAdoptPrompt() {
+  const res = await fetch(new URL('adopt-prompt.txt', ASSET_BASE));
+  if (!res.ok) throw new Error('adopt-prompt.txt');
+  return res.text();
+}
+
 async function main() {
   initTabs();
   initStaticCopy();
 
   let workflows;
+  let adoptPrompt = '';
+
   try {
-    workflows = await loadWorkflows();
+    [workflows, adoptPrompt] = await Promise.all([
+      loadWorkflows(),
+      loadAdoptPrompt(),
+    ]);
   } catch {
-    document.querySelector('.app').insertAdjacentHTML(
+    document.querySelector('.app')?.insertAdjacentHTML(
       'beforeend',
-      '<p style="color:#666;margin-top:1rem">Load via <code>./scripts/open-assistant.sh</code></p>'
+      '<p class="cell-note" style="margin-top:1rem">Load via <code>./scripts/open-assistant.sh</code></p>'
     );
     return;
   }
+
+  document.getElementById('copy-adopt')?.addEventListener('click', () => copy(adoptPrompt));
 
   initCreatePhase(workflows);
   initUsePhase(workflows);
