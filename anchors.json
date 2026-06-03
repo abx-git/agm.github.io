@@ -1,0 +1,18 @@
+[
+  {"id": "CHANGED_FILES", "meaning": "List of documentation files created or modified this session", "workflows": ["bootstrap-init", "bootstrap-continue", "refinement"]},
+  {"id": "TEMPLATE_SELECTED", "meaning": "Documentation template id and rationale (arc42, c4-light, …)", "workflows": ["bootstrap-init"]},
+  {"id": "PHASE_STATUS", "meaning": "Summary of blueprint phase state changes", "workflows": ["bootstrap-init", "refinement"]},
+  {"id": "OPEN_QUESTIONS", "meaning": "Unresolved assumptions needing human decision", "workflows": ["bootstrap-init", "bootstrap-continue", "refinement", "maintenance"]},
+  {"id": "LINK_CHECK", "meaning": "pass/fail plus broken relative link paths", "workflows": ["*"]},
+  {"id": "ASSUMPTION", "meaning": "Inline marker for uncertain claims (in prose)", "workflows": ["*"]},
+  {"id": "CHANGE_CLASSIFICATION", "meaning": "Per changed file: API, Event, Schema, Runtime, Deployment, Decision, No-impact", "workflows": ["maintenance"]},
+  {"id": "CHANGED_DOCS", "meaning": "Architecture docs updated and why", "workflows": ["maintenance"]},
+  {"id": "INTERFACE_IMPACT", "meaning": "Whether exports/imports changed", "workflows": ["maintenance"]},
+  {"id": "WORK_ITEM", "meaning": "Path and type of work/ file plus WRK id", "workflows": ["architecture-work-query", "architecture-work-analysis", "architecture-work-design", "architecture-work-continue"]},
+  {"id": "TRACEABILITY_COVERAGE", "meaning": "complete or partial traceability table", "workflows": ["architecture-work-*"]},
+  {"id": "ADR_IMPACT", "meaning": "required or not-required ADR draft", "workflows": ["architecture-work-design"]},
+  {"id": "REVIEW_SCOPE", "meaning": "What was reviewed", "workflows": ["review-phase", "review-milestone", "review-maintenance"]},
+  {"id": "VERDICT", "meaning": "PASS · PASS WITH NOTES · FAIL", "workflows": ["review-*"]},
+  {"id": "FINDINGS", "meaning": "Issues grouped by severity (critical, major, minor)", "workflows": ["review-*"]},
+  {"id": "TOP_RISKS", "meaning": "Up to five highest risks from review", "workflows": ["review-phase", "review-milestone"]}
+]

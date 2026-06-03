@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blueprint Pattern Assistant</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <h1>Blueprint Pattern Assistant</h1>
+      <p class="tagline">Pick a workflow, copy the session prompt, start a new chat.</p>
+      <p class="hint">
+        Like <a href="https://llm-coding.github.io/Semantic-Anchors/" rel="noopener">Semantic Anchors</a>
+        — a catalog you browse and copy from. Anchors here are
+        <code>[[ANCHOR:…]]</code> session checkpoints, not external vocabulary terms.
+      </p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" class="tab active" data-tab="workflows" role="tab" aria-selected="true">Workflows</button>
+    <button type="button" class="tab" data-tab="anchors" role="tab">Anchors</button>
+    <button type="button" class="tab" data-tab="start" role="tab">Quick start</button>
+  </nav>
+
+  <main class="main">
+    <section id="panel-workflows" class="panel active" role="tabpanel">
+      <div class="toolbar">
+        <label>
+          Filter
+          <select id="filter-role">
+            <option value="">All roles</option>
+            <option value="bootstrap">bootstrap</option>
+            <option value="maintenance">maintenance</option>
+            <option value="architecture-work">architecture-work</option>
+            <option value="review">review</option>
+          </select>
+        </label>
+        <input type="search" id="search-workflows" placeholder="Search workflows…" autocomplete="off" />
+      </div>
+      <div id="workflow-list" class="cards"></div>
+    </section>
+
+    <section id="panel-anchors" class="panel" role="tabpanel" hidden>
+      <p class="panel-intro">
+        Required session output markers. The agent reports these before stopping — they are not a substitute for human review.
+      </p>
+      <input type="search" id="search-anchors" placeholder="Search anchors…" autocomplete="off" />
+      <table class="anchor-table">
+        <thead>
+          <tr><th>Anchor</th><th>Meaning</th><th>Workflows</th><th></th></tr>
+        </thead>
+        <tbody id="anchor-body"></tbody>
+      </table>
+    </section>
+
+    <section id="panel-start" class="panel" role="tabpanel" hidden>
+      <ol class="steps">
+        <li>Copy <code>prompts/core/system-prompt.md</code> into IDE rules (once).</li>
+        <li>Copy <code>docs/templates/architecture/</code> → <code>docs/architecture/</code> in your app.</li>
+        <li>Fill <code>context/always-on.md</code>.</li>
+        <li>Pick a workflow on the <strong>Workflows</strong> tab → <strong>Copy session prompt</strong>.</li>
+        <li>Run <code id="checkout-cmd">./scripts/bp-workflow.sh checkout …</code> in the pattern or app repo.</li>
+        <li>Open a <strong>new</strong> agent chat (required for review workflows).</li>
+      </ol>
+      <p>Full procedure: <code>docs/guide.md</code> in this repository.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden>Copied</div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
