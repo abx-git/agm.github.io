@@ -1,6 +1,6 @@
 # Blueprint Pattern Assistant
 
-Minimal two-phase UI: **Part 1 Create** (5 steps) and **Part 2 Use** (mode picker). Copy checkout command and session prompt — nothing else.
+Minimal two-phase UI: **Part 1 Create** (adoption prompt + follow-up) and **Part 2 Use** (mode picker).
 
 Live: https://abx-git.github.io/blueprint-pattern.github.io/
 
