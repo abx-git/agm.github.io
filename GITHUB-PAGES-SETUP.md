@@ -1,59 +1,66 @@
 # GitHub Pages — setup
 
-If you only see **Verified domains** and no **Build and deployment** section, you are usually on the **wrong settings page** or Pages is not enabled for this repository yet.
+The interactive assistant is **not** served from this repository. It is deployed to:
 
-## 1. Open the repository settings (not the organization)
+| Item | Value |
+|------|--------|
+| **Pages repository** | [abx-git/blueprint-pattern.github.io](https://github.com/abx-git/blueprint-pattern.github.io) |
+| **Live URL** | **https://abx-git.github.io/blueprint-pattern.github.io/** |
+| **Source in this repo** | `docs/assistant/` (built by CI) |
 
-Correct URL pattern:
+## 1. Enable Pages on the Pages repository
 
-`https://github.com/abx-git/blueprint-pattern/settings/pages`
+Open **that** repository (not `blueprint-pattern`):
 
-Not:
-
-- `https://github.com/organizations/abx-git/settings/pages` (organization — often **only** verified domains)
-- Your personal account Settings → Pages
-
-You need **Admin** on the repository to change Pages.
-
-## 2. Enable Pages (branch deploy — recommended)
-
-On **abx-git/blueprint-pattern** → **Settings** → **Pages** (sidebar: *Code and automation*).
+**https://github.com/abx-git/blueprint-pattern.github.io/settings/pages**
 
 Under **Build and deployment**:
 
 | Field | Value |
 |-------|--------|
 | **Source** | Deploy from a branch |
-| **Branch** | `gh-pages` |
+| **Branch** | `main` |
 | **Folder** | `/` (root) |
 
-Click **Save**.
+Save.
 
-The workflow [`.github/workflows/pages.yml`](../../.github/workflows/pages.yml) pushes `docs/assistant/` to the `gh-pages` branch on each run.
+> If you only see **Verified domains**, you are on organization account settings or lack admin rights — use the repo link above.
 
-## 3. Run the workflow once
+## 2. Add deploy secret on blueprint-pattern (this repo)
+
+The workflow pushes from **blueprint-pattern** into **blueprint-pattern.github.io** using a Personal Access Token.
+
+1. GitHub → **Settings** → **Developer settings** → **Personal access tokens** (fine-grained or classic).
+2. Create a token with **Contents: Read and write** on repository `abx-git/blueprint-pattern.github.io`.
+3. In **abx-git/blueprint-pattern** → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
+   - Name: `BLUEPRINT_PATTERN_GHIO_DEPLOY`
+   - Value: the token
+
+## 3. Run the deploy workflow
+
+In **abx-git/blueprint-pattern**:
 
 **Actions** → **Deploy Blueprint Assistant (GitHub Pages)** → **Run workflow** (branch `main`).
 
-Wait until the job is green. After ~1–2 minutes refresh **Settings → Pages** — you should see:
+When green, open **https://abx-git.github.io/blueprint-pattern.github.io/** (after 1–2 minutes).
 
-> Your site is live at **https://abx-git.github.io/blueprint-pattern/**
+## 4. Ongoing updates
 
-## 4. If you still only see “Verified domains”
+Every push to `main` that changes `docs/assistant/` or `prompts/workflows/` triggers a new deploy.
 
-| Cause | What to do |
-|-------|------------|
-| Organization Pages policy | Org owner: **Settings → Pages** → allow Pages for repositories |
-| No admin on repo | Ask repo owner to configure Pages or run the workflow |
-| First deploy pending | Run the Actions workflow first; then Build and deployment may appear |
-| Private repo (legacy plans) | Pages may be unavailable — make repo public or upgrade plan |
+## Local preview (no token needed)
 
-## 5. Alternative: GitHub Actions as source
-
-If **Build and deployment** shows **GitHub Actions** as a source option, you can select it instead. The current workflow uses the `gh-pages` branch method because it works with the visible **Deploy from a branch** UI.
-
-## Local preview
+From **blueprint-pattern** repository root:
 
 ```bash
 ./scripts/open-assistant.sh
 ```
+
+## Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| Workflow fails: missing secret | Step 2 above |
+| 404 on URL | Pages enabled on **blueprint-pattern.github.io** (step 1), workflow green |
+| Wrong repo Settings | Pages config is on **blueprint-pattern.github.io**, not blueprint-pattern |
+| Old URL `/blueprint-pattern/` | Deprecated; use **blueprint-pattern.github.io** repo URL above |

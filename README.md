@@ -6,16 +6,10 @@ Inspired by the browse-and-copy UX of [Semantic Anchors](https://llm-coding.gith
 
 ## Live site (GitHub Pages)
 
-**URL:** https://abx-git.github.io/blueprint-pattern/
+**URL:** https://abx-git.github.io/blueprint-pattern.github.io/
 
-**Setup (once):** [GITHUB-PAGES-SETUP.md](./GITHUB-PAGES-SETUP.md) — especially if you only see *Verified domains* in Settings.
-
-Short version:
-
-1. Repo **Settings → Pages** (not organization settings).
-2. **Build and deployment** → Source: **Deploy from a branch** → Branch **`gh-pages`** → Folder **`/`**.
-3. **Actions** → run **Deploy Blueprint Assistant** → wait for green.
-4. Reload **Settings → Pages** — live URL should appear.
+**Pages repo:** [abx-git/blueprint-pattern.github.io](https://github.com/abx-git/blueprint-pattern.github.io)  
+**Setup (once):** [GITHUB-PAGES-SETUP.md](./GITHUB-PAGES-SETUP.md) — secret `BLUEPRINT_PATTERN_GHIO_DEPLOY` + Pages on the `.github.io` repo.
 
 ## Run locally
 
