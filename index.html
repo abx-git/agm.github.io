@@ -1,56 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Blueprint Pattern Assistant</title>
+  <title>Blueprint Pattern — Workflow Contracts</title>
   <link rel="stylesheet" href="app.css" />
 </head>
 <body>
   <header class="header">
     <div class="header-inner">
-      <h1>Blueprint Pattern Assistant</h1>
-      <p class="tagline">Pick a workflow, copy the session prompt, start a new chat.</p>
+      <p class="eyebrow">Blueprint Pattern</p>
+      <h1>Workflow Contracts</h1>
+      <p class="lead">
+        Jeder Contract definiert, was eine Agent-Session in deinem Projekt tun soll —
+        analog zu den
+        <a href="https://llm-coding.github.io/Semantic-Anchors/contracts" rel="noopener">Semantic Contracts</a>,
+        nur für Blueprint-Pattern-Workflows.
+      </p>
+      <ol class="how-to">
+        <li>Contract unten wählen und <strong>Session-Prompt kopieren</strong>.</li>
+        <li>Lokal <code>./scripts/bp-workflow.sh checkout &lt;id&gt;</code> ausführen (Checkout-Befehl mitkopieren).</li>
+        <li>Neuen Agent-Chat öffnen, Prompt einfügen — fertig.</li>
+      </ol>
       <p class="hint">
-        Like <a href="https://llm-coding.github.io/Semantic-Anchors/" rel="noopener">Semantic Anchors</a>
-        — a catalog you browse and copy from. Anchors here are
-        <code>[[ANCHOR:…]]</code> session checkpoints, not external vocabulary terms.
+        Kein Login, kein Backend: statische Seite, alles läuft lokal in IDE und Terminal.
+        Session-Marker: <code>[[ANCHOR:…]]</code> (nicht Semantic-Anchors-Vokabular).
       </p>
     </div>
   </header>
 
   <nav class="tabs" role="tablist">
-    <button type="button" class="tab active" data-tab="workflows" role="tab" aria-selected="true">Workflows</button>
+    <button type="button" class="tab active" data-tab="contracts" role="tab" aria-selected="true">Contracts</button>
     <button type="button" class="tab" data-tab="anchors" role="tab">Anchors</button>
     <button type="button" class="tab" data-tab="start" role="tab">Quick start</button>
   </nav>
 
   <main class="main">
-    <section id="panel-workflows" class="panel active" role="tabpanel">
+    <section id="panel-contracts" class="panel active" role="tabpanel">
       <div class="toolbar">
         <label>
-          Filter
+          Rolle
           <select id="filter-role">
-            <option value="">All roles</option>
-            <option value="bootstrap">bootstrap</option>
-            <option value="maintenance">maintenance</option>
-            <option value="architecture-work">architecture-work</option>
-            <option value="review">review</option>
+            <option value="">Alle Rollen</option>
+            <option value="bootstrap">Bootstrap</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="architecture-work">Architecture work</option>
+            <option value="review">Review</option>
           </select>
         </label>
-        <input type="search" id="search-workflows" placeholder="Search workflows…" autocomplete="off" />
+        <input type="search" id="search-workflows" placeholder="Workflows durchsuchen…" autocomplete="off" />
       </div>
-      <div id="workflow-list" class="cards"></div>
+      <div id="contract-list"></div>
     </section>
 
     <section id="panel-anchors" class="panel" role="tabpanel" hidden>
       <p class="panel-intro">
-        Required session output markers. The agent reports these before stopping — they are not a substitute for human review.
+        Pflicht-Ausgaben am Session-Ende. Der Agent meldet diese Marker — sie ersetzen keine menschliche Prüfung.
       </p>
-      <input type="search" id="search-anchors" placeholder="Search anchors…" autocomplete="off" />
+      <input type="search" id="search-anchors" placeholder="Anchors durchsuchen…" autocomplete="off" />
       <table class="anchor-table">
         <thead>
-          <tr><th>Anchor</th><th>Meaning</th><th>Workflows</th><th></th></tr>
+          <tr><th>Anchor</th><th>Bedeutung</th><th>Workflows</th><th></th></tr>
         </thead>
         <tbody id="anchor-body"></tbody>
       </table>
@@ -58,18 +68,18 @@
 
     <section id="panel-start" class="panel" role="tabpanel" hidden>
       <ol class="steps">
-        <li>Copy <code>prompts/core/system-prompt.md</code> into IDE rules (once).</li>
-        <li>Copy <code>docs/templates/architecture/</code> → <code>docs/architecture/</code> in your app.</li>
-        <li>Fill <code>context/always-on.md</code>.</li>
-        <li>Pick a workflow on the <strong>Workflows</strong> tab → <strong>Copy session prompt</strong>.</li>
-        <li>Run <code id="checkout-cmd">./scripts/bp-workflow.sh checkout …</code> in the pattern or app repo.</li>
-        <li>Open a <strong>new</strong> agent chat (required for review workflows).</li>
+        <li><code>prompts/core/system-prompt.md</code> einmalig in IDE-Regeln kopieren.</li>
+        <li><code>docs/templates/architecture/</code> → <code>docs/architecture/</code> im App-Repo.</li>
+        <li><code>context/always-on.md</code> ausfüllen.</li>
+        <li>Contract wählen → <strong>Session-Prompt kopieren</strong>.</li>
+        <li><code>./scripts/bp-workflow.sh checkout …</code> im Pattern- oder App-Repo.</li>
+        <li><strong>Neuen</strong> Agent-Chat öffnen (bei Review-Workflows Pflicht).</li>
       </ol>
-      <p>Full procedure: <code>docs/guide.md</code> in this repository.</p>
+      <p>Vollständige Anleitung: <code>docs/guide.md</code> in diesem Repository.</p>
     </section>
   </main>
 
-  <div id="toast" class="toast" hidden>Copied</div>
+  <div id="toast" class="toast" hidden>In Zwischenablage kopiert</div>
 
   <script src="app.js" type="module"></script>
 </body>

@@ -2,69 +2,134 @@
   {
     "id": "architecture-work-analysis",
     "role": "architecture-work",
+    "group": "Architecture work",
     "when": "Structured analysis (risks, coupling, quality)",
+    "prerequisite": "Bootstrap phase 0 `[x] done`",
     "freshChat": false,
+    "freshNote": "",
     "anchors": [
       "LINK_CHECK",
       "TRACEABILITY_COVERAGE",
       "WORK_ITEM"
+    ],
+    "steps": [
+      "Read blueprint.md and traverse the graph from entry-point.md.",
+      "Produce a structured analysis in docs/architecture/work/YYYY-MM-DD-<slug>.md (type: analysis): Context, Findings, Recommendations, Traceability.",
+      "Link to existing guardrail findings in blueprint.md if relevant.",
+      "Register in blueprint.md (WRK-NNN). Verify links."
+    ],
+    "placeholders": [
+      "e.g. coupling, failure modes, security, performance",
+      "e.g. payment integration resilience",
+      "modules, services, or arc42 sections",
+      "slug"
     ],
     "prompt": "Blueprint Pattern — Architecture Work (analysis).\nWorkflow: architecture-work-analysis\nRole: architecture-work\n\nTopic: <e.g. payment integration resilience>\nScope: <modules, services, or arc42 sections>\nFocus: <e.g. coupling, failure modes, security, performance>\n\nInstructions:\n1. Read blueprint.md and traverse the graph from entry-point.md.\n2. Produce a structured analysis in docs/architecture/work/YYYY-MM-DD-<slug>.md\n   (type: analysis): Context, Findings, Recommendations, Traceability.\n3. Link to existing guardrail findings in blueprint.md if relevant.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-continue",
     "role": "architecture-work",
+    "group": "Architecture work",
     "when": "Resume open WRK items in blueprint.md",
+    "prerequisite": "",
     "freshChat": false,
+    "freshNote": "",
     "anchors": [
       "LINK_CHECK",
       "TRACEABILITY_COVERAGE",
       "WORK_ITEM"
     ],
+    "steps": [
+      "Read docs/architecture/blueprint.md ## Architecture work.",
+      "Pick the next item with status draft, or start a new query/analysis/design if requested.",
+      "Update the work file and blueprint before stopping."
+    ],
+    "placeholders": [],
     "prompt": "Blueprint Pattern — continue Architecture Work.\nWorkflow: architecture-work-continue\nRole: architecture-work\n\nRead docs/architecture/blueprint.md ## Architecture work.\nPick the next item with status draft, or start a new query/analysis/design if requested.\nUpdate the work file and blueprint before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-design",
     "role": "architecture-work",
+    "group": "Architecture work",
     "when": "Architecture design proposal",
+    "prerequisite": "Bootstrap phase 0 `[x] done`",
     "freshChat": false,
+    "freshNote": "",
     "anchors": [
       "ADR_IMPACT",
       "LINK_CHECK",
       "TRACEABILITY_COVERAGE",
       "WORK_ITEM"
     ],
+    "steps": [
+      "Read blueprint.md and relevant work/ items and arc42 sections.",
+      "Write design to docs/architecture/work/YYYY-MM-DD-<slug>.md (type: design): Context, Design (with Mermaid), Alternatives, Impact, Traceability.",
+      "If the design implies a decision, draft ADR in arc42/decisions/ and cross-link.",
+      "Register in blueprint.md (WRK-NNN). Verify links."
+    ],
+    "placeholders": [
+      "e.g. add circuit breaker between order-service and payment-service",
+      "optional: latency, no new infra, etc.",
+      "slug"
+    ],
     "prompt": "Blueprint Pattern — Architecture Work (design).\nWorkflow: architecture-work-design\nRole: architecture-work\n\nGoal: <e.g. add circuit breaker between order-service and payment-service>\nConstraints: <optional: latency, no new infra, etc.>\n\nInstructions:\n1. Read blueprint.md and relevant work/ items and arc42 sections.\n2. Write design to docs/architecture/work/YYYY-MM-DD-<slug>.md (type: design):\n   Context, Design (with Mermaid), Alternatives, Impact, Traceability.\n3. If the design implies a decision, draft ADR in arc42/decisions/ and cross-link.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-query",
     "role": "architecture-work",
+    "group": "Architecture work",
     "when": "Answer a specific architecture question using the graph",
+    "prerequisite": "Bootstrap phase 0 `[x] done`; `entry-point.md` exists",
     "freshChat": false,
+    "freshNote": "",
     "anchors": [
       "LINK_CHECK",
       "TRACEABILITY_COVERAGE",
       "WORK_ITEM"
+    ],
+    "steps": [
+      "Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.",
+      "Traverse the Markdown link graph only; follow imports/exports, arc42, and ops links.",
+      "Do not scan raw source unless a link leads there.",
+      "Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).",
+      "Register the item in blueprint.md under ## Architecture work (next WRK-NNN).",
+      "Verify all links resolve."
+    ],
+    "placeholders": [
+      "slug",
+      "your question here"
     ],
     "prompt": "Blueprint Pattern — Architecture Work (query).\nWorkflow: architecture-work-query\nRole: architecture-work\n\nQuestion: <your question here>\n\nInstructions:\n1. Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.\n2. Traverse the Markdown link graph only; follow imports/exports, arc42, and ops links.\n3. Do not scan raw source unless a link leads there.\n4. Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).\n5. Register the item in blueprint.md under ## Architecture work (next WRK-NNN).\n6. Verify all links resolve.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",
     "role": "bootstrap",
+    "group": "Bootstrap",
     "when": "Resume arc42 phases after Bootstrap phase 0 is `[x] done`",
+    "prerequisite": "",
     "freshChat": false,
+    "freshNote": "Optional",
     "anchors": [
       "CHANGED_FILES",
       "LINK_CHECK",
       "OPEN_QUESTIONS"
     ],
+    "steps": [
+      "Follow Blueprint Pattern core prompt and docs/architecture/prompts/role-bootstrap.md.",
+      "Read docs/architecture/context/always-on.md → docs/architecture/blueprint.md.",
+      "Resume the next [~] or [ ] phase."
+    ],
+    "placeholders": [],
     "prompt": "Blueprint Pattern — Bootstrap (continue).\nWorkflow: bootstrap-continue\nRole: bootstrap\n\nFollow Blueprint Pattern core prompt and docs/architecture/prompts/role-bootstrap.md.\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md.\nResume the next [~] or [ ] phase.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-init",
     "role": "bootstrap",
+    "group": "Bootstrap",
     "when": "First-time setup; no `docs/architecture/blueprint.md` yet",
+    "prerequisite": "",
     "freshChat": false,
+    "freshNote": "Recommended",
     "anchors": [
       "CHANGED_FILES",
       "LINK_CHECK",
@@ -72,13 +137,22 @@
       "PHASE_STATUS",
       "TEMPLATE_SELECTED"
     ],
+    "steps": [
+      "Bootstrap Blueprint Pattern documentation for this application.",
+      "Follow docs/architecture/prompts/role-bootstrap.md (copy from docs/templates/architecture/prompts/ if missing).",
+      "Read prompts/core/system-prompt.md rules. Create docs/architecture/ structure from the chosen template."
+    ],
+    "placeholders": [],
     "prompt": "Blueprint Pattern — Bootstrap (initialize).\nWorkflow: bootstrap-init\nRole: bootstrap\n\nBootstrap Blueprint Pattern documentation for this application.\n\nFollow docs/architecture/prompts/role-bootstrap.md (copy from docs/templates/architecture/prompts/ if missing).\nRead prompts/core/system-prompt.md rules. Create docs/architecture/ structure from the chosen template.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "maintenance",
     "role": "maintenance",
+    "group": "Maintenance",
     "when": "After code changes; same PR or follow-up session",
+    "prerequisite": "",
     "freshChat": false,
+    "freshNote": "Optional",
     "anchors": [
       "CHANGED_DOCS",
       "CHANGE_CLASSIFICATION",
@@ -86,39 +160,74 @@
       "LINK_CHECK",
       "OPEN_QUESTIONS"
     ],
+    "steps": [
+      "Read docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.",
+      "<paste git diff or PR diff summary>",
+      "Update only architecture docs impacted by this diff."
+    ],
+    "placeholders": [
+      "paste git diff or PR diff summary"
+    ],
     "prompt": "Blueprint Pattern — Maintenance.\nWorkflow: maintenance\nRole: maintenance\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "refinement",
-    "role": "bootstrap",
+    "role": "bootstrap` (same role file; scoped steps)",
+    "group": "bootstrap` (same role file; scoped steps)",
     "when": "Targeted deepening of specific arc42 sections (ongoing on large systems)",
+    "prerequisite": "",
     "freshChat": false,
+    "freshNote": "Optional",
     "anchors": [
       "CHANGED_FILES",
       "LINK_CHECK",
       "OPEN_QUESTIONS",
       "PHASE_STATUS"
     ],
+    "steps": [
+      "Goal: <e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing>",
+      "Scope: <arc42 paths, modules, or blueprint phase numbers>",
+      "Follow docs/architecture/prompts/role-bootstrap.md for evidence and link rules.",
+      "Read always-on.md → blueprint.md. Update only the scoped sections and blueprint states.",
+      "Do not restart unrelated phases."
+    ],
+    "placeholders": [
+      "arc42 paths, modules, or blueprint phase numbers",
+      "e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing"
+    ],
     "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing>\n\nScope: <arc42 paths, modules, or blueprint phase numbers>\n\nFollow docs/architecture/prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",
     "role": "review",
+    "group": "Review",
     "when": "After a maintenance run",
+    "prerequisite": "",
     "freshChat": true,
+    "freshNote": "**Required**",
     "anchors": [
       "FINDINGS",
       "LINK_CHECK",
       "REVIEW_SCOPE",
       "VERDICT"
     ],
+    "steps": [
+      "Review Blueprint Pattern documentation for this application.",
+      "Review type: maintenance",
+      "Cross-check only files changed in the last maintenance run against the git diff.",
+      "Do not fix issues — report only."
+    ],
+    "placeholders": [],
     "prompt": "Blueprint Pattern — Review (maintenance).\nWorkflow: review-maintenance\nRole: review\n\nReview Blueprint Pattern documentation for this application.\nReview type: maintenance\n\nCross-check only files changed in the last maintenance run against the git diff.\nDo not fix issues — report only.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-milestone",
     "role": "review",
+    "group": "Review",
     "when": "After Bootstrap milestone",
+    "prerequisite": "",
     "freshChat": true,
+    "freshNote": "**Required**",
     "anchors": [
       "FINDINGS",
       "LINK_CHECK",
@@ -126,19 +235,37 @@
       "TOP_RISKS",
       "VERDICT"
     ],
+    "steps": [
+      "Review Blueprint Pattern documentation for this application.",
+      "Review type: milestone",
+      "Cross-check the full docs/architecture/ graph for consistency and stale content.",
+      "Report-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews."
+    ],
+    "placeholders": [],
     "prompt": "Blueprint Pattern — Review (milestone).\nWorkflow: review-milestone\nRole: review\n\nReview Blueprint Pattern documentation for this application.\nReview type: milestone\n\nCross-check the full docs/architecture/ graph for consistency and stale content.\nReport-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-phase",
     "role": "review",
+    "group": "Review",
     "when": "After each arc42 phase; verify one phase",
+    "prerequisite": "",
     "freshChat": true,
+    "freshNote": "**Required** (no generation context)",
     "anchors": [
       "FINDINGS",
       "LINK_CHECK",
       "REVIEW_SCOPE",
       "TOP_RISKS",
       "VERDICT"
+    ],
+    "steps": [
+      "Read docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-review.md.",
+      "Select next unreviewed phase in ## Reviews. Report-only — do not fix files.",
+      "Write work/YYYY-MM-DD-review-<slug>.md. Update ## Reviews and ## Guardrail findings in blueprint.md."
+    ],
+    "placeholders": [
+      "slug"
     ],
     "prompt": "Blueprint Pattern — Review (phase).\nWorkflow: review-phase\nRole: review\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-review.md.\nSelect next unreviewed phase in ## Reviews. Report-only — do not fix files.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop.\nWrite work/YYYY-MM-DD-review-<slug>.md. Update ## Reviews and ## Guardrail findings in blueprint.md."
   }

@@ -1,8 +1,8 @@
-# Blueprint Pattern Assistant
+# Blueprint Pattern Assistant — Workflow Contracts
 
-Interactive helper (static site) — browse workflows, copy session prompts and checkout commands, look up `[[ANCHOR:…]]` markers.
+Static site in the style of [Semantic Contracts](https://llm-coding.github.io/Semantic-Anchors/contracts): each workflow is a **contract** with explanation, steps, placeholders, and one-click copy to the clipboard for local use in IDE + terminal.
 
-Inspired by the browse-and-copy UX of [Semantic Anchors](https://llm-coding.github.io/Semantic-Anchors/); this assistant is **specific to the Blueprint Pattern** (workflows, roles, session checkpoints).
+Inspired by [Semantic Anchors](https://llm-coding.github.io/Semantic-Anchors/); this assistant is **specific to the Blueprint Pattern** (workflows, roles, session checkpoints `[[ANCHOR:…]]`).
 
 ## Live site (GitHub Pages)
 
