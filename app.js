@@ -3,13 +3,12 @@ const ASSET_BASE = new URL('./', import.meta.url);
 const GROUP_ORDER = ['Bootstrap', 'Maintenance', 'Architecture work', 'Review'];
 
 const GOAL_HINTS = {
-  maintenance: 'Git-Diff in den Session-Prompt einfügen, bevor du den Chat startest.',
-  'architecture-work-query': 'Platzhalter <your question here> durch deine Frage ersetzen.',
-  'architecture-work-analysis': 'Topic, Scope und Focus im Prompt anpassen.',
-  'architecture-work-design': 'Goal und Constraints im Prompt ausfüllen.',
-  'review-maintenance': 'Immer einen neuen Chat — der Agent darf nichts reparieren, nur berichten.',
-  'review-phase': 'Immer einen neuen Chat — Report-only.',
-  'review-milestone': 'Immer einen neuen Chat — prüft den gesamten docs/architecture/-Graphen.',
+  maintenance: 'Tipp: Füge deinen git diff in den Agent-Text ein, bevor du den Chat startest.',
+  'architecture-work-query': 'Ersetze <your question here> durch deine konkrete Frage.',
+  'architecture-work-analysis': 'Passe Topic, Scope und Focus im Text an.',
+  'architecture-work-design': 'Passe Goal und Constraints im Text an.',
+  'bootstrap-continue': 'Der Agent liest blueprint.md und macht mit der nächsten offenen Phase weiter.',
+  'review-maintenance': 'Neuer Chat — der Agent berichtet nur, repariert nichts.',
 };
 
 async function loadJson(filename) {
@@ -83,6 +82,8 @@ function initGoalPicker(workflows) {
 
   const showGoal = (id) => {
     const w = workflowById(workflows, id);
+    const hintEl = document.getElementById('goal-hint');
+    const freshEl = document.getElementById('goal-fresh');
     if (!w) {
       detail.hidden = true;
       current = null;
@@ -91,10 +92,7 @@ function initGoalPicker(workflows) {
     current = w;
     detail.hidden = false;
 
-    document.getElementById('goal-id').textContent = w.id;
     document.getElementById('goal-when').textContent = w.when;
-
-    const freshEl = document.getElementById('goal-fresh');
     freshEl.hidden = !w.freshChat;
 
     const checkout = `./scripts/bp-workflow.sh checkout ${w.id}`;
@@ -102,7 +100,12 @@ function initGoalPicker(workflows) {
     document.getElementById('goal-prompt').textContent = w.prompt;
 
     const hint = GOAL_HINTS[w.id] || (w.prerequisite ? `Voraussetzung: ${w.prerequisite}` : '');
-    document.getElementById('goal-hint').textContent = hint;
+    if (hint) {
+      hintEl.textContent = hint;
+      hintEl.hidden = false;
+    } else {
+      hintEl.hidden = true;
+    }
   };
 
   picker.addEventListener('change', () => showGoal(picker.value));
@@ -202,11 +205,9 @@ function renderAnchors(anchors, query) {
   for (const a of anchors) {
     if (q && !a.id.toLowerCase().includes(q) && !a.meaning.toLowerCase().includes(q)) continue;
     const tr = document.createElement('tr');
-    const wf = Array.isArray(a.workflows) ? a.workflows.join(', ') : a.workflows;
     tr.innerHTML = `
       <td><code>${anchorLabel(a.id)}</code></td>
       <td>${escapeHtml(a.meaning)}</td>
-      <td>${escapeHtml(wf)}</td>
       <td></td>
     `;
     const btn = document.createElement('button');

@@ -3,356 +3,349 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Blueprint Pattern — Guided Notebook</title>
-  <link rel="stylesheet" href="app.css" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Blueprint Pattern — Einstieg</title>
+  <link rel="stylesheet" href="app.css?v=3" />
 </head>
 <body>
   <aside class="toc" aria-label="Inhalt">
-    <p class="toc-title">Inhalt</p>
+    <p class="toc-title">Dein Weg</p>
     <nav>
-      <a href="#cell-was">Was ist das?</a>
-      <a href="#cell-setup">Einmalig einrichten</a>
-      <a href="#cell-result">Was du danach hast</a>
-      <a href="#cell-session">So funktioniert eine Session</a>
-      <a href="#cell-first">Erste Session</a>
-      <a href="#cell-daily">Tägliche Arbeit</a>
-      <a href="#cell-workflows">Alle Workflows</a>
-      <a href="#cell-anchors">Anhang: Anchors</a>
+      <a href="#start">Start</a>
+      <a href="#cell-was">1 · Was ist das?</a>
+      <a href="#cell-setup">2 · Einrichten</a>
+      <a href="#cell-result">3 · Was du hast</a>
+      <a href="#cell-first">4 · Erste Session</a>
+      <a href="#cell-daily">5 · Danach täglich</a>
+      <a href="#cell-expert" class="toc-expert">Experten-Referenz</a>
     </nav>
   </aside>
 
   <div class="notebook-wrap">
-    <header class="notebook-header">
-      <p class="eyebrow">Blueprint Pattern · Guided Notebook</p>
-      <h1>Architektur-Doku in dein Repository — Schritt für Schritt</h1>
-      <p class="subtitle">
-        Diese Seite führt dich wie ein Jupyter Notebook: erst verstehen, dann einrichten,
-        dann nutzen. Alles läuft lokal in deinem Git-Repo und deiner AI-IDE — kein Cloud-Dienst.
-      </p>
+    <header class="notebook-header" id="start">
+      <p class="eyebrow">Blueprint Pattern</p>
+      <h1>Architektur-Dokumentation in dein Git-Repo — mit AI, aber unter deiner Kontrolle</h1>
+
+      <div class="hero-box">
+        <p class="hero-lead">
+          <strong>Das Blueprint Pattern</strong> ist keine Software, die du installierst.
+          Es ist eine Ordnerstruktur + feste Regeln für deinen AI-Assistenten —
+          damit Architektur-Wissen <em>im gleichen Repository wie dein Code</em> liegt
+          und aktuell bleibt.
+        </p>
+        <div class="journey">
+          <a href="#cell-was" class="journey-step">
+            <span class="journey-num">1</span>
+            <span class="journey-label">Verstehen</span>
+            <span class="journey-hint">Was & warum</span>
+          </a>
+          <span class="journey-arrow" aria-hidden="true">→</span>
+          <a href="#cell-setup" class="journey-step">
+            <span class="journey-num">2</span>
+            <span class="journey-label">Einrichten</span>
+            <span class="journey-hint">~30 Min, einmalig</span>
+          </a>
+          <span class="journey-arrow" aria-hidden="true">→</span>
+          <a href="#cell-first" class="journey-step">
+            <span class="journey-num">3</span>
+            <span class="journey-label">Nutzen</span>
+            <span class="journey-hint">Agent-Chat starten</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="callout callout-warn" id="deploy-notice" hidden>
+        <strong>Hinweis:</strong> Wenn du noch „Blueprint Pattern Assistant“ mit dunkler Workflow-Liste siehst,
+        lade die Seite hart neu (Strg+Shift+R) — die Anleitung wurde komplett neu aufgebaut.
+      </div>
     </header>
 
     <main class="notebook">
 
-      <!-- Cell 1: Was ist das -->
+      <!-- 1: Was ist das -->
       <article class="cell cell-markdown" id="cell-was">
-        <div class="cell-gutter"><span class="cell-label">Md</span></div>
+        <div class="cell-gutter"><span class="cell-label">1</span></div>
         <div class="cell-body">
-          <h2>Was ist das Blueprint Pattern?</h2>
-          <p>
-            <strong>Das Problem:</strong> AI-Agenten sind gut in einzelnen Dateien, scheitern aber an
-            Querschnittsthemen — wer ruft wen auf, welche ADR gilt, was ändert sich am Interface?
-          </p>
-          <p>
-            <strong>Die Lösung:</strong> Du legst in deinem App-Repository einen
-            <strong>verlinkten Markdown-Graphen</strong> unter <code>docs/architecture/</code> an.
-            Der Agent ist <em>Schreiber</em>, nicht autonomer Architekt: er pflegt Docs anhand
-            klarer Workflows, du prüfst und entscheidest.
-          </p>
-          <div class="callout callout-info">
-            <strong>In einem Satz:</strong> Einmal Core-Regeln installieren, pro Chat einen Workflow wählen,
-            der Agent schreibt in <code>docs/architecture/</code> — Fortschritt steht in
-            <code>blueprint.md</code>.
+          <h2>Was macht das Pattern — und was nicht?</h2>
+
+          <div class="compare-grid">
+            <div class="compare-card compare-yes">
+              <h3>Das Pattern macht</h3>
+              <ul>
+                <li>Legt Architektur-Docs unter <code>docs/architecture/</code> in deinem Repo an</li>
+                <li>Verlinkt Kapitel, Schnittstellen und Code per Markdown</li>
+                <li>Gibt dem AI-Agent klare Aufgaben pro Chat („Workflows“)</li>
+                <li>Hält Fortschritt in <code>blueprint.md</code> fest</li>
+              </ul>
+            </div>
+            <div class="compare-card compare-no">
+              <h3>Das Pattern ist nicht</h3>
+              <ul>
+                <li>Kein Cloud-Dienst, kein Login</li>
+                <li>Kein autonomer Architekt — du prüfst alles</li>
+                <li>Kein Ersatz für arc42/C4 — es organisiert sie im Repo</li>
+                <li>Kein RAG oder externes Wiki</li>
+              </ul>
+            </div>
           </div>
-          <p><strong>Was du am Ende hast:</strong> versionierte Architektur-Doku (arc42 o. Ä.), die mit dem Code mitläuft — gepflegt per <code>git diff</code> und gezielten Agent-Sessions, ohne externes Wiki oder RAG.</p>
+
+          <figure class="diagram">
+            <figcaption>So sieht die Zusammenarbeit aus</figcaption>
+            <pre class="diagram-inner"><code>  Du                         AI-Agent                    Dein Repo
+  ───                        ─────────                   ──────────
+  Kopierst Vorlagen    →      liest Regeln         →      docs/architecture/
+  Füllst App-Fakten    →      schreibt Docs        →      arc42/, interfaces/, …
+  Wählst Aufgabe       →      meldet Ergebnis      →      blueprint.md (Fortschritt)
+  Prüfst & entscheidest</code></pre>
+          </figure>
         </div>
       </article>
 
-      <!-- Cell 2: Setup intro -->
+      <!-- 2: Setup -->
       <article class="cell cell-markdown" id="cell-setup">
-        <div class="cell-gutter"><span class="cell-label">Md</span></div>
+        <div class="cell-gutter"><span class="cell-label">2</span></div>
         <div class="cell-body">
-          <h2>Einmalig einrichten (~30 Minuten)</h2>
-          <p>Alles passiert in <strong>deinem Anwendungs-Repository</strong> (nicht nur im Pattern-Repo). Du brauchst:</p>
-          <ul>
-            <li>Ein Git-Repo mit deinem Code</li>
-            <li>Eine AI-IDE (Cursor, Claude Code, Copilot, …)</li>
-            <li>Das Pattern-Repo als Vorlage — klonen oder Submodule</li>
-          </ul>
-          <ol class="setup-steps">
-            <li>Pattern-Repo bereitstellen</li>
-            <li>Doc-Templates ins App-Repo kopieren</li>
-            <li><code>always-on.md</code> ausfüllen (App-Fakten)</li>
-            <li>Core-Prompt in IDE-Regeln</li>
-            <li>Workflow-Skript bereitstellen</li>
-          </ol>
+          <h2>Einmalig einrichten — in deinem App-Repository</h2>
+          <p>
+            Du arbeitest in <strong>zwei Repositories</strong>: dem
+            <strong>Pattern-Repo</strong> (Vorlage, einmal klonen) und deinem
+            <strong>App-Repo</strong> (dort landen alle Docs). Die Befehle kopierst du
+            nacheinander ins Terminal.
+          </p>
+          <p class="cell-note"><strong>Voraussetzungen:</strong> Git · AI-IDE (z. B. Cursor) · ~30 Minuten Zeit</p>
         </div>
       </article>
 
-      <!-- Cell 3: Clone pattern -->
       <article class="cell cell-code">
-        <div class="cell-gutter"><span class="cell-label">In</span><span class="cell-num">[1]</span></div>
+        <div class="cell-gutter"><span class="cell-label">A</span></div>
         <div class="cell-body">
           <div class="cell-bar">
-            <span>Schritt 1 — Pattern-Repo holen</span>
+            <span>Pattern-Repo klonen (Vorlage)</span>
             <button type="button" class="copy-btn" data-copy="#code-clone">Kopieren</button>
           </div>
-          <pre id="code-clone"><code># Neben deinem App-Repo klonen (oder als Submodule)
-git clone https://github.com/abx-git/blueprint-pattern.git
-
-# Optional: Submodule im App-Repo
-# git submodule add https://github.com/abx-git/blueprint-pattern.git blueprint-pattern</code></pre>
-          <p class="cell-note">Ab jetzt nennen wir den Pfad zum Pattern-Repo <code>blueprint-pattern/</code>.</p>
+          <pre id="code-clone"><code>git clone https://github.com/abx-git/blueprint-pattern.git</code></pre>
+          <p class="cell-note">Ergebnis: Ordner <code>blueprint-pattern/</code> neben deinem App-Projekt.</p>
         </div>
       </article>
 
-      <!-- Cell 4: Copy templates -->
       <article class="cell cell-code">
-        <div class="cell-gutter"><span class="cell-label">In</span><span class="cell-num">[2]</span></div>
+        <div class="cell-gutter"><span class="cell-label">B</span></div>
         <div class="cell-body">
           <div class="cell-bar">
-            <span>Schritt 2 — Doc-Struktur ins App-Repo kopieren</span>
+            <span>In dein App-Repo: Doc-Ordner + Skripte kopieren</span>
             <button type="button" class="copy-btn" data-copy="#code-templates">Kopieren</button>
           </div>
-          <pre id="code-templates"><code># Im Root deines App-Repos (Pfade anpassen)
+          <pre id="code-templates"><code># Im Root DEINES App-Repos ausführen (Pfad zu blueprint-pattern anpassen)
+
 mkdir -p docs/architecture
+cp -R ../blueprint-pattern/docs/templates/architecture/* docs/architecture/
 
-cp -R blueprint-pattern/docs/templates/architecture/* docs/architecture/
-
-# Workflow-Skript + Prompts (für checkout-Befehl)
 mkdir -p scripts prompts
-cp blueprint-pattern/scripts/bp-workflow.sh scripts/
-cp -R blueprint-pattern/prompts/workflows prompts/
+cp ../blueprint-pattern/scripts/bp-workflow.sh scripts/
+cp -R ../blueprint-pattern/prompts/workflows prompts/
 chmod +x scripts/bp-workflow.sh</code></pre>
         </div>
       </article>
 
-      <!-- Cell 5: always-on -->
       <article class="cell cell-markdown">
-        <div class="cell-gutter"><span class="cell-label">Md</span></div>
+        <div class="cell-gutter"><span class="cell-label">C</span></div>
         <div class="cell-body">
-          <h3>Schritt 3 — <code>always-on.md</code> ausfüllen</h3>
-          <p>Datei: <code>docs/architecture/context/always-on.md</code></p>
-          <p>Dort stehen Fakten, die der Agent <strong>jede Session</strong> kennt — ohne dass du sie in den Chat kopierst:</p>
+          <h3>App-Fakten eintragen</h3>
+          <p>Öffne und bearbeite:</p>
+          <p><code>docs/architecture/context/always-on.md</code></p>
           <ul>
-            <li>App-Name, Zweck, Tech-Stack</li>
-            <li>Wichtige Pfade (<code>src/</code>, Services, …)</li>
-            <li>Source Map: welche Docs zu welchem Code gehören</li>
+            <li>Wie heißt die App? Wofür ist sie da?</li>
+            <li>Welcher Tech-Stack? Wo liegt der Quellcode?</li>
+            <li>Welche Services/Systeme gibt es?</li>
           </ul>
+          <p class="cell-note">Der Agent liest diese Datei automatisch — du musst sie nicht in jeden Chat kopieren.</p>
         </div>
       </article>
 
-      <!-- Cell 6: Core prompt -->
       <article class="cell cell-code">
-        <div class="cell-gutter"><span class="cell-label">In</span><span class="cell-num">[3]</span></div>
+        <div class="cell-gutter"><span class="cell-label">D</span></div>
         <div class="cell-body">
           <div class="cell-bar">
-            <span>Schritt 4 — Core-Prompt in die IDE (einmalig)</span>
-            <button type="button" class="copy-btn" data-copy="#code-core-hint">Kopieren</button>
+            <span>Agent-Regeln in die IDE (einmalig)</span>
+            <button type="button" class="copy-btn" data-copy="#code-core-path">Pfad kopieren</button>
           </div>
-          <pre id="code-core-hint"><code># Cursor: Inhalt von blueprint-pattern/prompts/core/system-prompt.md
-# in .cursor/rules/ übernehmen (siehe blueprint-pattern/.cursor/rules/)
-
-# Claude Code: in CLAUDE.md verlinken
-# Copilot: .github/copilot-instructions.md
-
-# Datei zum Kopieren:
-# blueprint-pattern/prompts/core/system-prompt.md</code></pre>
-          <p class="cell-note">Der Core-Prompt definiert <em>Verhalten</em> (Schreiber, Read-Order, Invarianten) — nicht die Aufgabe des heutigen Chats.</p>
+          <pre id="code-core-path"><code>blueprint-pattern/prompts/core/system-prompt.md</code></pre>
+          <p>
+            <strong>Cursor:</strong> Inhalt in <code>.cursor/rules/</code> übernehmen
+            (Vorlage siehe <code>blueprint-pattern/.cursor/rules/</code>).<br>
+            <strong>Andere Tools:</strong> In <code>CLAUDE.md</code> oder Copilot-Instructions verlinken.
+          </p>
         </div>
       </article>
 
-      <!-- Cell 7: Output after setup -->
+      <!-- 3: Result -->
       <article class="cell cell-output" id="cell-result">
-        <div class="cell-gutter"><span class="cell-label">Out</span><span class="cell-num">[1]</span></div>
+        <div class="cell-gutter"><span class="cell-label">3</span></div>
         <div class="cell-body">
-          <h2>Was du danach in deinem Repository hast</h2>
-          <pre class="tree"><code>dein-app-repo/
-├── docs/architecture/          ← der Architektur-Graph
-│   ├── blueprint.md            ← Fortschritt & Session-Log (nicht die Architektur selbst)
-│   ├── entry-point.md          ← Einstieg in den Graphen
-│   ├── context/
-│   │   └── always-on.md        ← App-Fakten (von dir ausgefüllt)
-│   ├── prompts/                ← role-*.md (Prozedur, lädt der Agent)
-│   ├── work/                   ← Fragen, Analysen, Designs, Reviews
-│   ├── interfaces/             ← exports.md, imports.md
-│   ├── ops/                    ← Runbooks (optional)
-│   └── arc42/                  ← oder c4-light/, adr-first/, …
-├── prompts/workflows/          ← Session-Prompts + ACTIVE.md
-└── scripts/bp-workflow.sh      ← Workflow umschalten</code></pre>
+          <h2>Das hast du jetzt in deinem App-Repo</h2>
+          <pre class="tree"><code>mein-projekt/
+├── src/ …                          ← dein Code (war schon da)
+├── docs/architecture/              ← NEU: Architektur-Dokumentation
+│   ├── blueprint.md                ← Fortschrittsliste (kein Architektur-Text!)
+│   ├── entry-point.md              ← Startpunkt zum Navigieren
+│   ├── context/always-on.md        ← deine App-Fakten
+│   ├── arc42/ …                    ← Architektur-Kapitel (wird befüllt)
+│   └── work/ …                     ← Fragen, Analysen, Reviews
+├── prompts/workflows/              ← Aufgaben für den Agent
+└── scripts/bp-workflow.sh          ← schaltet die aktuelle Aufgabe um</code></pre>
           <div class="callout callout-success">
-            <strong>Checkpoint:</strong> Templates liegen im App-Repo, <code>always-on.md</code> ist ausgefüllt,
-            Core-Prompt ist in der IDE. Jetzt startest du die <strong>erste Agent-Session</strong>.
+            <strong>Fertig eingerichtet?</strong> Dann starte jetzt Abschnitt 4 — deine erste Agent-Session.
+            <a href="#cell-first">Zur ersten Session ↓</a>
           </div>
         </div>
       </article>
 
-      <!-- Cell 8: How session works -->
-      <article class="cell cell-markdown" id="cell-session">
-        <div class="cell-gutter"><span class="cell-label">Md</span></div>
-        <div class="cell-body">
-          <h2>So funktioniert jede Session</h2>
-          <p>Drei Prompt-Typen — bewusst getrennt, damit der Chat klein und fokussiert bleibt:</p>
-          <table class="data-table">
-            <thead>
-              <tr><th>Typ</th><th>Wo</th><th>Wer setzt es</th><th>Zweck</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Core</strong></td>
-                <td>IDE-Regeln</td>
-                <td>Du, einmalig</td>
-                <td>Verhalten: Schreiber, Invarianten</td>
-              </tr>
-              <tr>
-                <td><strong>Workflow</strong></td>
-                <td><code>ACTIVE.md</code></td>
-                <td><code>bp-workflow.sh checkout</code></td>
-                <td>Aufgabe <em>heute</em>: bootstrap, maintenance, …</td>
-              </tr>
-              <tr>
-                <td><strong>Role</strong></td>
-                <td><code>docs/architecture/prompts/role-*.md</code></td>
-                <td>Agent lädt selbst</td>
-                <td>Schritte & Qualitäts-Gates</td>
-              </tr>
-            </tbody>
-          </table>
-          <pre class="flow-diagram"><code>Core (einmal) + Workflow (dieser Chat) → Agent → docs/architecture/ → blueprint.md aktualisieren</code></pre>
-          <p><strong>Dein Ablauf pro Session:</strong></p>
-          <ol>
-            <li>Im Terminal: <code>./scripts/bp-workflow.sh checkout &lt;workflow-id&gt;</code></li>
-            <li><strong>Neuen</strong> Agent-Chat öffnen (bei Review zwingend)</li>
-            <li>Optional: Session-Prompt aus diesem Notebook kopieren & einfügen</li>
-            <li>Am Ende: Agent-Ausgabe prüfen (<code>[[ANCHOR:…]]</code>), <code>blueprint.md</code> lesen</li>
-          </ol>
-        </div>
-      </article>
-
-      <!-- Cell 9: First session -->
+      <!-- 4: First session - simplified -->
       <article class="cell cell-action" id="cell-first">
-        <div class="cell-gutter"><span class="cell-label">▶</span><span class="cell-num">[4]</span></div>
+        <div class="cell-gutter"><span class="cell-label">4</span></div>
         <div class="cell-body">
-          <h2>Erste Session — Dokumentation anlegen (<code>bootstrap-init</code>)</h2>
-          <p>Der Agent erstellt <code>blueprint.md</code>, wählt ein Template (arc42, …) und schreibt die ersten Kapitel.</p>
+          <h2>Erste Agent-Session — Architektur-Docs anlegen</h2>
+          <p>
+            Der Agent legt <code>blueprint.md</code> an und schreibt die ersten arc42-Kapitel.
+            Du musst nur zwei Dinge tun:
+          </p>
 
-          <div class="action-block">
-            <p class="action-step"><span class="step-num">1</span> Checkout im App-Repo</p>
-            <div class="code-inline-wrap">
-              <code id="code-first-checkout">./scripts/bp-workflow.sh checkout bootstrap-init</code>
-              <button type="button" class="copy-btn small" data-copy="#code-first-checkout">Kopieren</button>
+          <div class="session-flow">
+            <div class="session-step">
+              <div class="session-step-head">
+                <span class="step-num">1</span>
+                <div>
+                  <strong>Terminal</strong> — Aufgabe „bootstrap-init“ aktivieren
+                </div>
+              </div>
+              <div class="code-inline-wrap">
+                <code id="code-first-checkout">./scripts/bp-workflow.sh checkout bootstrap-init</code>
+                <button type="button" class="copy-btn small" data-copy="#code-first-checkout">Kopieren</button>
+              </div>
+            </div>
+
+            <div class="session-step">
+              <div class="session-step-head">
+                <span class="step-num">2</span>
+                <div>
+                  <strong>AI-IDE</strong> — neuen Chat öffnen, optional diesen Text senden:
+                </div>
+              </div>
+              <div class="prompt-box" id="first-session-prompt">Lade…</div>
+              <button type="button" class="copy-btn primary" id="copy-bootstrap-prompt" disabled>Text für Agent kopieren</button>
+            </div>
+
+            <div class="session-step">
+              <div class="session-step-head">
+                <span class="step-num">3</span>
+                <div>
+                  <strong>Du</strong> — Ergebnis kurz prüfen (Agent schreibt Dateien + meldet Status)
+                </div>
+              </div>
+              <pre class="agent-output"><code>Beispiel am Ende des Chats:
+
+„Ich habe blueprint.md und entry-point.md angelegt.
+ Template: arc42. Bitte bestätige: Ist Payment ein externer Service?“
+
+→ Du antwortest im Chat. Dann prüfst du die neuen Dateien in docs/architecture/.</code></pre>
             </div>
           </div>
 
-          <div class="action-block">
-            <p class="action-step"><span class="step-num">2</span> Neuen Agent-Chat öffnen — optional diesen Zusatztext senden:</p>
-            <div class="prompt-box" id="first-session-prompt">Lade Session-Prompt…</div>
-            <button type="button" class="copy-btn primary" id="copy-bootstrap-prompt" disabled>Session-Prompt kopieren</button>
-          </div>
-
-          <div class="action-block">
-            <p class="action-step"><span class="step-num">3</span> Typische Agent-Antwort am Session-Ende:</p>
-            <pre class="agent-output"><code>[[ANCHOR:TEMPLATE_SELECTED]] arc42
-[[ANCHOR:CHANGED_FILES]] blueprint.md, entry-point.md, arc42/introduction.md
-[[ANCHOR:PHASE_STATUS]] phase 0 [x], phase 1 [~]
-[[ANCHOR:OPEN_QUESTIONS]] Payment: extern oder intern?
-[[ANCHOR:LINK_CHECK]] pass</code></pre>
-            <p class="cell-note">Du prüfst die Docs — Phasen nicht auf <code>[x]</code> setzen, wenn der Inhalt noch dünn ist.</p>
-          </div>
-
-          <div class="action-block">
-            <p class="action-step"><span class="step-num">4</span> Nächste Session</p>
-            <div class="code-inline-wrap">
-              <code>./scripts/bp-workflow.sh checkout bootstrap-continue</code>
-              <button type="button" class="copy-btn small" data-copy-text="./scripts/bp-workflow.sh checkout bootstrap-continue">Kopieren</button>
-            </div>
-          </div>
+          <p class="cell-note">
+            <strong>Nächstes Mal:</strong>
+            <code>./scripts/bp-workflow.sh checkout bootstrap-continue</code> —
+            der Agent macht mit den nächsten Kapiteln weiter.
+          </p>
         </div>
       </article>
 
-      <!-- Cell 10: Daily work picker -->
+      <!-- 5: Daily -->
       <article class="cell cell-action" id="cell-daily">
-        <div class="cell-gutter"><span class="cell-label">▶</span></div>
+        <div class="cell-gutter"><span class="cell-label">5</span></div>
         <div class="cell-body">
-          <h2>Tägliche Arbeit — Was willst du tun?</h2>
-          <p>Wähle dein Ziel. Die Seite zeigt dir Checkout-Befehl und Session-Prompt.</p>
+          <h2>Danach im Alltag — Was möchtest du gerade tun?</h2>
+          <p>Wähle dein Ziel. Kopiere Checkout-Befehl und Agent-Text — gleicher Ablauf wie oben.</p>
 
-          <label class="picker-label" for="goal-picker">Mein Ziel</label>
+          <label class="picker-label" for="goal-picker">Ich möchte …</label>
           <select id="goal-picker" class="goal-picker">
-            <option value="">— Ziel wählen —</option>
-            <option value="maintenance">Code geändert → Docs nachziehen</option>
-            <option value="architecture-work-query">Architektur-Frage beantworten</option>
-            <option value="architecture-work-analysis">Analyse (Risiken, Kopplung, …)</option>
-            <option value="architecture-work-design">Design-Vorschlag schreiben</option>
-            <option value="architecture-work-continue">Offene WRK-Einträge fortsetzen</option>
-            <option value="refinement">Bestimmtes arc42-Kapitel vertiefen</option>
-            <option value="review-maintenance">Review nach Maintenance</option>
-            <option value="review-phase">Review einer Bootstrap-Phase</option>
-            <option value="review-milestone">Review nach Bootstrap-Meilenstein</option>
+            <option value="">— bitte wählen —</option>
+            <option value="maintenance">… nach Code-Änderung die Docs aktualisieren</option>
+            <option value="architecture-work-query">… eine Architektur-Frage beantworten lassen</option>
+            <option value="architecture-work-analysis">… Risiken oder Kopplung analysieren lassen</option>
+            <option value="architecture-work-design">… ein Design vorschlagen lassen</option>
+            <option value="bootstrap-continue">… die Dokumentation weiter ausbauen</option>
+            <option value="refinement">… ein bestimmtes Kapitel vertiefen</option>
+            <option value="review-maintenance">… prüfen lassen, ob die Docs zum Code passen</option>
           </select>
 
           <div id="goal-detail" class="goal-detail" hidden>
-            <div class="goal-meta">
-              <span id="goal-id" class="tag"></span>
-              <span id="goal-fresh" class="tag tag-warn" hidden>Neuer Chat Pflicht</span>
-            </div>
             <p id="goal-when" class="goal-when"></p>
-            <div class="action-block">
-              <p class="action-step">Checkout</p>
+            <div class="session-step">
+              <p class="action-step">Schritt 1 — Terminal</p>
               <div class="code-inline-wrap">
                 <code id="goal-checkout"></code>
                 <button type="button" class="copy-btn small" id="copy-goal-checkout">Kopieren</button>
               </div>
             </div>
-            <div class="action-block">
-              <p class="action-step">Session-Prompt</p>
+            <div class="session-step">
+              <p class="action-step">Schritt 2 — Neuer Chat, Text einfügen</p>
               <pre class="prompt-box" id="goal-prompt"></pre>
-              <button type="button" class="copy-btn primary" id="copy-goal-prompt">Session-Prompt kopieren</button>
+              <button type="button" class="copy-btn primary" id="copy-goal-prompt">Text für Agent kopieren</button>
             </div>
-            <p id="goal-hint" class="cell-note"></p>
+            <p id="goal-hint" class="callout callout-info" hidden></p>
+            <p id="goal-fresh" class="callout callout-warn" hidden>⚠ Für diese Aufgabe unbedingt einen <strong>neuen</strong> Chat öffnen — nicht im alten weiterchatten.</p>
           </div>
         </div>
       </article>
 
-      <!-- Cell 11: All workflows reference -->
-      <article class="cell cell-reference" id="cell-workflows">
-        <div class="cell-gutter"><span class="cell-label">Ref</span></div>
+      <!-- Expert reference collapsed -->
+      <article class="cell cell-reference" id="cell-expert">
+        <div class="cell-gutter"><span class="cell-label">+</span></div>
         <div class="cell-body">
-          <h2>Alle Workflows — Referenz</h2>
-          <p>Vollständige Liste mit Filtern. Jeder Eintrag: wann nutzen, was der Agent tut, Prompt kopieren.</p>
-          <div class="toolbar">
-            <label>
-              Rolle
-              <select id="filter-role">
-                <option value="">Alle</option>
-                <option value="bootstrap">Bootstrap</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="architecture-work">Architecture work</option>
-                <option value="review">Review</option>
-              </select>
-            </label>
-            <input type="search" id="search-workflows" placeholder="Suchen…" autocomplete="off" />
-          </div>
-          <div id="workflow-list"></div>
-        </div>
-      </article>
+          <details class="expert-block">
+            <summary>Experten-Referenz: alle Workflows &amp; Session-Anker</summary>
+            <p class="cell-note">Nur nötig, wenn du IDs und technische Details nachschlagen willst.</p>
 
-      <!-- Cell 12: Anchors -->
-      <article class="cell cell-reference" id="cell-anchors">
-        <div class="cell-gutter"><span class="cell-label">Ref</span></div>
-        <div class="cell-body">
-          <h2>Anhang — Session-Anker <code>[[ANCHOR:…]]</code></h2>
-          <p>Pflicht-Ausgaben am Session-Ende. Der Agent meldet diese Marker — du prüfst, ob sie plausibel sind.</p>
-          <input type="search" id="search-anchors" placeholder="Anchor suchen…" autocomplete="off" class="search-full" />
-          <table class="anchor-table">
-            <thead>
-              <tr><th>Anchor</th><th>Bedeutung</th><th>Workflows</th><th></th></tr>
-            </thead>
-            <tbody id="anchor-body"></tbody>
-          </table>
+            <h3 id="cell-workflows">Alle Workflows</h3>
+            <div class="toolbar">
+              <label>
+                Filter
+                <select id="filter-role">
+                  <option value="">Alle</option>
+                  <option value="bootstrap">Bootstrap</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="architecture-work">Architecture work</option>
+                  <option value="review">Review</option>
+                </select>
+              </label>
+              <input type="search" id="search-workflows" placeholder="Suchen…" autocomplete="off" />
+            </div>
+            <div id="workflow-list"></div>
+
+            <h3 id="cell-anchors">Session-Anker <code>[[ANCHOR:…]]</code></h3>
+            <p class="cell-note">Kurz-Checkliste am Ende jeder Session — der Agent soll diese Zeilen ausgeben.</p>
+            <input type="search" id="search-anchors" placeholder="Anchor suchen…" autocomplete="off" class="search-full" />
+            <table class="anchor-table">
+              <thead>
+                <tr><th>Marker</th><th>Bedeutung</th><th></th></tr>
+              </thead>
+              <tbody id="anchor-body"></tbody>
+            </table>
+          </details>
         </div>
       </article>
 
       <footer class="notebook-footer">
         <p>
-          Quell-Repo:
+          Quellcode:
           <a href="https://github.com/abx-git/blueprint-pattern">github.com/abx-git/blueprint-pattern</a>
-          · Vollständige Anleitung: <code>docs/guide.md</code>
+          · Version <span id="site-version">3</span>
         </p>
       </footer>
     </main>
   </div>
 
-  <div id="toast" class="toast" hidden>In Zwischenablage kopiert</div>
-  <script src="app.js" type="module"></script>
+  <div id="toast" class="toast" hidden>Kopiert ✓</div>
+  <script src="app.js?v=3" type="module"></script>
 </body>
 </html>
