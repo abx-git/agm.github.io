@@ -1,10 +1,8 @@
-# Blueprint Pattern Assistant — Adoption Guide
+# Blueprint Pattern Assistant
 
-Static site for senior architects: scope, one-time adoption, expected repository layout, and session workflows with clipboard copy. English, professional tone.
+Minimal two-phase UI: **Part 1 Create** (5 steps) and **Part 2 Use** (mode picker). Copy checkout command and session prompt — nothing else.
 
-Inspired by the browse-and-copy pattern of [Semantic Contracts](https://llm-coding.github.io/Semantic-Anchors/contracts); content is **specific to the Blueprint Pattern**.
-
-## Live site (GitHub Pages)
+Live: https://abx-git.github.io/blueprint-pattern.github.io/
 
 **URL:** https://abx-git.github.io/blueprint-pattern.github.io/
 

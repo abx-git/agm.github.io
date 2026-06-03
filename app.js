@@ -1,280 +1,147 @@
 const ASSET_BASE = new URL('./', import.meta.url);
 
-const GROUP_ORDER = ['Bootstrap', 'Maintenance', 'Architecture work', 'Review'];
+const USE_MODES = [
+  { id: 'maintenance', label: 'After code change', note: 'Paste git diff into the prompt.' },
+  { id: 'architecture-work-query', label: 'Answer question', note: 'Set your question in the prompt.' },
+  { id: 'architecture-work-analysis', label: 'Analyze', note: 'Set topic, scope, and focus.' },
+  { id: 'architecture-work-design', label: 'Design proposal', note: 'Set goal and constraints.' },
+  { id: 'architecture-work-continue', label: 'Open work items', note: 'Continues WRK entries in blueprint.md.' },
+  { id: 'refinement', label: 'Deepen section', note: 'Scoped arc42 refinement.' },
+  { id: 'review-maintenance', label: 'Review docs', note: 'New chat. Report-only.' },
+];
 
-const GOAL_HINTS = {
-  maintenance: 'Paste the relevant git diff into the session prompt before starting the chat.',
-  'architecture-work-query': 'Replace <your question here> with your specific architecture question.',
-  'architecture-work-analysis': 'Set Topic, Scope, and Focus in the session prompt.',
-  'architecture-work-design': 'Set Goal and Constraints in the session prompt.',
-  'bootstrap-continue': 'The agent reads blueprint.md and continues the next open bootstrap phase.',
-  'review-maintenance': 'Report-only: the agent must not modify files in this session.',
-};
+function checkoutCmd(id) {
+  return `./scripts/bp-workflow.sh checkout ${id}`;
+}
 
-async function loadJson(filename) {
-  const res = await fetch(new URL(filename, ASSET_BASE));
-  if (!res.ok) throw new Error(`Failed to load ${filename}`);
+async function loadWorkflows() {
+  const res = await fetch(new URL('workflows.json', ASSET_BASE));
+  if (!res.ok) throw new Error('workflows.json');
   return res.json();
 }
 
-function showToast(message = 'Copied to clipboard') {
+function showToast() {
   const el = document.getElementById('toast');
-  el.textContent = message;
   el.hidden = false;
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => { el.hidden = true; }, 1800);
+  showToast._t = setTimeout(() => { el.hidden = true; }, 1400);
 }
 
-async function copyText(text) {
+async function copy(text) {
   await navigator.clipboard.writeText(text);
   showToast();
 }
 
-function anchorLabel(id) {
-  return `[[ANCHOR:${id}]]`;
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function workflowById(workflows, id) {
+function byId(workflows, id) {
   return workflows.find((w) => w.id === id);
 }
 
-function initCopyButtons() {
-  document.querySelectorAll('[data-copy]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const sel = btn.getAttribute('data-copy');
-      const el = document.querySelector(sel);
-      if (el) copyText(el.textContent.trim());
-    });
-  });
-
-  document.querySelectorAll('[data-copy-text]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      copyText(btn.getAttribute('data-copy-text'));
-    });
-  });
-}
-
-function initBootstrapFirstSession(workflows) {
-  const w = workflowById(workflows, 'bootstrap-init');
-  const box = document.getElementById('first-session-prompt');
-  const btn = document.getElementById('copy-bootstrap-prompt');
-  if (!w || !box || !btn) return;
-
-  box.textContent = w.prompt;
-  btn.disabled = false;
-  btn.addEventListener('click', () => copyText(w.prompt));
-}
-
-function initGoalPicker(workflows) {
-  const picker = document.getElementById('goal-picker');
-  const detail = document.getElementById('goal-detail');
-  if (!picker || !detail) return;
-
-  let current = null;
-
-  const showGoal = (id) => {
-    const w = workflowById(workflows, id);
-    const hintEl = document.getElementById('goal-hint');
-    const freshEl = document.getElementById('goal-fresh');
-    if (!w) {
-      detail.hidden = true;
-      current = null;
-      return;
-    }
-    current = w;
-    detail.hidden = false;
-
-    document.getElementById('goal-when').textContent = w.when;
-    freshEl.hidden = !w.freshChat;
-
-    const checkout = `./scripts/bp-workflow.sh checkout ${w.id}`;
-    document.getElementById('goal-checkout').textContent = checkout;
-    document.getElementById('goal-prompt').textContent = w.prompt;
-
-    const hint = GOAL_HINTS[w.id] || (w.prerequisite ? `Prerequisite: ${w.prerequisite}` : '');
-    if (hint) {
-      hintEl.textContent = hint;
-      hintEl.hidden = false;
-    } else {
-      hintEl.hidden = true;
-    }
+function initTabs() {
+  const tabs = document.querySelectorAll('.phase-tab');
+  const panels = {
+    create: document.getElementById('phase-create'),
+    use: document.getElementById('phase-use'),
   };
 
-  picker.addEventListener('change', () => showGoal(picker.value));
-
-  document.getElementById('copy-goal-checkout')?.addEventListener('click', () => {
-    if (current) copyText(`./scripts/bp-workflow.sh checkout ${current.id}`);
-  });
-
-  document.getElementById('copy-goal-prompt')?.addEventListener('click', () => {
-    if (current) copyText(current.prompt);
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      Object.entries(panels).forEach(([key, panel]) => {
+        const on = tab.dataset.phase === key;
+        panel.hidden = !on;
+        panel.classList.toggle('active', on);
+      });
+    });
   });
 }
 
-function renderWorkflowItem(w) {
-  const details = document.createElement('details');
-  details.className = 'wf-item';
-  details.id = w.id;
-
-  const fresh = w.freshChat ? ' · fresh chat required' : '';
-  const steps = (w.steps || [])
-    .map((s) => `<li>${escapeHtml(s)}</li>`)
-    .join('');
-
-  details.innerHTML = `
-    <summary>${escapeHtml(w.id)}<span class="wf-when">— ${escapeHtml(w.when)}${fresh}</span></summary>
-    <div class="wf-item-body">
-      ${w.prerequisite ? `<p class="cell-note"><strong>Prerequisite:</strong> ${escapeHtml(w.prerequisite)}</p>` : ''}
-      ${steps ? `<ul class="wf-steps">${steps}</ul>` : ''}
-      <div class="wf-actions">
-        <button type="button" class="copy-btn primary wf-copy-prompt">Copy session prompt</button>
-        <button type="button" class="copy-btn wf-copy-checkout">Copy checkout command</button>
-      </div>
-    </div>
-  `;
-
-  details.querySelector('.wf-copy-prompt').addEventListener('click', (e) => {
-    e.preventDefault();
-    copyText(w.prompt);
+function initStaticCopy() {
+  document.querySelectorAll('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const el = document.querySelector(btn.dataset.copy);
+      if (el) copy(el.textContent.trim());
+    });
   });
-  details.querySelector('.wf-copy-checkout').addEventListener('click', (e) => {
-    e.preventDefault();
-    copyText(`./scripts/bp-workflow.sh checkout ${w.id}`);
-  });
-
-  return details;
 }
 
-function renderWorkflowList(workflows, roleFilter, query) {
-  const q = query.trim().toLowerCase();
-  const list = document.getElementById('workflow-list');
-  if (!list) return;
-  list.innerHTML = '';
+function bindStep(stepEl, workflow) {
+  const code = stepEl.querySelector('.checkout');
+  code.textContent = checkoutCmd(workflow.id);
 
-  const filtered = workflows.filter((w) => {
-    if (roleFilter && w.role !== roleFilter) return false;
-    if (!q) return true;
-    return [w.id, w.role, w.when, w.prompt, ...(w.steps || [])].join(' ').toLowerCase().includes(q);
+  stepEl.querySelector('.btn-checkout').addEventListener('click', () => {
+    copy(checkoutCmd(workflow.id));
   });
-
-  if (!filtered.length) {
-    list.innerHTML = '<p class="cell-note">No matching workflows.</p>';
-    return;
-  }
-
-  const groups = new Map();
-  for (const w of filtered) {
-    const key = w.group || w.role;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(w);
-  }
-
-  for (const name of GROUP_ORDER) {
-    if (!groups.has(name)) continue;
-    const heading = document.createElement('h3');
-    heading.textContent = name;
-    heading.style.fontSize = '0.85rem';
-    heading.style.textTransform = 'uppercase';
-    heading.style.letterSpacing = '0.05em';
-    heading.style.color = 'var(--muted)';
-    list.appendChild(heading);
-    for (const w of groups.get(name)) {
-      list.appendChild(renderWorkflowItem(w));
-    }
-    groups.delete(name);
-  }
-  for (const [, items] of groups) {
-    for (const w of items) list.appendChild(renderWorkflowItem(w));
-  }
+  stepEl.querySelector('.btn-prompt').addEventListener('click', () => {
+    copy(workflow.prompt);
+  });
 }
 
-function renderAnchors(anchors, query) {
-  const q = query.trim().toLowerCase();
-  const body = document.getElementById('anchor-body');
-  if (!body) return;
-  body.innerHTML = '';
+function initCreatePhase(workflows) {
+  document.querySelectorAll('.step[data-workflow]').forEach((step) => {
+    const w = byId(workflows, step.dataset.workflow);
+    if (w) bindStep(step, w);
+  });
+}
 
-  for (const a of anchors) {
-    if (q && !a.id.toLowerCase().includes(q) && !a.meaning.toLowerCase().includes(q)) continue;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><code>${anchorLabel(a.id)}</code></td>
-      <td>${escapeHtml(a.meaning)}</td>
-      <td></td>
-    `;
+function initUsePhase(workflows) {
+  const grid = document.getElementById('mode-grid');
+  const panel = document.getElementById('mode-panel');
+  let current = null;
+
+  for (const mode of USE_MODES) {
     const btn = document.createElement('button');
-    btn.className = 'copy-btn small';
     btn.type = 'button';
-    btn.textContent = 'Copy';
-    btn.addEventListener('click', () => copyText(anchorLabel(a.id)));
-    tr.lastElementChild.appendChild(btn);
-    body.appendChild(tr);
+    btn.className = 'mode-btn';
+    btn.textContent = mode.label;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.mode-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const w = byId(workflows, mode.id);
+      if (!w) return;
+      current = w;
+      panel.hidden = false;
+
+      document.getElementById('mode-label').textContent = w.when;
+      document.getElementById('mode-checkout').textContent = checkoutCmd(w.id);
+
+      const note = document.getElementById('mode-note');
+      const text = mode.note || (w.freshChat ? 'New chat required.' : '');
+      note.textContent = text;
+      note.hidden = !text;
+    });
+    grid.appendChild(btn);
   }
-}
 
-function initTocHighlight() {
-  const links = document.querySelectorAll('.toc a');
-  const sections = [...links].map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        links.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${entry.target.id}`));
-      }
-    },
-    { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
-  );
-
-  sections.forEach((s) => observer.observe(s));
+  document.getElementById('mode-copy-checkout').addEventListener('click', () => {
+    if (current) copy(checkoutCmd(current.id));
+  });
+  document.getElementById('mode-copy-prompt').addEventListener('click', () => {
+    if (current) copy(current.prompt);
+  });
 }
 
 async function main() {
-  initCopyButtons();
-  initTocHighlight();
+  initTabs();
+  initStaticCopy();
 
   let workflows;
-  let anchors;
   try {
-    [workflows, anchors] = await Promise.all([
-      loadJson('workflows.json'),
-      loadJson('anchors.json'),
-    ]);
-  } catch (err) {
-    const list = document.getElementById('workflow-list');
-    if (list) {
-      list.innerHTML = `
-        <p class="cell-note">
-          Could not load workflow data. For local preview, run:<br>
-          <code>./scripts/open-assistant.sh</code>
-        </p>`;
-    }
-    console.error(err);
+    workflows = await loadWorkflows();
+  } catch {
+    document.querySelector('.app').insertAdjacentHTML(
+      'beforeend',
+      '<p style="color:#666;margin-top:1rem">Load via <code>./scripts/open-assistant.sh</code></p>'
+    );
     return;
   }
 
-  initBootstrapFirstSession(workflows);
-  initGoalPicker(workflows);
-
-  const roleFilter = document.getElementById('filter-role');
-  const searchWf = document.getElementById('search-workflows');
-  const searchAn = document.getElementById('search-anchors');
-
-  const refresh = () => renderWorkflowList(workflows, roleFilter?.value || '', searchWf?.value || '');
-  roleFilter?.addEventListener('change', refresh);
-  searchWf?.addEventListener('input', refresh);
-  searchAn?.addEventListener('input', () => renderAnchors(anchors, searchAn.value));
-
-  refresh();
-  renderAnchors(anchors, '');
+  initCreatePhase(workflows);
+  initUsePhase(workflows);
 }
 
 main();

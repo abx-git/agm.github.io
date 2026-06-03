@@ -3,342 +3,127 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Blueprint Pattern — Adoption Guide</title>
-  <link rel="stylesheet" href="app.css?v=4" />
+  <title>Blueprint Pattern</title>
+  <link rel="stylesheet" href="app.css?v=5" />
 </head>
 <body>
-  <aside class="toc" aria-label="Contents">
-    <p class="toc-title">Contents</p>
-    <nav>
-      <a href="#start">Overview</a>
-      <a href="#cell-was">1 · Scope</a>
-      <a href="#cell-setup">2 · Adoption</a>
-      <a href="#cell-result">3 · Repository layout</a>
-      <a href="#cell-first">4 · First session</a>
-      <a href="#cell-daily">5 · Ongoing use</a>
-      <a href="#cell-expert" class="toc-expert">Reference</a>
-    </nav>
-  </aside>
-
-  <div class="notebook-wrap">
-    <header class="notebook-header" id="start">
-      <p class="eyebrow">Blueprint Pattern</p>
-      <h1>Architecture documentation in Git — AI-assisted, human-governed</h1>
-
-      <div class="hero-box">
-        <p class="hero-lead">
-          The Blueprint Pattern is not a product or hosted service. It is a
-          <strong>repository convention</strong>: a linked Markdown graph under
-          <code>docs/architecture/</code>, maintained through scoped agent sessions with
-          explicit workflows. Architecture knowledge stays versioned alongside code;
-          the architect retains decision authority.
-        </p>
-        <div class="journey">
-          <a href="#cell-was" class="journey-step">
-            <span class="journey-num">1</span>
-            <span class="journey-label">Understand</span>
-            <span class="journey-hint">Scope and boundaries</span>
-          </a>
-          <span class="journey-arrow" aria-hidden="true">→</span>
-          <a href="#cell-setup" class="journey-step">
-            <span class="journey-num">2</span>
-            <span class="journey-label">Adopt</span>
-            <span class="journey-hint">~30 min, one-time</span>
-          </a>
-          <span class="journey-arrow" aria-hidden="true">→</span>
-          <a href="#cell-first" class="journey-step">
-            <span class="journey-num">3</span>
-            <span class="journey-label">Operate</span>
-            <span class="journey-hint">Agent sessions</span>
-          </a>
-        </div>
-      </div>
+  <main class="app">
+    <header class="head">
+      <h1>Blueprint Pattern</h1>
+      <p class="tagline">Architecture documentation in Git — two phases, copy and run.</p>
     </header>
 
-    <main class="notebook">
+    <nav class="phase-nav" role="tablist">
+      <button type="button" class="phase-tab active" data-phase="create" role="tab" aria-selected="true">Part 1 · Create</button>
+      <button type="button" class="phase-tab" data-phase="use" role="tab">Part 2 · Use</button>
+    </nav>
 
-      <article class="cell cell-markdown" id="cell-was">
-        <div class="cell-gutter"><span class="cell-label">1</span></div>
-        <div class="cell-body">
-          <h2>What the pattern provides — and what it does not</h2>
-
-          <div class="compare-grid">
-            <div class="compare-card compare-yes">
-              <h3>In scope</h3>
-              <ul>
-                <li>Structured architecture docs under <code>docs/architecture/</code> in your application repository</li>
-                <li>Explicit links between views, interfaces, decisions, and source (Markdown graph)</li>
-                <li>Session-scoped agent tasks (<em>workflows</em>) with traceable outputs</li>
-                <li>Progress and session state in <code>blueprint.md</code> — separate from the architecture content itself</li>
-              </ul>
-            </div>
-            <div class="compare-card compare-no">
-              <h3>Out of scope</h3>
-              <ul>
-                <li>No cloud platform, no external wiki, no RAG pipeline</li>
-                <li>Not an autonomous architect — human review and approval remain mandatory</li>
-                <li>Not a substitute for arc42, C4, or ADRs — it hosts and links them in-repo</li>
-                <li>Not a replacement for architecture judgment or sign-off processes</li>
-              </ul>
+    <!-- Part 1 -->
+    <section id="phase-create" class="phase active" role="tabpanel">
+      <ol class="steps">
+        <li class="step">
+          <div class="step-head">
+            <span class="step-n">1</span>
+            <div>
+              <strong>Create the documentation folder</strong>
+              <p>In your application repository.</p>
             </div>
           </div>
-
-          <figure class="diagram">
-            <figcaption>Collaboration model (human-in-the-loop)</figcaption>
-            <pre class="diagram-inner"><code>  Architect                   AI agent                    Application repo
-  ─────────                   ────────                    ────────────────
-  Adopts templates      →     Reads rules            →     docs/architecture/
-  Defines context       →     Writes / updates docs  →     arc42/, interfaces/, work/
-  Selects workflow      →     Reports session output →     blueprint.md (state)
-  Reviews and decides</code></pre>
-          </figure>
-        </div>
-      </article>
-
-      <article class="cell cell-markdown" id="cell-setup">
-        <div class="cell-gutter"><span class="cell-label">2</span></div>
-        <div class="cell-body">
-          <h2>One-time adoption — in your application repository</h2>
-          <p>
-            Adoption uses <strong>two repositories</strong>: this pattern repository (templates and tooling)
-            and your <strong>application repository</strong> (where all architecture artefacts live).
-            Execute the commands below from your application repository root, adjusting paths as needed.
-          </p>
-          <p class="cell-note"><strong>Prerequisites:</strong> Git · AI-enabled IDE (e.g. Cursor, Claude Code) · approximately 30 minutes</p>
-        </div>
-      </article>
-
-      <article class="cell cell-code">
-        <div class="cell-gutter"><span class="cell-label">A</span></div>
-        <div class="cell-body">
-          <div class="cell-bar">
-            <span>Clone the pattern repository</span>
-            <button type="button" class="copy-btn" data-copy="#code-clone">Copy</button>
+          <div class="cmd-row">
+            <code id="cmd-mkdir">mkdir -p docs/architecture</code>
+            <button type="button" class="btn" data-copy="#cmd-mkdir">Copy</button>
           </div>
-          <pre id="code-clone"><code>git clone https://github.com/abx-git/blueprint-pattern.git</code></pre>
-          <p class="cell-note">Result: a <code>blueprint-pattern/</code> directory adjacent to your application project (or add as a submodule).</p>
-        </div>
-      </article>
+        </li>
 
-      <article class="cell cell-code">
-        <div class="cell-gutter"><span class="cell-label">B</span></div>
-        <div class="cell-body">
-          <div class="cell-bar">
-            <span>Copy documentation structure and workflow tooling into the application repo</span>
-            <button type="button" class="copy-btn" data-copy="#code-templates">Copy</button>
-          </div>
-          <pre id="code-templates"><code># Run from your application repository root (adjust path to blueprint-pattern)
-
-mkdir -p docs/architecture
-cp -R ../blueprint-pattern/docs/templates/architecture/* docs/architecture/
-
-mkdir -p scripts prompts
-cp ../blueprint-pattern/scripts/bp-workflow.sh scripts/
-cp -R ../blueprint-pattern/prompts/workflows prompts/
-chmod +x scripts/bp-workflow.sh</code></pre>
-        </div>
-      </article>
-
-      <article class="cell cell-markdown">
-        <div class="cell-gutter"><span class="cell-label">C</span></div>
-        <div class="cell-body">
-          <h3>Define application context</h3>
-          <p>Edit:</p>
-          <p><code>docs/architecture/context/always-on.md</code></p>
-          <ul>
-            <li>System purpose, boundaries, and technology stack</li>
-            <li>Key source paths and service map</li>
-            <li>Documentation-to-code traceability (source map)</li>
-          </ul>
-          <p class="cell-note">The agent reads this file each session via IDE rules — it does not need to be pasted into every chat.</p>
-        </div>
-      </article>
-
-      <article class="cell cell-code">
-        <div class="cell-gutter"><span class="cell-label">D</span></div>
-        <div class="cell-body">
-          <div class="cell-bar">
-            <span>Install core agent rules in the IDE (one-time)</span>
-            <button type="button" class="copy-btn" data-copy="#code-core-path">Copy path</button>
-          </div>
-          <pre id="code-core-path"><code>blueprint-pattern/prompts/core/system-prompt.md</code></pre>
-          <p>
-            <strong>Cursor:</strong> adopt into <code>.cursor/rules/</code>
-            (see <code>blueprint-pattern/.cursor/rules/</code> for reference).<br>
-            <strong>Other tools:</strong> link from <code>CLAUDE.md</code>, Copilot instructions, or equivalent.
-          </p>
-          <p class="cell-note">The core prompt defines agent behaviour (scribe, invariants, read order) — not the task for a specific session.</p>
-        </div>
-      </article>
-
-      <article class="cell cell-output" id="cell-result">
-        <div class="cell-gutter"><span class="cell-label">3</span></div>
-        <div class="cell-body">
-          <h2>Expected repository layout after adoption</h2>
-          <pre class="tree"><code>your-application/
-├── src/ …                          ← existing codebase
-├── docs/architecture/              ← architecture graph (new)
-│   ├── blueprint.md                ← session backlog & phase state (not the architecture)
-│   ├── entry-point.md              ← graph entry point
-│   ├── context/always-on.md        ← stable application context
-│   ├── arc42/ …                    ← views (populated during bootstrap)
-│   ├── interfaces/ …               ← exports / imports
-│   └── work/ …                     ← queries, analyses, designs, reviews
-├── prompts/workflows/              ← session prompts; ACTIVE.md set by checkout
-└── scripts/bp-workflow.sh          ← activates the current workflow</code></pre>
-          <div class="callout callout-success">
-            <strong>Adoption complete?</strong> Proceed to section 4 — the initial bootstrap session.
-            <a href="#cell-first">First session ↓</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="cell cell-action" id="cell-first">
-        <div class="cell-gutter"><span class="cell-label">4</span></div>
-        <div class="cell-body">
-          <h2>First session — establish architecture documentation (<code>bootstrap-init</code>)</h2>
-          <p>
-            The agent creates <code>blueprint.md</code>, selects a documentation template (arc42 by default),
-            and drafts initial sections. Two actions on your side:
-          </p>
-
-          <div class="session-flow">
-            <div class="session-step">
-              <div class="session-step-head">
-                <span class="step-num">1</span>
-                <div>
-                  <strong>Terminal</strong> — activate workflow <code>bootstrap-init</code>
-                </div>
-              </div>
-              <div class="code-inline-wrap">
-                <code id="code-first-checkout">./scripts/bp-workflow.sh checkout bootstrap-init</code>
-                <button type="button" class="copy-btn small" data-copy="#code-first-checkout">Copy</button>
-              </div>
-            </div>
-
-            <div class="session-step">
-              <div class="session-step-head">
-                <span class="step-num">2</span>
-                <div>
-                  <strong>IDE</strong> — open a new agent chat; optionally paste the session prompt:
-                </div>
-              </div>
-              <div class="prompt-box" id="first-session-prompt">Loading…</div>
-              <button type="button" class="copy-btn primary" id="copy-bootstrap-prompt" disabled>Copy session prompt</button>
-            </div>
-
-            <div class="session-step">
-              <div class="session-step-head">
-                <span class="step-num">3</span>
-                <div>
-                  <strong>Review</strong> — validate outputs and resolve open assumptions
-                </div>
-              </div>
-              <pre class="agent-output"><code>Typical end-of-session report:
-
-"I created blueprint.md and entry-point.md.
- Template: arc42. Assumption: payment is an external service — please confirm."
-
-→ Confirm or correct in chat. Review new files under docs/architecture/
-  before marking bootstrap phases complete in blueprint.md.</code></pre>
+        <li class="step">
+          <div class="step-head">
+            <span class="step-n">2</span>
+            <div>
+              <strong>Copy templates and prompts</strong>
+              <p>From the pattern repo into your app repo. Fill <code>context/always-on.md</code>. Install <code>prompts/core/system-prompt.md</code> in IDE rules (once).</p>
             </div>
           </div>
-
-          <p class="cell-note">
-            <strong>Subsequent bootstrap work:</strong>
-            <code>./scripts/bp-workflow.sh checkout bootstrap-continue</code> —
-            the agent resumes the next open phase from <code>blueprint.md</code>.
-          </p>
-        </div>
-      </article>
-
-      <article class="cell cell-action" id="cell-daily">
-        <div class="cell-gutter"><span class="cell-label">5</span></div>
-        <div class="cell-body">
-          <h2>Ongoing operation — select an intent</h2>
-          <p>Choose the task that matches your current need. Copy the checkout command and session prompt — same procedure as above.</p>
-
-          <label class="picker-label" for="goal-picker">I need to …</label>
-          <select id="goal-picker" class="goal-picker">
-            <option value="">— select an intent —</option>
-            <option value="maintenance">… update documentation after a code change</option>
-            <option value="architecture-work-query">… answer a specific architecture question</option>
-            <option value="architecture-work-analysis">… run a structured analysis (risks, coupling, quality)</option>
-            <option value="architecture-work-design">… produce an architecture design proposal</option>
-            <option value="bootstrap-continue">… continue bootstrap documentation</option>
-            <option value="refinement">… deepen a specific arc42 section</option>
-            <option value="review-maintenance">… review docs against recent code changes (report-only)</option>
-          </select>
-
-          <div id="goal-detail" class="goal-detail" hidden>
-            <p id="goal-when" class="goal-when"></p>
-            <div class="session-step">
-              <p class="action-step">Step 1 — Terminal</p>
-              <div class="code-inline-wrap">
-                <code id="goal-checkout"></code>
-                <button type="button" class="copy-btn small" id="copy-goal-checkout">Copy</button>
-              </div>
-            </div>
-            <div class="session-step">
-              <p class="action-step">Step 2 — New chat; paste session prompt</p>
-              <pre class="prompt-box" id="goal-prompt"></pre>
-              <button type="button" class="copy-btn primary" id="copy-goal-prompt">Copy session prompt</button>
-            </div>
-            <p id="goal-hint" class="callout callout-info" hidden></p>
-            <p id="goal-fresh" class="callout callout-warn" hidden>Review workflows require a <strong>new</strong> agent chat — do not continue in the session that produced the artefacts under review.</p>
+          <div class="cmd-row">
+            <button type="button" class="btn primary" data-copy="#cmd-copy">Copy commands</button>
           </div>
-        </div>
-      </article>
+          <pre id="cmd-copy" hidden>mkdir -p docs/architecture scripts prompts
+cp -R blueprint-pattern/docs/templates/architecture/* docs/architecture/
+cp blueprint-pattern/scripts/bp-workflow.sh scripts/
+cp -R blueprint-pattern/prompts/workflows prompts/
+chmod +x scripts/bp-workflow.sh</pre>
+        </li>
 
-      <article class="cell cell-reference" id="cell-expert">
-        <div class="cell-gutter"><span class="cell-label">Ref</span></div>
-        <div class="cell-body">
-          <details class="expert-block">
-            <summary>Reference: all workflows and session anchors</summary>
-            <p class="cell-note">Workflow IDs, steps, and <code>[[ANCHOR:…]]</code> markers for session governance.</p>
-
-            <h3 id="cell-workflows">Workflow catalogue</h3>
-            <div class="toolbar">
-              <label>
-                Role
-                <select id="filter-role">
-                  <option value="">All</option>
-                  <option value="bootstrap">Bootstrap</option>
-                  <option value="maintenance">Maintenance</option>
-                  <option value="architecture-work">Architecture work</option>
-                  <option value="review">Review</option>
-                </select>
-              </label>
-              <input type="search" id="search-workflows" placeholder="Search…" autocomplete="off" />
+        <li class="step" data-workflow="bootstrap-init">
+          <div class="step-head">
+            <span class="step-n">3</span>
+            <div>
+              <strong>First session</strong>
+              <p>Creates <code>blueprint.md</code> (work file) and initial docs from templates.</p>
             </div>
-            <div id="workflow-list"></div>
+          </div>
+          <div class="cmd-row">
+            <code class="checkout"></code>
+            <button type="button" class="btn btn-checkout">Copy checkout</button>
+            <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+          </div>
+        </li>
 
-            <h3 id="cell-anchors">Session anchors <code>[[ANCHOR:…]]</code></h3>
-            <p class="cell-note">Required session checkpoints the agent reports before stopping — not a substitute for human review.</p>
-            <input type="search" id="search-anchors" placeholder="Search anchors…" autocomplete="off" class="search-full" />
-            <table class="anchor-table">
-              <thead>
-                <tr><th>Anchor</th><th>Meaning</th><th></th></tr>
-              </thead>
-              <tbody id="anchor-body"></tbody>
-            </table>
-          </details>
+        <li class="step" data-workflow="bootstrap-continue">
+          <div class="step-head">
+            <span class="step-n">4</span>
+            <div>
+              <strong>Follow-up sessions</strong>
+              <p>Agent reads <code>blueprint.md</code>, completes the next open phase, updates the graph. Repeat until bootstrap is done.</p>
+            </div>
+          </div>
+          <div class="cmd-row">
+            <code class="checkout"></code>
+            <button type="button" class="btn btn-checkout">Copy checkout</button>
+            <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+          </div>
+        </li>
+
+        <li class="step" data-workflow="review-milestone">
+          <div class="step-head">
+            <span class="step-n">5</span>
+            <div>
+              <strong>Close creation</strong>
+              <p>Review session (report-only, new chat). Then mark phases complete in <code>blueprint.md</code>.</p>
+            </div>
+          </div>
+          <div class="cmd-row">
+            <code class="checkout"></code>
+            <button type="button" class="btn btn-checkout">Copy checkout</button>
+            <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Part 2 -->
+    <section id="phase-use" class="phase" role="tabpanel" hidden>
+      <p class="use-intro">Pick a mode. Copy checkout → run in terminal. Copy prompt → new agent chat.</p>
+
+      <div class="modes" id="mode-grid"></div>
+
+      <div id="mode-panel" class="mode-panel" hidden>
+        <p class="mode-label" id="mode-label"></p>
+        <div class="cmd-row">
+          <code id="mode-checkout"></code>
+          <button type="button" class="btn" id="mode-copy-checkout">Copy checkout</button>
+          <button type="button" class="btn primary" id="mode-copy-prompt">Copy prompt</button>
         </div>
-      </article>
+        <p class="mode-note" id="mode-note" hidden></p>
+      </div>
+    </section>
 
-      <footer class="notebook-footer">
-        <p>
-          Source:
-          <a href="https://github.com/abx-git/blueprint-pattern">github.com/abx-git/blueprint-pattern</a>
-          · Guide: <code>docs/guide.md</code>
-          · v<span id="site-version">4</span>
-        </p>
-      </footer>
-    </main>
-  </div>
+    <footer class="foot">
+      <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
+      · <code>docs/guide.md</code>
+    </footer>
+  </main>
 
-  <div id="toast" class="toast" hidden>Copied to clipboard</div>
-  <script src="app.js?v=4" type="module"></script>
+  <div id="toast" class="toast" hidden>Copied</div>
+  <script src="app.js?v=5" type="module"></script>
 </body>
 </html>
