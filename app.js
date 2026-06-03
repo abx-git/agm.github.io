@@ -3,12 +3,12 @@ const ASSET_BASE = new URL('./', import.meta.url);
 const GROUP_ORDER = ['Bootstrap', 'Maintenance', 'Architecture work', 'Review'];
 
 const GOAL_HINTS = {
-  maintenance: 'Tipp: Füge deinen git diff in den Agent-Text ein, bevor du den Chat startest.',
-  'architecture-work-query': 'Ersetze <your question here> durch deine konkrete Frage.',
-  'architecture-work-analysis': 'Passe Topic, Scope und Focus im Text an.',
-  'architecture-work-design': 'Passe Goal und Constraints im Text an.',
-  'bootstrap-continue': 'Der Agent liest blueprint.md und macht mit der nächsten offenen Phase weiter.',
-  'review-maintenance': 'Neuer Chat — der Agent berichtet nur, repariert nichts.',
+  maintenance: 'Paste the relevant git diff into the session prompt before starting the chat.',
+  'architecture-work-query': 'Replace <your question here> with your specific architecture question.',
+  'architecture-work-analysis': 'Set Topic, Scope, and Focus in the session prompt.',
+  'architecture-work-design': 'Set Goal and Constraints in the session prompt.',
+  'bootstrap-continue': 'The agent reads blueprint.md and continues the next open bootstrap phase.',
+  'review-maintenance': 'Report-only: the agent must not modify files in this session.',
 };
 
 async function loadJson(filename) {
@@ -17,7 +17,7 @@ async function loadJson(filename) {
   return res.json();
 }
 
-function showToast(message = 'In Zwischenablage kopiert') {
+function showToast(message = 'Copied to clipboard') {
   const el = document.getElementById('toast');
   el.textContent = message;
   el.hidden = false;
@@ -99,7 +99,7 @@ function initGoalPicker(workflows) {
     document.getElementById('goal-checkout').textContent = checkout;
     document.getElementById('goal-prompt').textContent = w.prompt;
 
-    const hint = GOAL_HINTS[w.id] || (w.prerequisite ? `Voraussetzung: ${w.prerequisite}` : '');
+    const hint = GOAL_HINTS[w.id] || (w.prerequisite ? `Prerequisite: ${w.prerequisite}` : '');
     if (hint) {
       hintEl.textContent = hint;
       hintEl.hidden = false;
@@ -124,7 +124,7 @@ function renderWorkflowItem(w) {
   details.className = 'wf-item';
   details.id = w.id;
 
-  const fresh = w.freshChat ? ' · Neuer Chat Pflicht' : '';
+  const fresh = w.freshChat ? ' · fresh chat required' : '';
   const steps = (w.steps || [])
     .map((s) => `<li>${escapeHtml(s)}</li>`)
     .join('');
@@ -132,11 +132,11 @@ function renderWorkflowItem(w) {
   details.innerHTML = `
     <summary>${escapeHtml(w.id)}<span class="wf-when">— ${escapeHtml(w.when)}${fresh}</span></summary>
     <div class="wf-item-body">
-      ${w.prerequisite ? `<p class="cell-note"><strong>Voraussetzung:</strong> ${escapeHtml(w.prerequisite)}</p>` : ''}
+      ${w.prerequisite ? `<p class="cell-note"><strong>Prerequisite:</strong> ${escapeHtml(w.prerequisite)}</p>` : ''}
       ${steps ? `<ul class="wf-steps">${steps}</ul>` : ''}
       <div class="wf-actions">
-        <button type="button" class="copy-btn primary wf-copy-prompt">Prompt kopieren</button>
-        <button type="button" class="copy-btn wf-copy-checkout">Checkout kopieren</button>
+        <button type="button" class="copy-btn primary wf-copy-prompt">Copy session prompt</button>
+        <button type="button" class="copy-btn wf-copy-checkout">Copy checkout command</button>
       </div>
     </div>
   `;
@@ -166,7 +166,7 @@ function renderWorkflowList(workflows, roleFilter, query) {
   });
 
   if (!filtered.length) {
-    list.innerHTML = '<p class="cell-note">Keine Treffer.</p>';
+    list.innerHTML = '<p class="cell-note">No matching workflows.</p>';
     return;
   }
 
@@ -213,7 +213,7 @@ function renderAnchors(anchors, query) {
     const btn = document.createElement('button');
     btn.className = 'copy-btn small';
     btn.type = 'button';
-    btn.textContent = 'Kopieren';
+    btn.textContent = 'Copy';
     btn.addEventListener('click', () => copyText(anchorLabel(a.id)));
     tr.lastElementChild.appendChild(btn);
     body.appendChild(tr);
@@ -253,7 +253,7 @@ async function main() {
     if (list) {
       list.innerHTML = `
         <p class="cell-note">
-          Daten nicht geladen — lokalen Server starten:<br>
+          Could not load workflow data. For local preview, run:<br>
           <code>./scripts/open-assistant.sh</code>
         </p>`;
     }

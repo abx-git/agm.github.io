@@ -1,8 +1,8 @@
-# Blueprint Pattern Assistant — Guided Notebook
+# Blueprint Pattern Assistant — Adoption Guide
 
-Static site as a **Jupyter-style notebook**: explains what the pattern is, how to adopt it into your app repo, what you get after setup, and how to run workflows (copy prompts to clipboard).
+Static site for senior architects: scope, one-time adoption, expected repository layout, and session workflows with clipboard copy. English, professional tone.
 
-Inspired by the browse-and-copy idea of [Semantic Contracts](https://llm-coding.github.io/Semantic-Anchors/contracts); content is **specific to the Blueprint Pattern**.
+Inspired by the browse-and-copy pattern of [Semantic Contracts](https://llm-coding.github.io/Semantic-Anchors/contracts); content is **specific to the Blueprint Pattern**.
 
 ## Live site (GitHub Pages)
 
