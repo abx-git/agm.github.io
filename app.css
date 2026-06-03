@@ -243,6 +243,11 @@ a.btn {
 
 .foot a { color: var(--accent); }
 
+.deploy-id {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .toast {
   position: fixed;
   bottom: 1.25rem;
