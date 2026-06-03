@@ -6,11 +6,16 @@ Inspired by the browse-and-copy UX of [Semantic Anchors](https://llm-coding.gith
 
 ## Live site (GitHub Pages)
 
-After the [Pages workflow](../../.github/workflows/pages.yml) runs on `main`:
+**URL:** https://abx-git.github.io/blueprint-pattern/
 
-**https://abx-git.github.io/blueprint-pattern/**
+**Setup (once):** [GITHUB-PAGES-SETUP.md](./GITHUB-PAGES-SETUP.md) — especially if you only see *Verified domains* in Settings.
 
-(Repository Settings → Pages → Source: **GitHub Actions** — enable once if the first deploy does not appear.)
+Short version:
+
+1. Repo **Settings → Pages** (not organization settings).
+2. **Build and deployment** → Source: **Deploy from a branch** → Branch **`gh-pages`** → Folder **`/`**.
+3. **Actions** → run **Deploy Blueprint Assistant** → wait for green.
+4. Reload **Settings → Pages** — live URL should appear.
 
 ## Run locally
 
