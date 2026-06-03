@@ -105,7 +105,7 @@
     "id": "bootstrap-adopt",
     "role": "bootstrap",
     "group": "Bootstrap",
-    "when": "First-time adoption; no `docs/architecture/blueprint.md` yet — prompt-driven setup",
+    "when": "First-time adoption; no `docs/architecture/blueprint.md` yet",
     "prerequisite": "",
     "freshChat": true,
     "freshNote": "Required",
@@ -117,16 +117,15 @@
       "TEMPLATE_SELECTED"
     ],
     "steps": [
-      "If docs/architecture/blueprint.md already exists, stop and tell the human to use bootstrap-continue instead.",
-      "Scaffold from the pattern repository (run at repository root, then verify paths exist): git clone --depth 1 https://github.com/abx-git/blueprint-pattern.git /tmp/blueprint-pattern mkdir -p docs/architecture scripts prompts .cursor/rules cp -R /tmp/blueprint-pattern/docs/templates/architecture/* docs/architecture/ cp /tmp/blueprint-pattern/scripts/bp-workflow.sh scripts/ cp -R /tmp/blueprint-pattern/prompts/core prompts/ cp -R /tmp/blueprint-pattern/prompts/workflows prompts/ cp /tmp/blueprint-pattern/.cursor/rules/blueprint-*.mdc .cursor/rules/ 2>/dev/null || true chmod +x scripts/bp-workflow.sh rm -rf /tmp/blueprint-pattern",
-      "If git clone fails, stop and report — do not invent template files.",
-      "Interview the human briefly (application name, purpose, tech stack, key paths, external systems). Write docs/architecture/context/always-on.md.",
-      "Remind the human to install prompts/core/system-prompt.md in IDE rules when not already present.",
-      "Bootstrap documentation: follow docs/architecture/prompts/role-bootstrap.md — select template, create blueprint.md and entry-point.md, interfaces/, populate the first high-value section from evidence only.",
+      "If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.",
+      "Execute Phase A–C in prompts/reference/adopt-procedure.md: write all files directly — no git clone, zip, curl, or bp-workflow.sh.",
+      "Interview the human briefly. Write docs/architecture/context/always-on.md.",
+      "Remind the human to install prompts/core/system-prompt.md in IDE rules (once).",
+      "Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — template selection, blueprint.md, entry-point.md, interfaces/, first evidence-based section.",
       "Verify relative links. Append a session log entry to blueprint.md."
     ],
     "placeholders": [],
-    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. Execute this session like a setup script: copy templates and tooling from the pattern repository, configure application context, then begin architecture documentation bootstrap.\n\nPrerequisites: application repository open in the IDE; network access to GitHub; run shell commands only with explicit human approval.\n\nInstructions:\n1. If docs/architecture/blueprint.md already exists, stop and tell the human to use bootstrap-continue instead.\n2. Scaffold from the pattern repository (run at repository root, then verify paths exist):\n   git clone --depth 1 https://github.com/abx-git/blueprint-pattern.git /tmp/blueprint-pattern\n   mkdir -p docs/architecture scripts prompts .cursor/rules\n   cp -R /tmp/blueprint-pattern/docs/templates/architecture/* docs/architecture/\n   cp /tmp/blueprint-pattern/scripts/bp-workflow.sh scripts/\n   cp -R /tmp/blueprint-pattern/prompts/core prompts/\n   cp -R /tmp/blueprint-pattern/prompts/workflows prompts/\n   cp /tmp/blueprint-pattern/.cursor/rules/blueprint-*.mdc .cursor/rules/ 2>/dev/null || true\n   chmod +x scripts/bp-workflow.sh\n   rm -rf /tmp/blueprint-pattern\n3. If git clone fails, stop and report — do not invent template files.\n4. Interview the human briefly (application name, purpose, tech stack, key paths, external systems). Write docs/architecture/context/always-on.md.\n5. Remind the human to install prompts/core/system-prompt.md in IDE rules when not already present.\n6. Bootstrap documentation: follow docs/architecture/prompts/role-bootstrap.md — select template, create blueprint.md and entry-point.md, interfaces/, populate the first high-value section from evidence only.\n7. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. Execute this session like a setup script: write the documentation scaffold, configure application context, then run bootstrap.\n\nPrerequisites: application repository open in the IDE; human available for a short interview.\n\nInstructions:\n1. If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Execute Phase A–C in prompts/reference/adopt-procedure.md: write all files directly — no git clone, zip, curl, or bp-workflow.sh.\n3. Interview the human briefly. Write docs/architecture/context/always-on.md.\n4. Remind the human to install prompts/core/system-prompt.md in IDE rules (once).\n5. Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — template selection, blueprint.md, entry-point.md, interfaces/, first evidence-based section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",

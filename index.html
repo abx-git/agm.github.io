@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=7" />
+  <link rel="stylesheet" href="app.css?v=8" />
 </head>
 <body>
   <main class="app">
     <header class="head">
       <h1>Blueprint Pattern</h1>
-      <p class="tagline">One prompt to adopt. Checkout + prompt for every session after.</p>
+      <p class="tagline">One prompt to adopt. Copy a session prompt for every chat after.</p>
     </header>
 
     <nav class="phase-nav" role="tablist">
@@ -25,7 +25,7 @@
             <span class="step-n">1</span>
             <div>
               <strong>Run the adoption prompt</strong>
-              <p>Open your app repo in the IDE. New chat → paste prompt. The agent copies templates from GitHub, writes <code>always-on.md</code>, creates <code>blueprint.md</code>, and starts documentation.</p>
+              <p>Open your app repo in the IDE. New chat → paste prompt. The agent writes the scaffold, <code>always-on.md</code>, <code>blueprint.md</code>, and the first documentation section — no download, no checkout script.</p>
             </div>
           </div>
           <button type="button" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
@@ -36,12 +36,10 @@
             <span class="step-n">2</span>
             <div>
               <strong>Follow-up sessions</strong>
-              <p>Work through <code>blueprint.md</code>. Repeat until bootstrap is complete.</p>
+              <p>Work through <code>blueprint.md</code>. New chat → copy prompt. Repeat until bootstrap is complete.</p>
             </div>
           </div>
           <div class="cmd-row">
-            <code class="checkout"></code>
-            <button type="button" class="btn btn-checkout">Copy checkout</button>
             <button type="button" class="btn primary btn-prompt">Copy prompt</button>
           </div>
         </li>
@@ -55,8 +53,6 @@
             </div>
           </div>
           <div class="cmd-row">
-            <code class="checkout"></code>
-            <button type="button" class="btn btn-checkout">Copy checkout</button>
             <button type="button" class="btn primary btn-prompt">Copy prompt</button>
           </div>
         </li>
@@ -64,13 +60,11 @@
     </section>
 
     <section id="phase-use" class="phase" role="tabpanel" hidden>
-      <p class="use-intro">Pick a mode. Copy checkout → terminal. Copy prompt → new agent chat.</p>
+      <p class="use-intro">Pick a mode. New chat → copy prompt → paste.</p>
       <div class="modes" id="mode-grid"></div>
       <div id="mode-panel" class="mode-panel" hidden>
         <p class="mode-label" id="mode-label"></p>
         <div class="cmd-row">
-          <code id="mode-checkout"></code>
-          <button type="button" class="btn" id="mode-copy-checkout">Copy checkout</button>
           <button type="button" class="btn primary" id="mode-copy-prompt">Copy prompt</button>
         </div>
         <p class="mode-note" id="mode-note" hidden></p>
@@ -84,6 +78,6 @@
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=7" type="module"></script>
+  <script src="app.js?v=8" type="module"></script>
 </body>
 </html>

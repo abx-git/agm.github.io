@@ -10,10 +10,6 @@ const USE_MODES = [
   { id: 'review-maintenance', label: 'Review docs', note: 'New chat. Report-only.' },
 ];
 
-function checkoutCmd(id) {
-  return `./scripts/bp-workflow.sh checkout ${id}`;
-}
-
 async function loadWorkflows() {
   const res = await fetch(new URL('workflows.json', ASSET_BASE));
   if (!res.ok) throw new Error('workflows.json');
@@ -69,12 +65,6 @@ function initStaticCopy() {
 }
 
 function bindStep(stepEl, workflow) {
-  const code = stepEl.querySelector('.checkout');
-  code.textContent = checkoutCmd(workflow.id);
-
-  stepEl.querySelector('.btn-checkout').addEventListener('click', () => {
-    copy(checkoutCmd(workflow.id));
-  });
   stepEl.querySelector('.btn-prompt').addEventListener('click', () => {
     copy(workflow.prompt);
   });
@@ -107,7 +97,6 @@ function initUsePhase(workflows) {
       panel.hidden = false;
 
       document.getElementById('mode-label').textContent = w.when;
-      document.getElementById('mode-checkout').textContent = checkoutCmd(w.id);
 
       const note = document.getElementById('mode-note');
       const text = mode.note || (w.freshChat ? 'New chat required.' : '');
@@ -117,9 +106,6 @@ function initUsePhase(workflows) {
     grid.appendChild(btn);
   }
 
-  document.getElementById('mode-copy-checkout').addEventListener('click', () => {
-    if (current) copy(checkoutCmd(current.id));
-  });
   document.getElementById('mode-copy-prompt').addEventListener('click', () => {
     if (current) copy(current.prompt);
   });
