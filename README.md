@@ -1,8 +1,8 @@
-# Blueprint Pattern Assistant — Workflow Contracts
+# Blueprint Pattern Assistant — Guided Notebook
 
-Static site in the style of [Semantic Contracts](https://llm-coding.github.io/Semantic-Anchors/contracts): each workflow is a **contract** with explanation, steps, placeholders, and one-click copy to the clipboard for local use in IDE + terminal.
+Static site as a **Jupyter-style notebook**: explains what the pattern is, how to adopt it into your app repo, what you get after setup, and how to run workflows (copy prompts to clipboard).
 
-Inspired by [Semantic Anchors](https://llm-coding.github.io/Semantic-Anchors/); this assistant is **specific to the Blueprint Pattern** (workflows, roles, session checkpoints `[[ANCHOR:…]]`).
+Inspired by the browse-and-copy idea of [Semantic Contracts](https://llm-coding.github.io/Semantic-Anchors/contracts); content is **specific to the Blueprint Pattern**.
 
 ## Live site (GitHub Pages)
 
