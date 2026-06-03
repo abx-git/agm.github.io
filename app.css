@@ -150,6 +150,12 @@ body {
   color: #fff;
 }
 
+a.btn {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
 .use-intro {
   font-size: 0.9rem;
   color: var(--muted);

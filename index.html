@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=5" />
+  <link rel="stylesheet" href="app.css?v=6" />
 </head>
 <body>
   <main class="app">
@@ -18,20 +18,22 @@
       <button type="button" class="phase-tab" data-phase="use" role="tab">Part 2 · Use</button>
     </nav>
 
-    <!-- Part 1 -->
     <section id="phase-create" class="phase active" role="tabpanel">
       <ol class="steps">
         <li class="step">
           <div class="step-head">
             <span class="step-n">1</span>
             <div>
-              <strong>Create the documentation folder</strong>
-              <p>In your application repository.</p>
+              <strong>Download and unpack</strong>
+              <p>At the root of your application repository. Creates <code>docs/architecture/</code>, <code>prompts/</code>, <code>scripts/</code>.</p>
             </div>
           </div>
           <div class="cmd-row">
-            <code id="cmd-mkdir">mkdir -p docs/architecture</code>
-            <button type="button" class="btn" data-copy="#cmd-mkdir">Copy</button>
+            <a class="btn primary" href="https://github.com/abx-git/blueprint-pattern/releases/latest/download/blueprint-pattern-adopt.zip">Download kit</a>
+          </div>
+          <div class="cmd-row" style="margin-top:0.5rem">
+            <code id="cmd-unzip">unzip blueprint-pattern-adopt.zip</code>
+            <button type="button" class="btn" data-copy="#cmd-unzip">Copy</button>
           </div>
         </li>
 
@@ -39,18 +41,10 @@
           <div class="step-head">
             <span class="step-n">2</span>
             <div>
-              <strong>Copy templates and prompts</strong>
-              <p>From the pattern repo into your app repo. Fill <code>context/always-on.md</code>. Install <code>prompts/core/system-prompt.md</code> in IDE rules (once).</p>
+              <strong>Configure</strong>
+              <p>Edit <code>docs/architecture/context/always-on.md</code>. Copy <code>ide/cursor/*.mdc</code> to <code>.cursor/rules/</code>. See <code>ADOPT.md</code> in the kit.</p>
             </div>
           </div>
-          <div class="cmd-row">
-            <button type="button" class="btn primary" data-copy="#cmd-copy">Copy commands</button>
-          </div>
-          <pre id="cmd-copy" hidden>mkdir -p docs/architecture scripts prompts
-cp -R blueprint-pattern/docs/templates/architecture/* docs/architecture/
-cp blueprint-pattern/scripts/bp-workflow.sh scripts/
-cp -R blueprint-pattern/prompts/workflows prompts/
-chmod +x scripts/bp-workflow.sh</pre>
         </li>
 
         <li class="step" data-workflow="bootstrap-init">
@@ -58,7 +52,7 @@ chmod +x scripts/bp-workflow.sh</pre>
             <span class="step-n">3</span>
             <div>
               <strong>First session</strong>
-              <p>Creates <code>blueprint.md</code> (work file) and initial docs from templates.</p>
+              <p>Creates <code>blueprint.md</code> (work file) and initial documentation.</p>
             </div>
           </div>
           <div class="cmd-row">
@@ -73,7 +67,7 @@ chmod +x scripts/bp-workflow.sh</pre>
             <span class="step-n">4</span>
             <div>
               <strong>Follow-up sessions</strong>
-              <p>Agent reads <code>blueprint.md</code>, completes the next open phase, updates the graph. Repeat until bootstrap is done.</p>
+              <p>Work through <code>blueprint.md</code>. Repeat until bootstrap is complete.</p>
             </div>
           </div>
           <div class="cmd-row">
@@ -88,7 +82,7 @@ chmod +x scripts/bp-workflow.sh</pre>
             <span class="step-n">5</span>
             <div>
               <strong>Close creation</strong>
-              <p>Review session (report-only, new chat). Then mark phases complete in <code>blueprint.md</code>.</p>
+              <p>Review session (new chat, report-only).</p>
             </div>
           </div>
           <div class="cmd-row">
@@ -100,12 +94,9 @@ chmod +x scripts/bp-workflow.sh</pre>
       </ol>
     </section>
 
-    <!-- Part 2 -->
     <section id="phase-use" class="phase" role="tabpanel" hidden>
-      <p class="use-intro">Pick a mode. Copy checkout → run in terminal. Copy prompt → new agent chat.</p>
-
+      <p class="use-intro">Pick a mode. Copy checkout → terminal. Copy prompt → new agent chat.</p>
       <div class="modes" id="mode-grid"></div>
-
       <div id="mode-panel" class="mode-panel" hidden>
         <p class="mode-label" id="mode-label"></p>
         <div class="cmd-row">
@@ -118,12 +109,12 @@ chmod +x scripts/bp-workflow.sh</pre>
     </section>
 
     <footer class="foot">
-      <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
-      · <code>docs/guide.md</code>
+      <a href="https://github.com/abx-git/blueprint-pattern/releases">Releases</a>
+      · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=5" type="module"></script>
+  <script src="app.js?v=6" type="module"></script>
 </body>
 </html>
