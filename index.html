@@ -7,47 +7,69 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=10" />
+  <link rel="stylesheet" href="app.css?v=12" />
 </head>
 <body>
   <main class="app">
     <header class="head">
       <h1>Blueprint Pattern</h1>
-      <p class="tagline">Configure adoption, copy one prompt, start documenting.</p>
+      <p class="tagline">Three lifecycle phases — Build the graph, Evolve it, Work from it.</p>
     </header>
 
-    <nav class="phase-nav" role="tablist">
-      <button type="button" class="phase-tab active" data-phase="create" role="tab" aria-selected="true">Part 1 · Create</button>
-      <button type="button" class="phase-tab" data-phase="use" role="tab">Part 2 · Use</button>
+    <details class="glossary" open>
+      <summary>Core files (read once)</summary>
+      <p class="glossary-lead">Architecture content lives in template folders (<code>arc42/</code>, …). Three files orchestrate the graph:</p>
+      <table class="role-table">
+        <thead>
+          <tr>
+            <th scope="col">File</th>
+            <th scope="col">Role</th>
+            <th scope="col">Contains</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>always-on.md</code></td>
+            <td>Session context</td>
+            <td>Name, stack, source map — every session</td>
+          </tr>
+          <tr>
+            <td><code>blueprint.md</code></td>
+            <td><strong>Construction plan</strong></td>
+            <td>Phase → target file, status, WRK, reviews, session log</td>
+          </tr>
+          <tr>
+            <td><code>entry-point.md</code></td>
+            <td>Human entry</td>
+            <td>Overview, navigation, source links — no status column</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="glossary-note">Blueprint and entry-point link to the same docs: blueprint = <em>plan &amp; progress</em>; entry-point = <em>read &amp; navigate</em>.</p>
+    </details>
+
+    <nav class="phase-nav" role="tablist" aria-label="Lifecycle">
+      <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Build</button>
+      <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Evolve</button>
+      <button type="button" class="phase-tab" data-phase="work" role="tab">3 · Work</button>
     </nav>
 
-    <section id="phase-create" class="phase active" role="tabpanel">
-      <details class="glossary" open>
-        <summary>Key files (read once)</summary>
-        <dl>
-          <dt><code>always-on.md</code></dt>
-          <dd>Stable application context the agent reads every session: name, purpose, stack, source map, doc paths. Not the architecture itself — facts that rarely change.</dd>
-          <dt><code>blueprint.md</code></dt>
-          <dd>Session backlog and reference state: phase checklist, open work items (WRK), reviews, session log. Tracks progress — not a substitute for arc42 (or your template) chapters.</dd>
-        </dl>
-      </details>
-
+    <section id="phase-build" class="phase active" role="tabpanel">
+      <p class="phase-intro">Create the doc graph iteratively — traverse <code>blueprint.md</code> phase by phase until bootstrap is complete.</p>
       <ol class="steps">
         <li class="step step-hero">
           <div class="step-head">
             <span class="step-n">1</span>
             <div>
-              <strong>Configure and run adoption</strong>
-              <p>Set parameters below. New chat in your app repo → paste the generated prompt. The agent writes the scaffold, fills <code>always-on.md</code>, creates <code>blueprint.md</code>, and starts the first doc section.</p>
+              <strong>Adopt</strong>
+              <p>Configure parameters → copy prompt → new chat. Agent creates all three core files, template scaffold, first evidence-based section.</p>
             </div>
           </div>
-
           <form id="adopt-form" class="adopt-form">
             <label class="field">
               <span>Application name <em>(required)</em></span>
               <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
             </label>
-
             <label class="field">
               <span>Documentation template</span>
               <select name="template">
@@ -57,23 +79,20 @@
                 <option value="lean-service">lean-service</option>
                 <option value="custom">custom</option>
               </select>
+              <span class="field-hint">Phase rows in <code>blueprint.md</code> + template folder.</span>
             </label>
-
             <label class="field field-custom" hidden>
               <span>Custom template name</span>
               <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
             </label>
-
             <label class="field">
               <span>Purpose / domain</span>
               <input type="text" name="purpose" placeholder="One sentence — what the system does" />
             </label>
-
             <label class="field">
               <span>Stack</span>
               <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
             </label>
-
             <details class="field-advanced">
               <summary>More parameters</summary>
               <label class="field">
@@ -89,30 +108,31 @@
                 <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
               </label>
             </details>
+            <details class="prompt-preview">
+              <summary>Preview parameter block</summary>
+              <pre id="prompt-preview" class="preview-box" aria-live="polite"></pre>
+            </details>
           </form>
-
           <button type="submit" form="adopt-form" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
         </li>
-
         <li class="step" data-workflow="bootstrap-continue">
           <div class="step-head">
             <span class="step-n">2</span>
             <div>
-              <strong>Follow-up sessions</strong>
-              <p>Work through open phases in <code>blueprint.md</code> (the session backlog). New chat → copy prompt → repeat until bootstrap phases are done.</p>
+              <strong>Continue building</strong>
+              <p>Next open row in <code>blueprint.md</code> → copy prompt → new chat. Sync <code>entry-point.md</code> when sections appear.</p>
             </div>
           </div>
           <div class="cmd-row">
             <button type="button" class="btn primary btn-prompt">Copy prompt</button>
           </div>
         </li>
-
         <li class="step" data-workflow="review-milestone">
           <div class="step-head">
             <span class="step-n">3</span>
             <div>
-              <strong>Close creation</strong>
-              <p>New chat, report-only. Validates <code>blueprint.md</code> against the doc graph, checks links, and recommends where to move insights from follow-up sessions into template sections (references, not duplicates).</p>
+              <strong>Close build phase</strong>
+              <p>Report-only: validate construction plan vs. graph, links, redistribute follow-up insights into template sections.</p>
             </div>
           </div>
           <div class="cmd-row">
@@ -122,26 +142,50 @@
       </ol>
     </section>
 
-    <section id="phase-use" class="phase" role="tabpanel" hidden>
-      <p class="use-intro">Pick a mode. New chat → copy prompt → paste.</p>
-      <div class="modes" id="mode-grid"></div>
-      <div id="mode-panel" class="mode-panel" hidden>
-        <p class="mode-label" id="mode-label"></p>
+    <section id="phase-evolve" class="phase" role="tabpanel" hidden>
+      <p class="phase-intro">Deepen sections or keep docs aligned with code. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
+      <div class="modes" id="evolve-grid"></div>
+      <div id="evolve-panel" class="mode-panel" hidden>
+        <p class="mode-label" id="evolve-label"></p>
         <div class="cmd-row">
-          <button type="button" class="btn primary" id="mode-copy-prompt">Copy prompt</button>
+          <button type="button" class="btn primary mode-copy" data-panel="evolve">Copy prompt</button>
         </div>
-        <p class="mode-note" id="mode-note" hidden></p>
+        <p class="mode-note" id="evolve-note" hidden></p>
       </div>
     </section>
 
+    <section id="phase-work" class="phase" role="tabpanel" hidden>
+      <p class="phase-intro">Use the compiled graph for architecture work — traverse links, write to <code>work/</code>, register WRK in <code>blueprint.md</code>.</p>
+      <div class="modes" id="work-grid"></div>
+      <div id="work-panel" class="mode-panel" hidden>
+        <p class="mode-label" id="work-label"></p>
+        <div class="cmd-row">
+          <button type="button" class="btn primary mode-copy" data-panel="work">Copy prompt</button>
+        </div>
+        <p class="mode-note" id="work-note" hidden></p>
+      </div>
+    </section>
+
+    <details class="review-block">
+      <summary>Review (all phases — report-only, new chat)</summary>
+      <p class="review-intro">Separate verification from writing. Pick a review workflow:</p>
+      <div class="modes review-modes" id="review-grid"></div>
+      <div id="review-panel" class="mode-panel" hidden>
+        <p class="mode-label" id="review-label"></p>
+        <div class="cmd-row">
+          <button type="button" class="btn primary mode-copy" data-panel="review">Copy prompt</button>
+        </div>
+      </div>
+    </details>
+
     <footer class="foot">
-      <span class="deploy-id">Params · 2026-06-03</span>
-      · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/prompts/adopt-standalone.md">Adoption prompt source</a>
+      <span class="deploy-id">Lifecycle · v12</span>
+      · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=10" type="module"></script>
+  <script src="app.js?v=12" type="module"></script>
 </body>
 </html>

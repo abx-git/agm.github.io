@@ -18,7 +18,7 @@ body {
 }
 
 .app {
-  max-width: 36rem;
+  max-width: 42rem;
   margin: 0 auto;
   padding: 2rem 1.25rem 3rem;
 }
@@ -65,6 +65,101 @@ body {
   margin: 0.2rem 0 0;
   color: var(--muted);
   line-height: 1.45;
+}
+
+.glossary-lead {
+  margin-top: 0.65rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.glossary-note {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.role-table {
+  width: 100%;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.role-table th,
+.role-table td {
+  border: 1px solid var(--line);
+  padding: 0.4rem 0.45rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.role-table th {
+  background: #fff;
+  font-weight: 600;
+}
+
+.phase-intro {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  line-height: 1.45;
+}
+
+.field-hint {
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.prompt-preview {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.prompt-preview summary {
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.preview-box {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 14rem;
+  overflow: auto;
+}
+
+.review-block {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 0.85rem;
+}
+
+.review-block summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.review-intro {
+  margin: 0.65rem 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.review-modes {
+  margin-top: 0.5rem;
 }
 
 .adopt-form {
@@ -132,10 +227,10 @@ body {
 
 .phase-tab {
   flex: 1;
-  padding: 0.6rem 0.75rem;
+  padding: 0.55rem 0.4rem;
   border: none;
   background: #fff;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   color: var(--muted);

@@ -1,15 +1,24 @@
 const ASSET_BASE = new URL('./', import.meta.url);
 const STORAGE_KEY = 'bp-adopt-params';
 
-const USE_MODES = [
-  { id: 'maintenance', label: 'After code change', note: 'Paste git diff into the prompt.' },
+const EVOLVE_MODES = [
+  { id: 'refinement', label: 'Deepen section', note: 'Scoped refinement of one template section.' },
+  { id: 'maintenance', label: 'After code change', note: 'Paste git diff — update only impacted docs.' },
+];
+
+const WORK_MODES = [
   { id: 'architecture-work-query', label: 'Answer question', note: 'Set your question in the prompt.' },
   { id: 'architecture-work-analysis', label: 'Analyze', note: 'Set topic, scope, and focus.' },
   { id: 'architecture-work-design', label: 'Design proposal', note: 'Set goal and constraints.' },
   { id: 'architecture-work-continue', label: 'Open work items', note: 'Continues WRK entries in blueprint.md.' },
-  { id: 'refinement', label: 'Deepen section', note: 'Scoped arc42 refinement.' },
-  { id: 'review-maintenance', label: 'Review docs', note: 'New chat. Report-only.' },
 ];
+
+const REVIEW_MODES = [
+  { id: 'review-phase', label: 'Review one phase' },
+  { id: 'review-maintenance', label: 'Review all docs' },
+];
+
+const panelState = { evolve: null, work: null, review: null };
 
 async function loadWorkflows() {
   const res = await fetch(new URL('workflows.json', ASSET_BASE));
@@ -71,7 +80,12 @@ function buildParameterBlock(params) {
   if (params.sourceRoot) lines.push(`- Primary source path: ${params.sourceRoot}`);
   if (params.externalSystems) lines.push(`- External systems: ${params.externalSystems}`);
   lines.push('');
-  lines.push('Use these values in always-on.md and entry-point.md. Create the template folder for the selected documentation template. Interview only for missing facts (source map detail, team conventions).');
+  lines.push('## File roles (create all three — do not merge)');
+  lines.push('- always-on.md — session context (name, stack, source map); not architecture chapters');
+  lines.push('- blueprint.md — construction plan: phase rows → target files, status, WRK, reviews, session log');
+  lines.push('- entry-point.md — human entry: overview, navigation, source links; no phase status or session log');
+  lines.push('');
+  lines.push(`Create "${template}/" with phase stubs matching blueprint rows. Keep blueprint (plan) and entry-point (navigation) in sync. Interview only for missing facts.`);
   lines.push('');
   return lines.join('\n');
 }
@@ -124,10 +138,28 @@ function initAdoptForm(adoptBase) {
   if (!form) return;
 
   applyParams(form, loadParams());
+  const previewEl = document.getElementById('prompt-preview');
+
+  function refreshPreview() {
+    if (!previewEl) return;
+    const params = readForm(form);
+    if (!params.appName) {
+      previewEl.textContent = 'Enter an application name to preview.';
+      return;
+    }
+    if (params.template === 'custom' && !params.customTemplate) {
+      previewEl.textContent = 'Enter a custom template name.';
+      return;
+    }
+    previewEl.textContent = buildParameterBlock(params);
+  }
 
   form.elements.namedItem('template')?.addEventListener('change', () => {
     toggleCustomField(form);
+    refreshPreview();
   });
+  form.addEventListener('input', refreshPreview);
+  refreshPreview();
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -148,8 +180,9 @@ function initAdoptForm(adoptBase) {
 function initTabs() {
   const tabs = document.querySelectorAll('.phase-tab');
   const panels = {
-    create: document.getElementById('phase-create'),
-    use: document.getElementById('phase-use'),
+    build: document.getElementById('phase-build'),
+    evolve: document.getElementById('phase-evolve'),
+    work: document.getElementById('phase-work'),
   };
 
   tabs.forEach((tab) => {
@@ -174,19 +207,19 @@ function bindStep(stepEl, workflow) {
   });
 }
 
-function initCreatePhase(workflows) {
+function initBuildPhase(workflows) {
   document.querySelectorAll('.step[data-workflow]').forEach((step) => {
     const w = byId(workflows, step.dataset.workflow);
     if (w) bindStep(step, w);
   });
 }
 
-function initUsePhase(workflows) {
-  const grid = document.getElementById('mode-grid');
-  const panel = document.getElementById('mode-panel');
-  let current = null;
+function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
+  const grid = document.getElementById(gridId);
+  const panel = document.getElementById(panelId);
+  if (!grid || !panel) return;
 
-  for (const mode of USE_MODES) {
+  for (const mode of modes) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'mode-btn';
@@ -197,21 +230,29 @@ function initUsePhase(workflows) {
 
       const w = byId(workflows, mode.id);
       if (!w) return;
-      current = w;
+      panelState[key] = w;
       panel.hidden = false;
 
-      document.getElementById('mode-label').textContent = w.when;
+      const label = document.getElementById(labelId);
+      if (label) label.textContent = w.when;
 
-      const note = document.getElementById('mode-note');
-      const text = mode.note || (w.freshChat ? 'New chat required.' : '');
-      note.textContent = text;
-      note.hidden = !text;
+      const note = document.getElementById(noteId);
+      if (note) {
+        const text = mode.note || (w.freshChat ? 'New chat required.' : '');
+        note.textContent = text;
+        note.hidden = !text;
+      }
     });
     grid.appendChild(btn);
   }
+}
 
-  document.getElementById('mode-copy-prompt').addEventListener('click', () => {
-    if (current) copy(current.prompt);
+function initCopyButtons() {
+  document.querySelectorAll('.mode-copy').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const w = panelState[btn.dataset.panel];
+      if (w) copy(w.prompt);
+    });
   });
 }
 
@@ -241,8 +282,11 @@ async function main() {
   }
 
   initAdoptForm(adoptBase);
-  initCreatePhase(workflows);
-  initUsePhase(workflows);
+  initBuildPhase(workflows);
+  initModeGrid(workflows, 'evolve', EVOLVE_MODES, 'evolve-grid', 'evolve-panel', 'evolve-label', 'evolve-note');
+  initModeGrid(workflows, 'work', WORK_MODES, 'work-grid', 'work-panel', 'work-label', 'work-note');
+  initModeGrid(workflows, 'review', REVIEW_MODES, 'review-grid', 'review-panel', 'review-label', null);
+  initCopyButtons();
 }
 
 main();
