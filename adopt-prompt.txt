@@ -46,7 +46,7 @@ Do not re-download, clone, or duplicate files already installed.
 
 ## Phase B — Configure
 
-If the session prompt includes **Documentation focus (bootstrap)**, extend `blueprint.md` with phase rows and stubs for each selected focus (see [doc-extensions.md](./doc-extensions.md)). Do not skip focus items the human selected.
+If the session prompt includes **Architecture documentation areas (bootstrap)**, extend `blueprint.md` with phase rows and stubs for each selected area (see [doc-extensions.md](./doc-extensions.md)). Do not skip areas the human selected.
 
 If the session prompt includes an **Adoption parameters** block (with **File roles**), create three separate files under `${docRoot}/` — do not merge:
 

@@ -122,14 +122,14 @@
       "If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.",
       "Verify Phase A in prompts/reference/adopt-procedure.md: role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script (no git clone).",
       "If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.",
-      "If **Documentation focus (bootstrap)** is present, extend blueprint.md and entry-point.md per prompts/reference/doc-extensions.md for every selected focus.",
+      "If **Architecture documentation areas (bootstrap)** is present, add blueprint phases and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).",
       "Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.",
       "Verify relative links. Append a session log entry to blueprint.md."
     ],
     "placeholders": [
       "doc-root"
     ],
-    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. The human has already run `bp-install.sh` (Assistant UI → Build → Install). Execute Phase B–C in prompts/reference/adopt-procedure.md only.\n\nPrerequisites: application repository open in the IDE; install script completed; human available for a short interview.\n\nInstructions:\n1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Verify Phase A in prompts/reference/adopt-procedure.md: role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script (no git clone).\n3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.\n4. If **Documentation focus (bootstrap)** is present, extend blueprint.md and entry-point.md per prompts/reference/doc-extensions.md for every selected focus.\n5. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. The human has already run `bp-install.sh` (Assistant UI → Build → Install). Execute Phase B–C in prompts/reference/adopt-procedure.md only.\n\nPrerequisites: application repository open in the IDE; install script completed; human available for a short interview.\n\nInstructions:\n1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Verify Phase A in prompts/reference/adopt-procedure.md: role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script (no git clone).\n3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.\n4. If **Architecture documentation areas (bootstrap)** is present, add blueprint phases and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).\n5. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",
@@ -195,14 +195,14 @@
       "Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it: a) If a Git MCP server is connected, use its diff/compare tool with the same refs. b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO} c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}",
       "If the diff is empty, stop and report; do not update architecture docs.",
       "Classify changes and update only architecture docs impacted by this diff.",
-      "If **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them."
+      "If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them."
     ],
     "placeholders": [
       "diff-from",
       "diff-to",
       "doc-root"
     ],
-    "prompt": "Blueprint Pattern — Maintenance (git diff range).\nWorkflow: maintenance-diff-range\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n5. If **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Maintenance (git diff range).\nWorkflow: maintenance-diff-range\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n5. If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "maintenance",
@@ -223,12 +223,12 @@
       "Read docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.",
       "<paste git diff or PR diff summary>",
       "Update only architecture docs impacted by this diff.",
-      "If **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them."
+      "If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them."
     ],
     "placeholders": [
       "paste git diff or PR diff summary"
     ],
-    "prompt": "Blueprint Pattern — Maintenance.\nWorkflow: maintenance\nRole: maintenance\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\nIf **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Maintenance.\nWorkflow: maintenance\nRole: maintenance\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\nIf **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "refinement",
@@ -249,7 +249,7 @@
       "Scope: <scope>",
       "Follow <doc-root>prompts/role-bootstrap.md for evidence and link rules.",
       "Read always-on.md → blueprint.md. Update only the scoped sections and blueprint states.",
-      "If **Documentation focus (evolve)** is present, apply those orientations within the stated scope.",
+      "If **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).",
       "Do not restart unrelated phases."
     ],
     "placeholders": [
@@ -257,7 +257,7 @@
       "goal",
       "scope"
     ],
-    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope>\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Documentation focus (evolve)** is present, apply those orientations within the stated scope.\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope>\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",

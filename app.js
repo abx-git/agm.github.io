@@ -25,15 +25,16 @@ const REVIEW_MODES = [
   { id: 'review-maintenance', label: 'Review all docs' },
 ];
 
-/** Evolve workflows that receive the documentation focus block. */
+/** Evolve workflows that receive the architecture documentation areas block. */
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
-/** Documentation focus — extends blueprint.md from bootstrap (see prompts/reference/doc-extensions.md). */
+/** Which architecture Markdown areas to scaffold/maintain (see prompts/reference/doc-extensions.md). */
 const DOC_EXTENSIONS = [
   {
     id: 'onboarding',
-    label: 'Onboarding & navigation',
-    hint: 'Reading paths in entry-point for developers and architects',
+    label: 'entry-point.md — onboarding paths',
+    docPaths: 'entry-point.md, context/always-on.md',
+    hint: 'Create/update reading guides for humans in your doc graph — not the Assistant or prompts/',
     bootstrap: [
       'entry-point.md: add ## Onboarding with recommended reading order by role (developer, architect, ops).',
       'always-on.md: link to entry-point ## Onboarding.',
@@ -45,8 +46,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'operations',
-    label: 'Operations & incidents',
-    hint: 'ops/: runbooks, pitfalls, troubleshooting, environments',
+    label: 'ops/ — operations & incidents',
+    docPaths: 'ops/ (runbooks, pitfalls, troubleshooting, environments)',
+    hint: 'Scaffold and maintain operational Markdown under your documentation root',
     bootstrap: [
       'blueprint.md: phase row for ops/ ([ ] open) if not already present (arc42 phase 13).',
       'entry-point.md: ## Operations linking ops/pitfalls.md, ops/troubleshooting.md, ops/runbooks/.',
@@ -58,8 +60,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'persistence',
-    label: 'Persistence & data',
-    hint: 'Data stores, schema, migrations',
+    label: 'Template + on-demand — data & persistence',
+    docPaths: '<template>/ (data sections), context/on-demand.md',
+    hint: 'Document databases, schemas, migrations in your architecture files',
     bootstrap: [
       'Prioritize template sections for data model (runtime, concepts, overview — per template).',
       'context/on-demand.md: ## Data stores table (technology, ownership, links to code).',
@@ -72,8 +75,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'interfaces',
-    label: 'Integration contracts',
-    hint: 'interfaces/exports.md and imports.md',
+    label: 'interfaces/ — APIs & events',
+    docPaths: 'interfaces/exports.md, interfaces/imports.md',
+    hint: 'Maintain contract docs when public APIs or integrations change',
     bootstrap: [
       'blueprint.md: early priority for interfaces/ phase (after context or in phase 3).',
       'Populate interfaces/ stubs with first known APIs/events; link from building blocks / runtime.',
@@ -84,8 +88,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'security',
-    label: 'Security & compliance',
-    hint: 'Constraints, quality, risks',
+    label: '<template>/ — security & compliance',
+    docPaths: 'constraints, quality, risks sections; context/on-demand.md',
+    hint: 'Document auth, policy, and compliance in template sections you already use',
     bootstrap: [
       'Elevate constraints, quality, and risks phases in blueprint.md ordering notes.',
       'context/on-demand.md: ## Security & compliance assumptions (short, evidence-linked).',
@@ -96,8 +101,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'deployment',
-    label: 'Deployment & environments',
-    hint: 'Deployment view + environment map',
+    label: 'Deployment docs + ops/environments.md',
+    docPaths: '<template>/ deployment section, ops/environments.md',
+    hint: 'Describe how and where the system runs — in your Markdown, not CI config alone',
     bootstrap: [
       'Template deployment section + ops/environments.md (if installed).',
       'entry-point.md: link environments and deployment docs.',
@@ -108,8 +114,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'observability',
-    label: 'Observability',
-    hint: 'Logs, metrics, traces',
+    label: 'Runtime + ops/troubleshooting — observability',
+    docPaths: '<template>/ runtime notes, ops/troubleshooting.md',
+    hint: 'Document logging, metrics, tracing in architecture Markdown',
     bootstrap: [
       'Template runtime section: observability subsection stub.',
       'ops/troubleshooting.md (if installed): link dashboards/runbooks.',
@@ -121,8 +128,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'decisions',
-    label: 'Architecture decisions (ADRs)',
-    hint: '<template>/decisions/',
+    label: '<template>/decisions/ — ADRs',
+    docPaths: '<template>/decisions/, entry-point index',
+    hint: 'Create and update decision records as Markdown ADRs in your repo',
     bootstrap: [
       'blueprint.md: dedicated phase row for <template>/decisions/ near top of plan.',
       'entry-point.md: ## Decisions index linking decisions/README.md and 001-template.md.',
@@ -133,8 +141,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'ecosystem',
-    label: 'Multi-service ecosystem',
-    hint: 'Partner services and cross-repo links',
+    label: 'ecosystem-index.md + interfaces/imports.md',
+    docPaths: 'ecosystem-index.md, interfaces/imports.md, entry-point.md',
+    hint: 'Document partner services and cross-repo links in your architecture graph',
     bootstrap: [
       'interfaces/imports.md: partner export links as primary work.',
       'ecosystem-index.md (if installed): table of services, entry-point, exports.',
@@ -146,8 +155,9 @@ const DOC_EXTENSIONS = [
   },
   {
     id: 'domain-glossary',
-    label: 'Domain language & glossary',
-    hint: 'Ubiquitous language, glossary phase',
+    label: 'Glossary & domain terms',
+    docPaths: 'glossary / context sections, context/on-demand.md',
+    hint: 'Capture ubiquitous language in your template and on-demand context files',
     bootstrap: [
       'context/on-demand.md: ## Key domain concepts table.',
       'blueprint.md: prioritize glossary / context terminology phase.',
@@ -437,14 +447,15 @@ function buildDocFocusBlock(params) {
   if (!ids.length) return '';
   const template = resolvedTemplate(params);
   const lines = [
-    '## Documentation focus (bootstrap — extend blueprint.md)',
+    '## Architecture documentation areas (bootstrap)',
     '',
-    'Selected orientations (implement all; see prompts/reference/doc-extensions.md):',
+    'Create or extend **your** Markdown under the documentation root only — not prompts/, workflows, or Blueprint Pattern procedure. Implement all selected areas (see prompts/reference/doc-extensions.md):',
     '',
   ];
   for (const ext of DOC_EXTENSIONS) {
     if (!ids.includes(ext.id)) continue;
     lines.push(`### ${ext.label} (\`${ext.id}\`)`);
+    if (ext.docPaths) lines.push(`_Files: ${substituteTemplate(ext.docPaths, template)}_`);
     lines.push(`_${ext.hint}_`);
     for (const step of ext.bootstrap) {
       lines.push(`- ${substituteTemplate(step, template)}`);
@@ -459,14 +470,15 @@ function buildDocFocusEvolveBlock(params) {
   if (!ids.length) return '';
   const template = resolvedTemplate(params);
   const lines = [
-    '## Documentation focus (evolve — respect selected orientations)',
+    '## Architecture documentation areas (evolve)',
     '',
-    'Apply to this refinement or maintenance session (see prompts/reference/doc-extensions.md):',
+    'Update **your** architecture Markdown only (same selections as Build). Do not change prompts/ or adoption procedure. Apply in this session (see prompts/reference/doc-extensions.md):',
     '',
   ];
   for (const ext of DOC_EXTENSIONS) {
     if (!ids.includes(ext.id)) continue;
     lines.push(`### ${ext.label} (\`${ext.id}\`)`);
+    if (ext.docPaths) lines.push(`_Files: ${substituteTemplate(ext.docPaths, template)}_`);
     const steps = ext.evolve || ext.bootstrap;
     for (const step of steps) {
       lines.push(`- ${substituteTemplate(step, template)}`);
@@ -492,7 +504,7 @@ function buildParameterBlock(params) {
   if (params.sourceRoot) lines.push(`- Primary source path: ${params.sourceRoot}`);
   if (params.externalSystems) lines.push(`- External systems: ${params.externalSystems}`);
   if (params.docFocus?.length) {
-    lines.push(`- Documentation focus: ${params.docFocus.join(', ')}`);
+    lines.push(`- Architecture documentation areas: ${params.docFocus.join(', ')}`);
   }
   lines.push('');
   const focusBlock = buildDocFocusBlock(params);
@@ -720,7 +732,7 @@ function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
   const docRoot = normDocRoot(params.docRoot);
   const focusNote =
     params.docFocus?.length > 0
-      ? `- Documentation focus: ${params.docFocus.join(', ')}`
+      ? `- Architecture documentation areas: ${params.docFocus.join(', ')}`
       : '';
   const header = [
     '## Session context (installed prompts)',
@@ -786,6 +798,28 @@ function onDocFocusChange(form) {
   refreshOpenWorkflowPanels();
 }
 
+function refreshDocFocusLabels(form) {
+  const template = resolvedTemplate(readForm(form));
+  document.querySelectorAll('.focus-option').forEach((label) => {
+    const cb = label.querySelector('input[name="docFocus"]');
+    const ext = DOC_EXTENSIONS.find((e) => e.id === cb?.value);
+    if (!ext) return;
+    const strong = label.querySelector('strong');
+    if (strong) strong.textContent = substituteTemplate(ext.label, template);
+    let paths = label.querySelector('.focus-doc-paths');
+    if (ext.docPaths) {
+      if (!paths) {
+        paths = document.createElement('em');
+        paths.className = 'focus-doc-paths';
+        strong?.insertAdjacentElement('afterend', paths);
+      }
+      paths.textContent = substituteTemplate(ext.docPaths, template);
+    } else if (paths) {
+      paths.remove();
+    }
+  });
+}
+
 function initDocFocusGrids(form) {
   document.querySelectorAll('[data-doc-focus-grid]').forEach((host) => {
     host.replaceChildren();
@@ -799,9 +833,17 @@ function initDocFocusGrids(form) {
       const text = document.createElement('span');
       const strong = document.createElement('strong');
       strong.textContent = ext.label;
+      text.append(strong);
+      if (ext.docPaths) {
+        const paths = document.createElement('em');
+        paths.className = 'focus-doc-paths';
+        paths.textContent = ext.docPaths;
+        text.append(paths);
+      }
       const small = document.createElement('small');
+      small.className = 'focus-hint';
       small.textContent = ext.hint;
-      text.append(strong, small);
+      text.append(small);
       label.append(cb, text);
       cb.addEventListener('change', () => {
         setDocFocusChecked(form, ext.id, cb.checked);
@@ -810,6 +852,7 @@ function initDocFocusGrids(form) {
       host.append(label);
     }
   });
+  refreshDocFocusLabels(form);
 }
 
 function initSetupForm(adoptBase) {
@@ -863,6 +906,7 @@ function initSetupForm(adoptBase) {
     refreshTemplateBadge();
     const n = e.target?.name;
     if (n === 'template' || n === 'customTemplate' || n === 'docRoot') {
+      refreshDocFocusLabels(form);
       refreshOpenWorkflowPanels();
     }
   });

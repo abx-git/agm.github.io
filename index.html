@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=21" />
+  <link rel="stylesheet" href="app.css?v=22" />
 </head>
 <body>
   <main class="app">
@@ -114,8 +114,8 @@
                 </label>
               </div>
               <fieldset class="focus-fieldset">
-                <legend>Documentation focus <span class="legend-note">(step 1 — install)</span></legend>
-                <p class="field-hint">Select orientations to scaffold via <code>bp-install.sh</code> (e.g. <code>ops/</code> for operations).</p>
+                <legend>Architecture documentation areas <span class="legend-note">(step 1 — install)</span></legend>
+                <p class="field-hint focus-fieldset-lead">Which <strong>Markdown files</strong> to create under your documentation root (e.g. <code>ops/</code>). Does <em>not</em> change Blueprint prompts, workflows, or how adoption works.</p>
                 <div class="focus-grid" data-doc-focus-grid="install"></div>
               </fieldset>
             </div>
@@ -165,8 +165,8 @@
                 </label>
               </fieldset>
               <fieldset class="focus-fieldset">
-                <legend>Documentation focus <span class="legend-note">(step 2 — bootstrap)</span></legend>
-                <p class="field-hint">Same selections apply to Evolve. Extends <code>blueprint.md</code> during adoption. <code>prompts/reference/doc-extensions.md</code></p>
+                <legend>Architecture documentation areas <span class="legend-note">(step 2 — bootstrap)</span></legend>
+                <p class="field-hint focus-fieldset-lead">Same checkboxes as step 1: tell the agent which <strong>architecture docs</strong> to write in your repo (<code>entry-point.md</code>, <code>ops/</code>, template sections, …). Adds phases in <code>blueprint.md</code> — not changes to <code>prompts/</code>.</p>
                 <div class="focus-grid" data-doc-focus-grid="adopt"></div>
               </fieldset>
             </div>
@@ -206,8 +206,8 @@
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
         <p class="phase-intro">Deepen sections or keep docs aligned with code. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
         <fieldset class="focus-fieldset focus-fieldset-evolve">
-          <legend>Documentation focus <span class="legend-note">(Evolve — refinement &amp; maintenance)</span></legend>
-          <p class="field-hint">Synced with step 2 selections. Injected into copied Evolve prompts.</p>
+          <legend>Architecture documentation areas <span class="legend-note">(Evolve)</span></legend>
+          <p class="field-hint focus-fieldset-lead">Synced with Build. When code changes, the agent updates <strong>your</strong> selected architecture Markdown — still not prompts or workflows.</p>
           <div class="focus-grid" data-doc-focus-grid="evolve"></div>
         </fieldset>
         <div class="modes" id="evolve-grid"></div>
@@ -256,13 +256,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v21</span>
+      <span class="deploy-id">Lifecycle · v22</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=21" type="module"></script>
+  <script src="app.js?v=22" type="module"></script>
 </body>
 </html>

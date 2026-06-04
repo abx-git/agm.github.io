@@ -259,6 +259,25 @@ body {
   margin-bottom: 1.25rem;
 }
 
+.focus-fieldset-lead {
+  margin: 0 0 0.65rem;
+  max-width: 42rem;
+  line-height: 1.45;
+}
+
+.focus-option .focus-doc-paths {
+  display: block;
+  font-style: normal;
+  font-size: 0.78rem;
+  color: var(--accent);
+  margin: 0.15rem 0 0.2rem;
+}
+
+.focus-option .focus-hint {
+  display: block;
+  margin-top: 0.1rem;
+}
+
 .template-active {
   margin: 0 0 0.75rem;
   padding: 0.4rem 0.55rem;
