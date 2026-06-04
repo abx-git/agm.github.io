@@ -2,17 +2,16 @@ Blueprint Pattern — Adopt (standalone session).
 Workflow: bootstrap-adopt
 Role: bootstrap
 
-Adopt the Blueprint Pattern into this application repository. Execute this session like a setup script: write the documentation scaffold, configure application context, then run bootstrap.
+Adopt the Blueprint Pattern into this application repository. The human has already run `bp-install.sh`. Execute Phase B–C in prompts/reference/adopt-procedure.md (bundled below).
 
-Prerequisites: application repository open in the IDE; human available for a short interview.
+Prerequisites: install script completed; application repository open in the IDE; human available for a short interview.
 
 Instructions:
 1. If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.
-2. Execute Phase A–C in prompts/reference/adopt-procedure.md (bundled below if not in repo): write all files directly — no git clone, zip, curl, or bp-workflow.sh.
+2. Verify Phase A in adopt-procedure.md: docs/architecture/prompts/role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script.
 3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files; interview only for missing facts.
-4. Remind the human to install prompts/core/system-prompt.md in IDE rules (once).
-5. Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.
-6. Verify relative links. Append a session log entry to blueprint.md.
+4. Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.
+5. Verify relative links. Append a session log entry to blueprint.md.
 
 Output [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop.
 
@@ -20,41 +19,34 @@ Output [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_ST
 
 # Adoption procedure (agent reference)
 
-Bundled into the standalone adoption prompt. **Write files directly** — no git clone, zip, curl, or checkout scripts.
+Bundled into the standalone adoption prompt. **Preparation:** human runs the install script from the [Assistant UI](https://abx-git.github.io/blueprint-pattern.github.io/) (Build → Install). **Adoption session:** agent executes Phase B–C only.
 
-## Phase A — Scaffold (write files)
+## Phase 0 — Install (human, before first chat)
 
-Create at application repository root:
+From the application repository root, run the generated script (downloads files via HTTPS — **no git clone** of blueprint-pattern):
 
-```
-docs/architecture/
-├── context/always-on.md      ← stub first; fill in Phase B
-├── context/on-demand.md      ← minimal stub
-├── prompts/
-│   ├── role-bootstrap.md
-│   ├── role-maintenance.md
-│   ├── role-architecture-work.md
-│   └── role-review.md
-├── work/_template.md
-├── work/_template-review.md
-├── interfaces/exports.md     ← stub table
-├── interfaces/imports.md     ← stub table
-├── blueprint.md              ← construction plan; phase table in Phase C
-├── entry-point.md            ← human entry; completed in Phase C
-└── <template>/               ← arc42 (default) | c4-light | adr-first | lean-service
-prompts/core/system-prompt.md ← core agent rules (see appendix A)
+```bash
+# Example — values come from the Assistant UI generator
+./bp-install.sh --project "Order Service" --doc-root docs/architecture/ --template arc42 --ai-tool cursor
 ```
 
-Rules:
+The script installs:
 
-- Create every path by **writing files in the repo** — do not download or clone.
-- Role prompts: use the [SA:ROLE] structure from the Blueprint Pattern (appendix B); match the four role files under `docs/templates/architecture/prompts/` in the pattern repository when you know them.
-- Template folder: default **arc42** unless the human chooses otherwise; create chapter stubs with titles and placeholder sections.
-- Do not create `scripts/bp-workflow.sh`, `prompts/workflows/`, or `ACTIVE.md` — session tasks are pasted per chat.
+- `prompts/core/system-prompt.md`, `prompts/reference/`, `prompts/workflows/*.md`
+- `${docRoot}/` scaffold: context, role prompts, work templates, interfaces stubs, template folder
+- AI tool rules (Cursor `.cursor/rules/`, `CLAUDE.md`, `.github/copilot-instructions.md`, or `AGENTS.md`)
+
+Do **not** create `blueprint.md` or `entry-point.md` in the install script — the adoption session owns those.
+
+## Phase A — Verify scaffold (agent)
+
+Confirm `${docRoot}/prompts/role-bootstrap.md` and `prompts/core/system-prompt.md` exist. If missing, stop and ask the human to run the install script first.
+
+Do not re-download, clone, or duplicate files already installed.
 
 ## Phase B — Configure
 
-If the session prompt includes an **Adoption parameters** block (with **File roles**), create three separate files — do not merge:
+If the session prompt includes an **Adoption parameters** block (with **File roles**), create three separate files under `${docRoot}/` — do not merge:
 
 | File | Write |
 |------|-------|
@@ -62,11 +54,11 @@ If the session prompt includes an **Adoption parameters** block (with **File rol
 | `blueprint.md` | Construction plan: phase rows for selected template, initial `[ ]` / `[~]` states |
 | `entry-point.md` | Overview stub, navigation table, links to template sections and source paths |
 
-Remind the human to paste `prompts/core/system-prompt.md` into IDE rules (once).
+AI tool rules were written by the install script — remind the human only if rules are missing.
 
 ## Phase C — Bootstrap
 
-Follow `docs/architecture/prompts/role-bootstrap.md`:
+Follow `${docRoot}/prompts/role-bootstrap.md`:
 
 - Record template in `entry-point.md`.
 - Populate `blueprint.md` phase table; mark first in-progress phase.
@@ -83,43 +75,14 @@ Follow `docs/architecture/prompts/role-bootstrap.md`:
 | **3 · Work** | `architecture-work-query`, `-analysis`, `-design`, `-continue` |
 | **Review** (any phase) | `review-phase`, `review-maintenance` — report-only, new chat |
 
-No checkout command — copy the session prompt only.
+Session prompts: paste from Assistant UI or read `prompts/workflows/<id>.md` installed in step 0.
 
 ---
 
-## Appendix A — Core prompt (write to `prompts/core/system-prompt.md`)
+## Appendix A — Core prompt (installed to `prompts/core/system-prompt.md`)
 
-```
-# Blueprint Pattern — Core Prompt
-
-You maintain architecture documentation for this repository using the Blueprint Pattern.
-
-[SA:MODE]
-You are a human-in-the-loop architecture scribe. Do not act autonomously.
-
-[SA:READ_ORDER]
-At session start, read in this order:
-1) docs/architecture/context/always-on.md
-2) docs/architecture/blueprint.md
-3) This chat's session prompt (Workflow / Role lines)
-4) docs/architecture/prompts/role-<role>.md
-
-[SA:INVARIANTS]
-- Markdown graph with relative links only
-- Blueprint state in docs/architecture/blueprint.md
-- Interface contracts in interfaces/exports.md and interfaces/imports.md
-- Verify links before stopping
-
-[SA:TEMPLATE]
-arc42 | c4-light | adr-first | lean-service | custom — record in entry-point.md
-
-[SA:EVIDENCE]
-Mark uncertainty with [[ANCHOR:ASSUMPTION]]. Link claims to docs or source.
-
-[SA:CHECKPOINT]
-Output anchors required by the session prompt. Update blueprint.md session log.
-```
+See [system-prompt.md](../core/system-prompt.md) in the pattern repository. The install script copies it; do not duplicate in the adoption chat unless the file is missing.
 
 ## Appendix B — Role prompt shape
 
-Each `docs/architecture/prompts/role-*.md` file uses: `[SA:ROLE]`, `[SA:INPUTS]`, `[SA:STEPS]`, `[SA:QUALITY_GATES]`, `[SA:OUTPUT_CONTRACT]`, `[SA:STOP]`. Copy content from the pattern repository templates or equivalent Bootstrap / Maintenance / Architecture Work / Review procedures.
+Each `${docRoot}/prompts/role-*.md` file uses: `[SA:ROLE]`, `[SA:INPUTS]`, `[SA:STEPS]`, `[SA:QUALITY_GATES]`, `[SA:OUTPUT_CONTRACT]`, `[SA:STOP]`. Installed from `docs/templates/architecture/prompts/` by `bp-install.sh`.

@@ -117,15 +117,16 @@
       "TEMPLATE_SELECTED"
     ],
     "steps": [
-      "If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.",
-      "Execute Phase A–C in prompts/reference/adopt-procedure.md: write all files directly — no git clone, zip, curl, or bp-workflow.sh.",
-      "If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files; interview only for missing facts.",
-      "Remind the human to install prompts/core/system-prompt.md in IDE rules (once).",
-      "Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.",
+      "If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.",
+      "Verify Phase A in prompts/reference/adopt-procedure.md: role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script (no git clone).",
+      "If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.",
+      "Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.",
       "Verify relative links. Append a session log entry to blueprint.md."
     ],
-    "placeholders": [],
-    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. Execute this session like a setup script: write the documentation scaffold, configure application context, then run bootstrap.\n\nPrerequisites: application repository open in the IDE; human available for a short interview.\n\nInstructions:\n1. If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Execute Phase A–C in prompts/reference/adopt-procedure.md: write all files directly — no git clone, zip, curl, or bp-workflow.sh.\n3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files; interview only for missing facts.\n4. Remind the human to install prompts/core/system-prompt.md in IDE rules (once).\n5. Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "placeholders": [
+      "doc-root"
+    ],
+    "prompt": "Blueprint Pattern — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Blueprint Pattern into this application repository. The human has already run `bp-install.sh` (Assistant UI → Build → Install). Execute Phase B–C in prompts/reference/adopt-procedure.md only.\n\nPrerequisites: application repository open in the IDE; install script completed; human available for a short interview.\n\nInstructions:\n1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Verify Phase A in prompts/reference/adopt-procedure.md: role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script (no git clone).\n3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.\n4. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.\n5. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",

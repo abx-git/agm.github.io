@@ -1,5 +1,7 @@
 const ASSET_BASE = new URL('./', import.meta.url);
 const STORAGE_KEY = 'bp-adopt-params';
+const BP_INSTALL_URL =
+  'https://raw.githubusercontent.com/abx-git/blueprint-pattern/main/scripts/bp-install.sh';
 
 const EVOLVE_MODES = [
   { id: 'refinement', label: 'Deepen section', note: 'Scoped refinement of one template section.' },
@@ -18,7 +20,37 @@ const REVIEW_MODES = [
   { id: 'review-maintenance', label: 'Review all docs' },
 ];
 
+/** Per-workflow user fields (name → placeholder in workflow prompt). */
+const WORKFLOW_INPUTS = {
+  'architecture-work-query': [
+    { name: 'question', label: 'Your question', placeholder: 'e.g. How does order-service call payment-service?', required: true },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. order-payment-flow', required: true },
+  ],
+  'architecture-work-analysis': [
+    { name: 'topic', label: 'Topic', placeholder: 'e.g. payment integration resilience', required: true },
+    { name: 'scope', label: 'Scope', placeholder: 'modules, services, or template sections', required: true },
+    { name: 'focus', label: 'Focus', placeholder: 'e.g. coupling, failure modes, security', required: true },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. payment-resilience', required: true },
+  ],
+  'architecture-work-design': [
+    { name: 'goal', label: 'Goal', placeholder: 'e.g. add circuit breaker between services', required: true },
+    { name: 'constraints', label: 'Constraints (optional)', placeholder: 'latency, no new infra, …', required: false },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. payment-circuit-breaker', required: true },
+  ],
+  refinement: [
+    { name: 'goal', label: 'Goal', placeholder: 'e.g. extend runtime.md with retry behavior', required: true },
+    { name: 'scope', label: 'Scope', placeholder: 'template paths or blueprint phase numbers', required: true },
+  ],
+  maintenance: [
+    { name: 'gitDiff', label: 'Git diff or PR summary', placeholder: 'paste git diff …', required: true, multiline: true },
+  ],
+  'review-phase': [
+    { name: 'slug', label: 'Review report slug', placeholder: 'e.g. phase-3-context', required: true },
+  ],
+};
+
 const panelState = { evolve: null, work: null, review: null };
+const inputState = { evolve: {}, work: {}, review: {} };
 
 async function loadWorkflows() {
   const res = await fetch(new URL('workflows.json', ASSET_BASE));
@@ -30,7 +62,9 @@ function showToast() {
   const el = document.getElementById('toast');
   el.hidden = false;
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => { el.hidden = true; }, 1400);
+  showToast._t = setTimeout(() => {
+    el.hidden = true;
+  }, 1400);
 }
 
 async function copy(text) {
@@ -42,16 +76,25 @@ function byId(workflows, id) {
   return workflows.find((w) => w.id === id);
 }
 
+function normDocRoot(raw) {
+  let r = String(raw || 'docs/architecture/').trim();
+  if (!r) r = 'docs/architecture';
+  r = r.replace(/\/+$/, '');
+  return `${r}/`;
+}
+
 function readForm(form) {
   const data = new FormData(form);
   const template = String(data.get('template') || 'arc42');
   return {
+    os: String(data.get('os') || 'macos'),
+    aiTool: String(data.get('aiTool') || 'cursor'),
     appName: String(data.get('appName') || '').trim(),
     template,
     customTemplate: String(data.get('customTemplate') || '').trim(),
     purpose: String(data.get('purpose') || '').trim(),
     stack: String(data.get('stack') || '').trim(),
-    docRoot: String(data.get('docRoot') || 'docs/architecture/').trim().replace(/\/?$/, '/'),
+    docRoot: normDocRoot(data.get('docRoot')),
     sourceRoot: String(data.get('sourceRoot') || '').trim(),
     externalSystems: String(data.get('externalSystems') || '').trim(),
   };
@@ -64,39 +107,189 @@ function resolvedTemplate(params) {
   return params.template;
 }
 
+function substituteDocRoot(text, docRoot) {
+  const norm = normDocRoot(docRoot);
+  const noSlash = norm.replace(/\/$/, '');
+  return text
+    .replace(/docs\/architecture\//g, norm)
+    .replace(/docs\/architecture(?![/\w])/g, noSlash)
+    .replace(/<doc-root>\//g, norm)
+    .replace(/<doc-root>/g, noSlash);
+}
+
+function workflowRole(workflow) {
+  const r = String(workflow.role || '').trim();
+  return r.split('`')[0].split('(')[0].trim() || 'bootstrap';
+}
+
 function buildParameterBlock(params) {
   const template = resolvedTemplate(params);
+  const docRoot = normDocRoot(params.docRoot);
   const lines = [
     '## Adoption parameters (from architect — do not re-interview if already set)',
     '',
     `- Application: ${params.appName}`,
     `- Documentation template: ${template}`,
+    `- Documentation root: ${docRoot}`,
+    `- Install: bp-install.sh completed (prompts + scaffold present)`,
   ];
   if (params.purpose) lines.push(`- Purpose / domain: ${params.purpose}`);
   if (params.stack) lines.push(`- Stack: ${params.stack}`);
-  if (params.docRoot !== 'docs/architecture/') {
-    lines.push(`- Documentation root: ${params.docRoot}`);
-  }
   if (params.sourceRoot) lines.push(`- Primary source path: ${params.sourceRoot}`);
   if (params.externalSystems) lines.push(`- External systems: ${params.externalSystems}`);
   lines.push('');
-  lines.push('## File roles (create all three — do not merge)');
-  lines.push('- always-on.md — session context (name, stack, source map); not architecture chapters');
-  lines.push('- blueprint.md — construction plan: phase rows → target files, status, WRK, reviews, session log');
-  lines.push('- entry-point.md — human entry: overview, navigation, source links; no phase status or session log');
+  lines.push('## File roles (create all three under documentation root — do not merge)');
+  lines.push(`- ${docRoot}context/always-on.md — session context (name, stack, source map)`);
+  lines.push(`- ${docRoot}blueprint.md — construction plan: phase rows → target files, status, WRK, reviews, session log`);
+  lines.push(`- ${docRoot}entry-point.md — human entry: overview, navigation, source links; no phase status`);
   lines.push('');
-  lines.push(`Create "${template}/" with phase stubs matching blueprint rows. Keep blueprint (plan) and entry-point (navigation) in sync. Interview only for missing facts.`);
+  lines.push(`Template folder: "${template}/" under ${docRoot}. Interview only for missing facts.`);
   lines.push('');
   return lines.join('\n');
 }
 
 function buildAdoptPrompt(base, params) {
   const block = buildParameterBlock(params);
+  let prompt = substituteDocRoot(base, params.docRoot);
   const anchor = 'Role: bootstrap\n\n';
-  if (base.includes(anchor)) {
-    return base.replace(anchor, `${anchor}${block}`);
+  if (prompt.includes(anchor)) {
+    prompt = prompt.replace(anchor, `${anchor}${block}`);
+  } else {
+    prompt = `${block}\n${prompt}`;
   }
-  return `${block}\n${base}`;
+  return prompt;
+}
+
+function shellQuote(s) {
+  return `'${String(s).replace(/'/g, `'\\''`)}`;
+}
+
+function buildInstallScript(params) {
+  const docRoot = normDocRoot(params.docRoot);
+  const template = resolvedTemplate(params);
+  const project = params.appName || 'My Application';
+  const aiTool = params.aiTool;
+  const os = params.os;
+
+  if (os === 'windows') {
+    return buildInstallScriptWindows({ docRoot, template, project, aiTool });
+  }
+
+  const lines = [
+    '#!/usr/bin/env bash',
+    '# Blueprint Pattern — generated install script',
+    '# Run from your application repository root. No git clone required.',
+    'set -euo pipefail',
+    '',
+    `PROJECT=${shellQuote(project)}`,
+    `DOC_ROOT=${shellQuote(docRoot)}`,
+    `TEMPLATE=${shellQuote(template)}`,
+    `AI_TOOL=${shellQuote(aiTool)}`,
+    '',
+    'INSTALLER="$(mktemp -t bp-install.XXXXXX.sh)"',
+    'trap \'rm -f "$INSTALLER"\' EXIT',
+    `curl -fsSL ${shellQuote(BP_INSTALL_URL)} -o "$INSTALLER"`,
+    'chmod +x "$INSTALLER"',
+    '"$INSTALLER" \\',
+    '  --project "$PROJECT" \\',
+    '  --doc-root "$DOC_ROOT" \\',
+    '  --template "$TEMPLATE" \\',
+    '  --ai-tool "$AI_TOOL"',
+    '',
+    'echo "Install finished. Open Assistant UI → Build → Adopt."',
+    '',
+  ];
+  return lines.join('\n');
+}
+
+function buildInstallScriptWindows({ docRoot, template, project, aiTool }) {
+  const q = (s) => `"${String(s).replace(/"/g, '""')}"`;
+  return [
+    '# Blueprint Pattern — generated install script (Windows)',
+    '# Run in PowerShell from your application repository root.',
+    '# Requires: curl.exe (Windows 10+) or run under Git Bash with the bash script instead.',
+    '$ErrorActionPreference = "Stop"',
+    '',
+    `$Project = ${q(project)}`,
+    `$DocRoot = ${q(docRoot)}`,
+    `$Template = ${q(template)}`,
+    `$AiTool = ${q(aiTool)}`,
+    '',
+    '$Installer = Join-Path $env:TEMP ("bp-install-" + [guid]::NewGuid().ToString("n") + ".sh")',
+    `curl.exe -fsSL ${q(BP_INSTALL_URL)} -o $Installer`,
+    'if (-not $?) { throw "Download failed. Use Git Bash and the macOS/Linux script from the Assistant UI." }',
+    '',
+    '# Git Bash (adjust path if needed)',
+    '$bash = @("C:\\Program Files\\Git\\bin\\bash.exe", "C:\\Program Files (x86)\\Git\\bin\\bash.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1',
+    'if (-not $bash) {',
+    '  Write-Host "Install Git for Windows, then re-run — or copy the bash script and run it in Git Bash."',
+    '  exit 1',
+    '}',
+    '',
+    '& $bash $Installer `',
+    '  --project $Project `',
+    '  --doc-root $DocRoot `',
+    '  --template $Template `',
+    '  --ai-tool $AiTool',
+    'Remove-Item -Force $Installer -ErrorAction SilentlyContinue',
+    '',
+    'Write-Host "Install finished. Open Assistant UI → Build → Adopt."',
+    '',
+  ].join('\n');
+}
+
+function applyWorkflowInputs(prompt, workflowId, values) {
+  let out = prompt;
+  const map = {
+    'your question here': values.question,
+    'e.g. payment integration resilience': values.topic,
+    'modules, services, or arc42 sections': values.scope,
+    'e.g. coupling, failure modes, security, performance': values.focus,
+    'e.g. add circuit breaker between order-service and payment-service': values.goal,
+    'optional: latency, no new infra, etc.': values.constraints,
+    'paste git diff or PR diff summary': values.gitDiff,
+    'e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing': values.goal,
+    'arc42 paths, modules, or blueprint phase numbers': values.scope,
+    slug: values.slug,
+  };
+  for (const [placeholder, val] of Object.entries(map)) {
+    if (val == null || val === '') continue;
+    out = out.replace(new RegExp(`<${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}>`, 'g'), val);
+    if (placeholder.includes('e.g.') || placeholder === 'paste git diff or PR diff summary') {
+      out = out.replace(placeholder, val);
+    }
+  }
+  if (values.slug) {
+    out = out.replace(/YYYY-MM-DD-<slug>/g, `YYYY-MM-DD-${values.slug}`);
+    out = out.replace(/<slug>/g, values.slug);
+  }
+  if (values.question) {
+    out = out.replace(/Question: <your question here>/, `Question: ${values.question}`);
+  }
+  if (values.gitDiff) {
+    out = out.replace(/<paste git diff or PR diff summary>/, values.gitDiff);
+    out = out.replace(
+      /Git diff:\n<paste git diff or PR diff summary>/,
+      `Git diff:\n${values.gitDiff}`
+    );
+  }
+  return out;
+}
+
+function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
+  let prompt = substituteDocRoot(workflow.prompt, params.docRoot);
+  prompt = applyWorkflowInputs(prompt, workflow.id, inputValues);
+  const docRoot = normDocRoot(params.docRoot);
+  const header = [
+    '## Session context (installed prompts)',
+    '',
+    `- Documentation root: ${docRoot}`,
+    '- Core rules: prompts/core/system-prompt.md (installed)',
+    `- Role file: ${docRoot}prompts/role-${workflowRole(workflow)}.md`,
+    `- Workflow reference: prompts/workflows/${workflow.id}.md`,
+    '',
+  ].join('\n');
+  return `${header}${prompt}`;
 }
 
 function saveParams(params) {
@@ -133,33 +326,52 @@ function toggleCustomField(form) {
   }
 }
 
-function initAdoptForm(adoptBase) {
-  const form = document.getElementById('adopt-form');
+function initSetupForm(adoptBase) {
+  const form = document.getElementById('setup-form');
   if (!form) return;
 
   applyParams(form, loadParams());
-  const previewEl = document.getElementById('prompt-preview');
+  const installPreview = document.getElementById('install-script-preview');
+  const adoptPreview = document.getElementById('prompt-preview');
 
-  function refreshPreview() {
-    if (!previewEl) return;
+  function refreshInstallPreview() {
+    if (!installPreview) return;
+    const params = readForm(form);
+    installPreview.textContent = buildInstallScript(params);
+  }
+
+  function refreshAdoptPreview() {
+    if (!adoptPreview) return;
     const params = readForm(form);
     if (!params.appName) {
-      previewEl.textContent = 'Enter an application name to preview.';
+      adoptPreview.textContent = 'Enter a project name to preview the adoption block.';
       return;
     }
     if (params.template === 'custom' && !params.customTemplate) {
-      previewEl.textContent = 'Enter a custom template name.';
+      adoptPreview.textContent = 'Enter a custom template name.';
       return;
     }
-    previewEl.textContent = buildParameterBlock(params);
+    adoptPreview.textContent = buildParameterBlock(params);
   }
 
   form.elements.namedItem('template')?.addEventListener('change', () => {
     toggleCustomField(form);
-    refreshPreview();
+    refreshInstallPreview();
+    refreshAdoptPreview();
   });
-  form.addEventListener('input', refreshPreview);
-  refreshPreview();
+  form.addEventListener('input', () => {
+    refreshInstallPreview();
+    refreshAdoptPreview();
+  });
+  refreshInstallPreview();
+  refreshAdoptPreview();
+
+  document.getElementById('copy-install')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const params = readForm(form);
+    saveParams(params);
+    copy(buildInstallScript(params));
+  });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -201,9 +413,61 @@ function initTabs() {
   });
 }
 
+function renderWorkflowInputs(container, workflowId, panelKey) {
+  if (!container) return;
+  container.innerHTML = '';
+  const fields = WORKFLOW_INPUTS[workflowId];
+  if (!fields?.length) {
+    container.hidden = true;
+    return;
+  }
+  container.hidden = false;
+  const params = loadParams() || { docRoot: 'docs/architecture/' };
+  const stored = inputState[panelKey][workflowId] || {};
+
+  for (const field of fields) {
+    const label = document.createElement('label');
+    label.className = 'field';
+    const span = document.createElement('span');
+    span.textContent = field.label + (field.required ? ' *' : '');
+    label.appendChild(span);
+
+    let input;
+    if (field.multiline) {
+      input = document.createElement('textarea');
+      input.rows = 4;
+    } else {
+      input = document.createElement('input');
+      input.type = 'text';
+    }
+    input.name = `${panelKey}-${workflowId}-${field.name}`;
+    input.placeholder = field.placeholder || '';
+    input.value = stored[field.name] || '';
+    input.addEventListener('input', () => {
+      inputState[panelKey][workflowId] = inputState[panelKey][workflowId] || {};
+      inputState[panelKey][workflowId][field.name] = input.value;
+      updatePromptPreview(panelKey, workflowId, params);
+    });
+    label.appendChild(input);
+    container.appendChild(label);
+  }
+}
+
+function updatePromptPreview(panelKey, workflowId, params) {
+  const pre = document.getElementById(`${panelKey}-prompt-preview`);
+  const w = panelState[panelKey];
+  if (!pre || !w || w.id !== workflowId) return;
+  pre.textContent = personalizeWorkflowPrompt(
+    w,
+    params || loadParams() || { docRoot: 'docs/architecture/' },
+    inputState[panelKey][workflowId] || {}
+  );
+}
+
 function bindStep(stepEl, workflow) {
-  stepEl.querySelector('.btn-prompt').addEventListener('click', () => {
-    copy(workflow.prompt);
+  stepEl.querySelector('.btn-prompt')?.addEventListener('click', () => {
+    const params = loadParams() || { docRoot: 'docs/architecture/' };
+    copy(personalizeWorkflowPrompt(workflow, params, {}));
   });
 }
 
@@ -218,6 +482,9 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
   const grid = document.getElementById(gridId);
   const panel = document.getElementById(panelId);
   if (!grid || !panel) return;
+
+  const inputsHost = document.getElementById(`${key}-inputs`);
+  const previewHost = document.getElementById(`${key}-prompt-preview`);
 
   for (const mode of modes) {
     const btn = document.createElement('button');
@@ -242,6 +509,15 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
         note.textContent = text;
         note.hidden = !text;
       }
+
+      renderWorkflowInputs(inputsHost, w.id, key);
+      if (previewHost) {
+        previewHost.textContent = personalizeWorkflowPrompt(
+          w,
+          loadParams() || { docRoot: 'docs/architecture/' },
+          inputState[key][w.id] || {}
+        );
+      }
     });
     grid.appendChild(btn);
   }
@@ -250,8 +526,16 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
 function initCopyButtons() {
   document.querySelectorAll('.mode-copy').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const w = panelState[btn.dataset.panel];
-      if (w) copy(w.prompt);
+      const key = btn.dataset.panel;
+      const w = panelState[key];
+      if (!w) return;
+      copy(
+        personalizeWorkflowPrompt(
+          w,
+          loadParams() || { docRoot: 'docs/architecture/' },
+          inputState[key][w.id] || {}
+        )
+      );
     });
   });
 }
@@ -269,10 +553,7 @@ async function main() {
   let adoptBase = '';
 
   try {
-    [workflows, adoptBase] = await Promise.all([
-      loadWorkflows(),
-      loadAdoptPrompt(),
-    ]);
+    [workflows, adoptBase] = await Promise.all([loadWorkflows(), loadAdoptPrompt()]);
   } catch {
     document.querySelector('.app')?.insertAdjacentHTML(
       'beforeend',
@@ -281,7 +562,7 @@ async function main() {
     return;
   }
 
-  initAdoptForm(adoptBase);
+  initSetupForm(adoptBase);
   initBuildPhase(workflows);
   initModeGrid(workflows, 'evolve', EVOLVE_MODES, 'evolve-grid', 'evolve-panel', 'evolve-label', 'evolve-note');
   initModeGrid(workflows, 'work', WORK_MODES, 'work-grid', 'work-panel', 'work-label', 'work-note');

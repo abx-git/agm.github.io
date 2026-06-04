@@ -19,7 +19,7 @@ Opens `http://localhost:8765` (requires Python 3).
 
 | Tab | Phase | Workflows |
 |-----|-------|-----------|
-| **Build** | Create doc graph iteratively | adopt (form), `bootstrap-continue`, `review-milestone` |
+| **Build** | Install script + adopt + continue | install (generated script), adopt (form), `bootstrap-continue`, `review-milestone` |
 | **Evolve** | Deepen or sync with code | `refinement`, `maintenance` |
 | **Work** | Use compiled graph | `architecture-work-*` |
 | **Review** | Verify (report-only) | `review-phase`, `review-maintenance` |

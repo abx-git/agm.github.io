@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=12" />
+  <link rel="stylesheet" href="app.css?v=13" />
 </head>
 <body>
   <main class="app">
@@ -55,69 +55,104 @@
     </nav>
 
     <section id="phase-build" class="phase active" role="tabpanel">
-      <p class="phase-intro">Create the doc graph iteratively — traverse <code>blueprint.md</code> phase by phase until bootstrap is complete.</p>
+      <p class="phase-intro">Install prompts with a script (no git clone), then adopt in a new chat. Continue via <code>blueprint.md</code> until bootstrap is complete.</p>
+
+      <form id="setup-form" class="adopt-form setup-form">
+        <div class="setup-grid">
+          <label class="field">
+            <span>Operating system</span>
+            <select name="os">
+              <option value="macos">macOS</option>
+              <option value="linux">Linux</option>
+              <option value="windows">Windows</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>AI tool</span>
+            <select name="aiTool">
+              <option value="cursor">Cursor</option>
+              <option value="claude">Claude Code</option>
+              <option value="copilot">GitHub Copilot</option>
+              <option value="generic">Other / generic (AGENTS.md)</option>
+            </select>
+            <span class="field-hint">Install script wires core prompt + doc paths for your tool.</span>
+          </label>
+        </div>
+        <label class="field">
+          <span>Project name <em>(required)</em></span>
+          <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
+        </label>
+        <label class="field">
+          <span>Documentation template</span>
+          <select name="template">
+            <option value="arc42">arc42 (default)</option>
+            <option value="c4-light">c4-light</option>
+            <option value="adr-first">adr-first</option>
+            <option value="lean-service">lean-service</option>
+            <option value="custom">custom</option>
+          </select>
+        </label>
+        <label class="field field-custom" hidden>
+          <span>Custom template name</span>
+          <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
+        </label>
+        <label class="field">
+          <span>Documentation root <em>(relative to repo root)</em></span>
+          <input type="text" name="docRoot" value="docs/architecture/" />
+        </label>
+        <details class="field-advanced">
+          <summary>Adoption context (for step 2)</summary>
+          <label class="field">
+            <span>Purpose / domain</span>
+            <input type="text" name="purpose" placeholder="One sentence — what the system does" />
+          </label>
+          <label class="field">
+            <span>Stack</span>
+            <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
+          </label>
+          <label class="field">
+            <span>Primary source path</span>
+            <input type="text" name="sourceRoot" placeholder="e.g. src/main/kotlin" />
+          </label>
+          <label class="field">
+            <span>External systems</span>
+            <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
+          </label>
+        </details>
+      </form>
+
       <ol class="steps">
         <li class="step step-hero">
           <div class="step-head">
             <span class="step-n">1</span>
             <div>
-              <strong>Adopt</strong>
-              <p>Configure parameters → copy prompt → new chat. Agent creates all three core files, template scaffold, first evidence-based section.</p>
+              <strong>Install</strong>
+              <p>Copy the generated script → save as <code>bp-install.sh</code> (or run in PowerShell on Windows) → execute at your application repo root. Downloads prompts and scaffold via HTTPS.</p>
             </div>
           </div>
-          <form id="adopt-form" class="adopt-form">
-            <label class="field">
-              <span>Application name <em>(required)</em></span>
-              <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
-            </label>
-            <label class="field">
-              <span>Documentation template</span>
-              <select name="template">
-                <option value="arc42">arc42 (default)</option>
-                <option value="c4-light">c4-light</option>
-                <option value="adr-first">adr-first</option>
-                <option value="lean-service">lean-service</option>
-                <option value="custom">custom</option>
-              </select>
-              <span class="field-hint">Phase rows in <code>blueprint.md</code> + template folder.</span>
-            </label>
-            <label class="field field-custom" hidden>
-              <span>Custom template name</span>
-              <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
-            </label>
-            <label class="field">
-              <span>Purpose / domain</span>
-              <input type="text" name="purpose" placeholder="One sentence — what the system does" />
-            </label>
-            <label class="field">
-              <span>Stack</span>
-              <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
-            </label>
-            <details class="field-advanced">
-              <summary>More parameters</summary>
-              <label class="field">
-                <span>Documentation root</span>
-                <input type="text" name="docRoot" value="docs/architecture/" />
-              </label>
-              <label class="field">
-                <span>Primary source path</span>
-                <input type="text" name="sourceRoot" placeholder="e.g. src/main/kotlin" />
-              </label>
-              <label class="field">
-                <span>External systems</span>
-                <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
-              </label>
-            </details>
-            <details class="prompt-preview">
-              <summary>Preview parameter block</summary>
-              <pre id="prompt-preview" class="preview-box" aria-live="polite"></pre>
-            </details>
-          </form>
-          <button type="submit" form="adopt-form" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
+          <details class="prompt-preview" open>
+            <summary>Generated install script</summary>
+            <pre id="install-script-preview" class="preview-box install-box" aria-live="polite"></pre>
+          </details>
+          <button type="button" class="btn primary btn-install" id="copy-install">Copy install script</button>
+        </li>
+        <li class="step step-hero">
+          <div class="step-head">
+            <span class="step-n">2</span>
+            <div>
+              <strong>Adopt</strong>
+              <p>After install: copy adoption prompt → new chat. Agent creates <code>blueprint.md</code>, <code>entry-point.md</code>, configures <code>always-on.md</code>, first evidence-based section.</p>
+            </div>
+          </div>
+          <details class="prompt-preview">
+            <summary>Preview adoption parameters</summary>
+            <pre id="prompt-preview" class="preview-box" aria-live="polite"></pre>
+          </details>
+          <button type="submit" form="setup-form" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
         </li>
         <li class="step" data-workflow="bootstrap-continue">
           <div class="step-head">
-            <span class="step-n">2</span>
+            <span class="step-n">3</span>
             <div>
               <strong>Continue building</strong>
               <p>Next open row in <code>blueprint.md</code> → copy prompt → new chat. Sync <code>entry-point.md</code> when sections appear.</p>
@@ -129,7 +164,7 @@
         </li>
         <li class="step" data-workflow="review-milestone">
           <div class="step-head">
-            <span class="step-n">3</span>
+            <span class="step-n">4</span>
             <div>
               <strong>Close build phase</strong>
               <p>Report-only: validate construction plan vs. graph, links, redistribute follow-up insights into template sections.</p>
@@ -147,6 +182,11 @@
       <div class="modes" id="evolve-grid"></div>
       <div id="evolve-panel" class="mode-panel" hidden>
         <p class="mode-label" id="evolve-label"></p>
+        <div id="evolve-inputs" class="workflow-inputs" hidden></div>
+        <details class="prompt-preview">
+          <summary>Preview prompt</summary>
+          <pre id="evolve-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
+        </details>
         <div class="cmd-row">
           <button type="button" class="btn primary mode-copy" data-panel="evolve">Copy prompt</button>
         </div>
@@ -159,6 +199,11 @@
       <div class="modes" id="work-grid"></div>
       <div id="work-panel" class="mode-panel" hidden>
         <p class="mode-label" id="work-label"></p>
+        <div id="work-inputs" class="workflow-inputs" hidden></div>
+        <details class="prompt-preview">
+          <summary>Preview prompt</summary>
+          <pre id="work-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
+        </details>
         <div class="cmd-row">
           <button type="button" class="btn primary mode-copy" data-panel="work">Copy prompt</button>
         </div>
@@ -179,13 +224,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v12</span>
+      <span class="deploy-id">Lifecycle · v13</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=12" type="module"></script>
+  <script src="app.js?v=13" type="module"></script>
 </body>
 </html>
