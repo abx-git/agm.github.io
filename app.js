@@ -35,6 +35,7 @@ const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-d
 /** Display order for documentation area checkboxes (general categories). */
 const DOC_AREA_ORDER = [
   'onboarding',
+  'implementation',
   'interfaces',
   'persistence',
   'security',
@@ -48,7 +49,11 @@ const DOC_AREA_ORDER = [
 
 /** Multi-select helpers — add to current selection, never replace. */
 const DOC_FOCUS_HELPERS = [
-  { id: 'starter', label: '+ Starter set', focus: ['onboarding', 'interfaces', 'decisions'] },
+  {
+    id: 'starter',
+    label: '+ Starter set',
+    focus: ['onboarding', 'implementation', 'interfaces', 'decisions'],
+  },
   { id: 'full', label: 'Select all', focus: () => DOC_AREA_ORDER.slice() },
   { id: 'clear', label: 'Clear all', focus: [] },
 ];
@@ -69,6 +74,25 @@ const DOC_EXTENSIONS = [
     evolve: [
       'When sections or links change: update entry-point.md navigation table so agents can traverse the full graph.',
       'Ensure always-on.md still points to entry-point.md.',
+    ],
+  },
+  {
+    id: 'implementation',
+    label: '<template>/ — structure & implementation',
+    userLabel: 'Software structure & implementation',
+    userHint: 'Modules, components, runtime behaviour — traced to source code',
+    docPaths: '<template>/ (building blocks, runtime), always-on.md source map, work/',
+    hint: 'Document how the software is built and behaves, with evidence from the codebase',
+    bootstrap: [
+      'blueprint.md: prioritize template phases for structure/building blocks, runtime/solution (per template) early in the plan.',
+      'always-on.md: ## Source code map — table module/service → repository path (keep current when code moves).',
+      'entry-point.md: link structure and runtime sections plus primary source paths from always-on.',
+      'Template sections: populate building blocks / components / runtime from code inspection (not guesswork).',
+      'work/: use for analysis/design items that precede ADRs when exploring implementation changes.',
+    ],
+    evolve: [
+      'Maintenance: when packages, modules, or runtime flows change — update structure/runtime template sections, always-on source map, and cross-links from entry-point.',
+      'Refinement: deepen implementation docs with diagrams and traceability to code paths.',
     ],
   },
   {
@@ -434,6 +458,28 @@ const FOCUS_SCOPE_PRESETS = {
   onboarding: (root) => [
     { value: `${root}entry-point.md`, label: 'Graph index (entry-point.md) — agent link table' },
   ],
+  implementation: (root, template) => {
+    const tp = `${root}${template}/`;
+    const picks = [
+      { value: `${root}context/always-on.md`, label: 'Source code map (always-on.md)' },
+      { value: `${tp}`, label: `Structure & runtime (${template}/)` },
+      { value: `${root}work/`, label: 'Implementation analysis / design (work/)' },
+    ];
+    const blocks =
+      template === 'arc42'
+        ? ['05-building-block-view.md', '06-runtime-view.md', '04-solution-strategy.md']
+        : template === 'c4-light'
+          ? ['components.md', 'containers.md', 'context.md']
+          : template === 'lean-service'
+            ? ['overview.md', 'runtime.md']
+            : template === 'adr-first'
+              ? ['views.md', 'context.md']
+              : [];
+    for (const f of blocks) {
+      picks.push({ value: `${tp}${f}`, label: sectionFriendlyLabel(f) });
+    }
+    return picks;
+  },
   operations: (root) => [
     { value: `${root}ops/`, label: 'Operations folder (ops/)' },
     { value: `${root}ops/runbooks/`, label: 'Runbooks (ops/runbooks/)' },
@@ -540,6 +586,10 @@ function buildRefinementScopeOptions(params) {
   addContent(`${root}work/`, 'Architecture analysis / design notes (work/)');
 
   const focus = params.docFocus || [];
+  if (focus.includes('implementation')) {
+    const fn = FOCUS_SCOPE_PRESETS.implementation;
+    if (fn) for (const item of fn(root, template)) addContent(item.value, item.label);
+  }
   if (focus.includes('persistence')) {
     addContent(tp, 'Data & storage (all related template sections)');
   }
