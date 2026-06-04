@@ -341,6 +341,21 @@ body {
   margin-top: 0.1rem;
 }
 
+.evolve-focus-summary {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--accent);
+  background: #f0f7ff;
+  border: 1px solid #c5daf5;
+  border-radius: 6px;
+}
+
+.evolve-focus-summary[hidden] {
+  display: none;
+}
+
 .workflow-inputs {
   display: flex;
   flex-direction: column;

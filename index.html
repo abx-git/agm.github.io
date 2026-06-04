@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=18" />
+  <link rel="stylesheet" href="app.css?v=19" />
 </head>
 <body>
   <main class="app">
@@ -48,6 +48,76 @@
       <p class="glossary-note">Blueprint and entry-point link to the same docs: blueprint = <em>plan &amp; progress</em>; entry-point = <em>read &amp; navigate</em>.</p>
     </details>
 
+    <form id="setup-form" class="adopt-form setup-form">
+      <div class="setup-grid">
+        <label class="field">
+          <span>Operating system</span>
+          <select name="os">
+            <option value="macos">macOS</option>
+            <option value="linux">Linux</option>
+            <option value="windows">Windows</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>AI tool</span>
+          <select name="aiTool">
+            <option value="cursor">Cursor</option>
+            <option value="claude">Claude Code</option>
+            <option value="copilot">GitHub Copilot</option>
+            <option value="generic">Other / generic (AGENTS.md)</option>
+          </select>
+          <span class="field-hint">Install script wires core prompt + doc paths for your tool.</span>
+        </label>
+      </div>
+      <label class="field">
+        <span>Project name <em>(required)</em></span>
+        <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
+      </label>
+      <p id="template-active" class="template-active" hidden aria-live="polite"></p>
+      <label class="field">
+        <span>Documentation template</span>
+        <select name="template">
+          <option value="arc42">arc42 (default)</option>
+          <option value="c4-light">c4-light</option>
+          <option value="adr-first">adr-first</option>
+          <option value="lean-service">lean-service</option>
+          <option value="custom">custom</option>
+        </select>
+      </label>
+      <label class="field field-custom" hidden>
+        <span>Custom template name</span>
+        <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
+      </label>
+      <label class="field">
+        <span>Documentation root <em>(relative to repo root)</em></span>
+        <input type="text" name="docRoot" value="docs/architecture/" />
+      </label>
+      <fieldset class="focus-fieldset">
+        <legend>Documentation focus <span class="legend-note">(Build, Evolve, and Work prompts)</span></legend>
+        <p class="field-hint">Orientations for bootstrap and for evolve/maintenance sessions. Reference: <code>prompts/reference/doc-extensions.md</code></p>
+        <div id="doc-focus-grid" class="focus-grid"></div>
+      </fieldset>
+      <details class="field-advanced">
+        <summary>Adoption context (Build step 2)</summary>
+        <label class="field">
+          <span>Purpose / domain</span>
+          <input type="text" name="purpose" placeholder="One sentence — what the system does" />
+        </label>
+        <label class="field">
+          <span>Stack</span>
+          <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
+        </label>
+        <label class="field">
+          <span>Primary source path</span>
+          <input type="text" name="sourceRoot" placeholder="e.g. src/main/kotlin" />
+        </label>
+        <label class="field">
+          <span>External systems</span>
+          <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
+        </label>
+      </details>
+    </form>
+
     <nav class="phase-nav" role="tablist" aria-label="Lifecycle">
       <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Build</button>
       <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Evolve</button>
@@ -56,76 +126,6 @@
 
     <section id="phase-build" class="phase active" role="tabpanel">
       <p class="phase-intro">Install prompts with a script (no git clone), then adopt in a new chat. Continue via <code>blueprint.md</code> until bootstrap is complete.</p>
-
-      <form id="setup-form" class="adopt-form setup-form">
-        <div class="setup-grid">
-          <label class="field">
-            <span>Operating system</span>
-            <select name="os">
-              <option value="macos">macOS</option>
-              <option value="linux">Linux</option>
-              <option value="windows">Windows</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>AI tool</span>
-            <select name="aiTool">
-              <option value="cursor">Cursor</option>
-              <option value="claude">Claude Code</option>
-              <option value="copilot">GitHub Copilot</option>
-              <option value="generic">Other / generic (AGENTS.md)</option>
-            </select>
-            <span class="field-hint">Install script wires core prompt + doc paths for your tool.</span>
-          </label>
-        </div>
-        <label class="field">
-          <span>Project name <em>(required)</em></span>
-          <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
-        </label>
-        <p id="template-active" class="template-active" hidden aria-live="polite"></p>
-        <label class="field">
-          <span>Documentation template</span>
-          <select name="template">
-            <option value="arc42">arc42 (default)</option>
-            <option value="c4-light">c4-light</option>
-            <option value="adr-first">adr-first</option>
-            <option value="lean-service">lean-service</option>
-            <option value="custom">custom</option>
-          </select>
-        </label>
-        <label class="field field-custom" hidden>
-          <span>Custom template name</span>
-          <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
-        </label>
-        <label class="field">
-          <span>Documentation root <em>(relative to repo root)</em></span>
-          <input type="text" name="docRoot" value="docs/architecture/" />
-        </label>
-        <fieldset class="focus-fieldset">
-          <legend>Documentation focus <span class="legend-note">(extends blueprint from bootstrap)</span></legend>
-          <p class="field-hint">Select orientations to add phase rows, stubs, and entry-point sections. Reference: <code>prompts/reference/doc-extensions.md</code></p>
-          <div id="doc-focus-grid" class="focus-grid"></div>
-        </fieldset>
-        <details class="field-advanced">
-          <summary>Adoption context (for step 2)</summary>
-          <label class="field">
-            <span>Purpose / domain</span>
-            <input type="text" name="purpose" placeholder="One sentence — what the system does" />
-          </label>
-          <label class="field">
-            <span>Stack</span>
-            <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
-          </label>
-          <label class="field">
-            <span>Primary source path</span>
-            <input type="text" name="sourceRoot" placeholder="e.g. src/main/kotlin" />
-          </label>
-          <label class="field">
-            <span>External systems</span>
-            <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
-          </label>
-        </details>
-      </form>
 
       <ol class="steps">
         <li class="step step-hero">
@@ -195,7 +195,8 @@
     </section>
 
     <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-      <p class="phase-intro">Deepen sections or keep docs aligned with code. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
+      <p class="phase-intro">Deepen sections or keep docs aligned with code. Selected <strong>Documentation focus</strong> above is injected into copied prompts. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
+      <p id="evolve-focus-summary" class="evolve-focus-summary" hidden aria-live="polite"></p>
       <div class="modes" id="evolve-grid"></div>
       <div id="evolve-panel" class="mode-panel" hidden>
         <p class="mode-label" id="evolve-label"></p>
@@ -241,13 +242,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v18</span>
+      <span class="deploy-id">Lifecycle · v19</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=18" type="module"></script>
+  <script src="app.js?v=19" type="module"></script>
 </body>
 </html>

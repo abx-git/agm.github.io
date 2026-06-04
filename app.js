@@ -25,6 +25,9 @@ const REVIEW_MODES = [
   { id: 'review-maintenance', label: 'Review all docs' },
 ];
 
+/** Evolve workflows that receive the documentation focus block. */
+const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
+
 /** Documentation focus — extends blueprint.md from bootstrap (see prompts/reference/doc-extensions.md). */
 const DOC_EXTENSIONS = [
   {
@@ -35,6 +38,10 @@ const DOC_EXTENSIONS = [
       'entry-point.md: add ## Onboarding with recommended reading order by role (developer, architect, ops).',
       'always-on.md: link to entry-point ## Onboarding.',
     ],
+    evolve: [
+      'After structural doc changes: update ## Onboarding paths and role-based reading order in entry-point.md.',
+      'Ensure always-on.md still points to the onboarding section.',
+    ],
   },
   {
     id: 'operations',
@@ -43,6 +50,10 @@ const DOC_EXTENSIONS = [
     bootstrap: [
       'blueprint.md: phase row for ops/ ([ ] open) if not already present (arc42 phase 13).',
       'entry-point.md: ## Operations linking ops/pitfalls.md, ops/troubleshooting.md, ops/runbooks/.',
+    ],
+    evolve: [
+      'Maintenance: if diff touches runtime, deploy, config, or incidents — update ops/pitfalls.md, ops/troubleshooting.md, ops/runbooks/ as needed.',
+      'Refinement: prefer scoped updates under ops/ when deepening operational knowledge.',
     ],
   },
   {
@@ -54,6 +65,10 @@ const DOC_EXTENSIONS = [
       'context/on-demand.md: ## Data stores table (technology, ownership, links to code).',
       'blueprint.md: note persistence as elevated priority in session log / phase rationale.',
     ],
+    evolve: [
+      'Maintenance: update data model sections and context/on-demand.md when migrations, entities, or repositories change.',
+      'Refinement: deepen persistence-related template sections with evidence from source.',
+    ],
   },
   {
     id: 'interfaces',
@@ -62,6 +77,9 @@ const DOC_EXTENSIONS = [
     bootstrap: [
       'blueprint.md: early priority for interfaces/ phase (after context or in phase 3).',
       'Populate interfaces/ stubs with first known APIs/events; link from building blocks / runtime.',
+    ],
+    evolve: [
+      'Maintenance: always classify API/event/schema diffs; update interfaces/exports.md and imports.md and cross-links.',
     ],
   },
   {
@@ -72,6 +90,9 @@ const DOC_EXTENSIONS = [
       'Elevate constraints, quality, and risks phases in blueprint.md ordering notes.',
       'context/on-demand.md: ## Security & compliance assumptions (short, evidence-linked).',
     ],
+    evolve: [
+      'Maintenance: update constraints, quality, risks, and on-demand security notes when auth, crypto, or policy code changes.',
+    ],
   },
   {
     id: 'deployment',
@@ -80,6 +101,9 @@ const DOC_EXTENSIONS = [
     bootstrap: [
       'Template deployment section + ops/environments.md (if installed).',
       'entry-point.md: link environments and deployment docs.',
+    ],
+    evolve: [
+      'Maintenance: sync deployment template sections and ops/environments.md with infra/config diffs.',
     ],
   },
   {
@@ -91,6 +115,9 @@ const DOC_EXTENSIONS = [
       'ops/troubleshooting.md (if installed): link dashboards/runbooks.',
       'entry-point.md: ## Observability links.',
     ],
+    evolve: [
+      'Maintenance: update runtime observability notes and ops/troubleshooting.md when logging, metrics, or tracing changes.',
+    ],
   },
   {
     id: 'decisions',
@@ -99,6 +126,9 @@ const DOC_EXTENSIONS = [
     bootstrap: [
       'blueprint.md: dedicated phase row for <template>/decisions/ near top of plan.',
       'entry-point.md: ## Decisions index linking decisions/README.md and 001-template.md.',
+    ],
+    evolve: [
+      'Maintenance/refinement: draft or update ADRs in <template>/decisions/ when the change implies an architectural decision.',
     ],
   },
   {
@@ -110,6 +140,9 @@ const DOC_EXTENSIONS = [
       'ecosystem-index.md (if installed): table of services, entry-point, exports.',
       'entry-point.md: ## Ecosystem links.',
     ],
+    evolve: [
+      'Maintenance: update imports.md partner links and ecosystem-index.md when integration boundaries change.',
+    ],
   },
   {
     id: 'domain-glossary',
@@ -119,6 +152,9 @@ const DOC_EXTENSIONS = [
       'context/on-demand.md: ## Key domain concepts table.',
       'blueprint.md: prioritize glossary / context terminology phase.',
       'entry-point.md: link glossary and domain terms.',
+    ],
+    evolve: [
+      'Maintenance/refinement: update glossary, on-demand concepts, and ubiquitous language when domain terms change in code or APIs.',
     ],
   },
 ];
@@ -298,6 +334,28 @@ function buildDocFocusBlock(params) {
     lines.push(`### ${ext.label} (\`${ext.id}\`)`);
     lines.push(`_${ext.hint}_`);
     for (const step of ext.bootstrap) {
+      lines.push(`- ${substituteTemplate(step, template)}`);
+    }
+    lines.push('');
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function buildDocFocusEvolveBlock(params) {
+  const ids = params.docFocus || [];
+  if (!ids.length) return '';
+  const template = resolvedTemplate(params);
+  const lines = [
+    '## Documentation focus (evolve — respect selected orientations)',
+    '',
+    'Apply to this refinement or maintenance session (see prompts/reference/doc-extensions.md):',
+    '',
+  ];
+  for (const ext of DOC_EXTENSIONS) {
+    if (!ids.includes(ext.id)) continue;
+    lines.push(`### ${ext.label} (\`${ext.id}\`)`);
+    const steps = ext.evolve || ext.bootstrap;
+    for (const step of steps) {
       lines.push(`- ${substituteTemplate(step, template)}`);
     }
     lines.push('');
@@ -495,11 +553,21 @@ function applyWorkflowInputs(prompt, workflowId, values) {
   return out;
 }
 
+function focusScopeHint(params) {
+  const ids = params?.docFocus || [];
+  if (!ids.length) return '';
+  const labels = ids
+    .map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.id || id)
+    .join(', ');
+  return ` — or focus areas: ${labels}`;
+}
+
 function workflowFields(workflowId, params) {
   const base = WORKFLOW_INPUTS[workflowId];
   if (!base) return [];
   const t = resolvedTemplate(params || {});
   const ex = templateExampleSection(t);
+  const scopeExtra = focusScopeHint(params);
   return base.map((field) => {
     if (workflowId === 'refinement' && field.name === 'goal') {
       return { ...field, placeholder: `e.g. extend ${ex} with …` };
@@ -507,7 +575,7 @@ function workflowFields(workflowId, params) {
     if (workflowId === 'refinement' && field.name === 'scope') {
       return {
         ...field,
-        placeholder: `paths under ${t}/, modules, or blueprint phase numbers`,
+        placeholder: `paths under ${t}/, ops/, modules, blueprint phases${scopeExtra}`,
       };
     }
     if (workflowId === 'architecture-work-analysis' && field.name === 'scope') {
@@ -530,18 +598,28 @@ function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
   prompt = substituteTemplate(prompt, template);
   prompt = applyWorkflowInputs(prompt, workflow.id, inputValues);
   const docRoot = normDocRoot(params.docRoot);
+  const focusNote =
+    params.docFocus?.length > 0
+      ? `- Documentation focus: ${params.docFocus.join(', ')}`
+      : '';
   const header = [
     '## Session context (installed prompts)',
     '',
     `- Documentation template: ${template}`,
     `- Documentation root: ${docRoot}`,
     `- Template folder: ${docRoot}${template}/`,
+    focusNote,
     '- Core rules: prompts/core/system-prompt.md (installed)',
     `- Role file: ${docRoot}prompts/role-${workflowRole(workflow)}.md`,
     `- Workflow reference: prompts/workflows/${workflow.id}.md`,
     '',
-  ].join('\n');
-  return `${header}${prompt}`;
+  ]
+    .filter(Boolean)
+    .join('\n');
+  const focusBlock = EVOLVE_WORKFLOW_IDS.has(workflow.id)
+    ? buildDocFocusEvolveBlock(params)
+    : '';
+  return `${header}${focusBlock}${prompt}`;
 }
 
 function saveParams(params) {
@@ -601,8 +679,31 @@ function initDocFocusGrid(form) {
     small.textContent = ext.hint;
     text.append(strong, small);
     label.append(cb, text);
+    cb.addEventListener('change', () => {
+      const form = document.getElementById('setup-form');
+      if (form) {
+        saveParams(readForm(form));
+        refreshEvolveFocusSummary();
+        refreshOpenWorkflowPanels();
+      }
+    });
     host.append(label);
   }
+}
+
+function refreshEvolveFocusSummary() {
+  const el = document.getElementById('evolve-focus-summary');
+  if (!el) return;
+  const form = document.getElementById('setup-form');
+  const ids = form ? readDocFocus(form) : loadParams()?.docFocus || [];
+  if (!ids.length) {
+    el.hidden = true;
+    el.textContent = '';
+    return;
+  }
+  const labels = ids.map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.label || id);
+  el.hidden = false;
+  el.textContent = `Active documentation focus (included in copied Evolve prompts): ${labels.join(' · ')}. Change selections above.`;
 }
 
 function initSetupForm(adoptBase) {
@@ -648,17 +749,20 @@ function initSetupForm(adoptBase) {
     refreshInstallPreview();
     refreshAdoptPreview();
     refreshTemplateBadge();
+    refreshEvolveFocusSummary();
     refreshOpenWorkflowPanels();
   });
   form.addEventListener('input', () => {
     refreshInstallPreview();
     refreshAdoptPreview();
     refreshTemplateBadge();
+    refreshEvolveFocusSummary();
     refreshOpenWorkflowPanels();
   });
   refreshInstallPreview();
   refreshAdoptPreview();
   refreshTemplateBadge();
+  refreshEvolveFocusSummary();
 
   document.getElementById('copy-install')?.addEventListener('click', (e) => {
     e.preventDefault();

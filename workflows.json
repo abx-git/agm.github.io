@@ -194,14 +194,15 @@
       "Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.",
       "Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it: a) If a Git MCP server is connected, use its diff/compare tool with the same refs. b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO} c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}",
       "If the diff is empty, stop and report; do not update architecture docs.",
-      "Classify changes and update only architecture docs impacted by this diff."
+      "Classify changes and update only architecture docs impacted by this diff.",
+      "If **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them."
     ],
     "placeholders": [
       "diff-from",
       "diff-to",
       "doc-root"
     ],
-    "prompt": "Blueprint Pattern — Maintenance (git diff range).\nWorkflow: maintenance-diff-range\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Maintenance (git diff range).\nWorkflow: maintenance-diff-range\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n5. If **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "maintenance",
@@ -221,12 +222,13 @@
     "steps": [
       "Read docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.",
       "<paste git diff or PR diff summary>",
-      "Update only architecture docs impacted by this diff."
+      "Update only architecture docs impacted by this diff.",
+      "If **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them."
     ],
     "placeholders": [
       "paste git diff or PR diff summary"
     ],
-    "prompt": "Blueprint Pattern — Maintenance.\nWorkflow: maintenance\nRole: maintenance\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Maintenance.\nWorkflow: maintenance\nRole: maintenance\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\nIf **Documentation focus (evolve)** is present, include docs for those orientations when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "refinement",
@@ -245,15 +247,17 @@
     "steps": [
       "Goal: <goal>",
       "Scope: <scope>",
-      "Follow docs/architecture/prompts/role-bootstrap.md for evidence and link rules.",
+      "Follow <doc-root>prompts/role-bootstrap.md for evidence and link rules.",
       "Read always-on.md → blueprint.md. Update only the scoped sections and blueprint states.",
+      "If **Documentation focus (evolve)** is present, apply those orientations within the stated scope.",
       "Do not restart unrelated phases."
     ],
     "placeholders": [
+      "doc-root",
       "goal",
       "scope"
     ],
-    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope>\n\nFollow docs/architecture/prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope>\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Documentation focus (evolve)** is present, apply those orientations within the stated scope.\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",
