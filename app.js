@@ -232,8 +232,20 @@ const WORKFLOW_INPUTS = {
     { name: 'slug', label: 'Work file slug', placeholder: 'e.g. payment-circuit-breaker', required: true },
   ],
   refinement: [
-    { name: 'goal', label: 'Goal', placeholder: 'e.g. extend runtime.md with retry behavior', required: true },
-    { name: 'scope', label: 'Scope', placeholder: 'template paths or blueprint phase numbers', required: true },
+    {
+      name: 'goal',
+      label: 'What should improve?',
+      help: 'One sentence: the result of this chat (e.g. “add a diagram”, “fill API section from code”, “clarify deployment steps”).',
+      placeholder: 'e.g. document retry behaviour for outbound HTTP calls',
+      required: true,
+    },
+    {
+      name: 'scope',
+      label: 'Where may the agent edit?',
+      help: 'Boundary for this session — which files or sections. Prevents rewriting unrelated docs. Use the dropdown or type a path under your documentation root.',
+      placeholder: 'Pick a file/section below, or type a path',
+      required: true,
+    },
   ],
   maintenance: [
     { name: 'gitDiff', label: 'Git diff or PR summary', placeholder: 'paste git diff …', required: true, multiline: true },
@@ -796,12 +808,15 @@ function workflowFields(workflowId, params) {
   const scopeExtra = focusScopeHint(params);
   return base.map((field) => {
     if (workflowId === 'refinement' && field.name === 'goal') {
-      return { ...field, placeholder: `e.g. extend ${ex} with …` };
+      return {
+        ...field,
+        placeholder: `e.g. deepen ${ex} with evidence from code`,
+      };
     }
     if (workflowId === 'refinement' && field.name === 'scope') {
       return {
         ...field,
-        placeholder: `Pick a preset or type a path${scopeExtra}`,
+        placeholder: `e.g. ${ex} — or pick from list${scopeExtra}`,
         scopeSuggestions: buildScopeSuggestions(params),
       };
     }
@@ -1069,7 +1084,7 @@ function fillScopePresetSelect(select, suggestions) {
   select.replaceChildren();
   const first = document.createElement('option');
   first.value = '';
-  first.textContent = 'Choose scope preset…';
+  first.textContent = 'Pick file or section to edit…';
   select.appendChild(first);
   for (const item of suggestions || []) {
     const opt = document.createElement('option');
@@ -1185,7 +1200,21 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
     input.addEventListener('input', () => {
       syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params);
     });
+    if (field.help) {
+      const help = document.createElement('p');
+      help.className = 'field-help';
+      help.textContent = field.help;
+      label.appendChild(help);
+    }
     container.appendChild(label);
+  }
+
+  if (workflowId === 'refinement') {
+    const guide = document.createElement('p');
+    guide.className = 'workflow-field-guide';
+    guide.textContent =
+      'Goal = what to achieve in this chat. Where = which files the agent may change. Documentation areas (above) = long-term topics you document — optional overlap, but Where is the limit for this single session.';
+    container.prepend(guide);
   }
 }
 

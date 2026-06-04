@@ -530,6 +530,24 @@ body {
   display: none;
 }
 
+.workflow-field-guide {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.workflow-inputs .field-help {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
 .workflow-inputs input[type="text"],
 .workflow-inputs textarea {
   width: 100%;
