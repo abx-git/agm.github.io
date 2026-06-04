@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=16" />
+  <link rel="stylesheet" href="app.css?v=17" />
 </head>
 <body>
   <main class="app">
@@ -128,8 +128,19 @@
             <span class="step-n">1</span>
             <div>
               <strong>Install</strong>
-              <p>Copy the generated script → save as <code>bp-install.sh</code> (or run in PowerShell on Windows) → execute at your application repo root. Downloads prompts and scaffold via HTTPS.</p>
+              <p>Downloads prompts and scaffold via HTTPS — no git clone of blueprint-pattern.</p>
             </div>
+          </div>
+          <div class="install-hint" role="note">
+            <p class="install-hint-title">Where to run the script</p>
+            <p>Run it in the <strong>root of your application repository</strong> — the project you document (where your source code and <code>.git</code> live).</p>
+            <p class="install-hint-not">Not in the blueprint-pattern repository. Not from the Assistant URL folder.</p>
+            <ol class="install-hint-steps">
+              <li><code>cd /path/to/your-app</code> (repo root)</li>
+              <li>Copy script → save as <code>bp-install-run.sh</code></li>
+              <li><code>chmod +x bp-install-run.sh && ./bp-install-run.sh</code> (macOS/Linux) or follow the Windows note in the script</li>
+            </ol>
+            <p class="install-hint-foot">After success you should see <code>prompts/</code> and your documentation root (e.g. <code>docs/architecture/</code>) in that repo.</p>
           </div>
           <details class="prompt-preview" open>
             <summary>Generated install script</summary>
@@ -225,13 +236,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v16</span>
+      <span class="deploy-id">Lifecycle · v17</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=16" type="module"></script>
+  <script src="app.js?v=17" type="module"></script>
 </body>
 </html>
