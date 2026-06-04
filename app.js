@@ -57,18 +57,18 @@ const DOC_FOCUS_HELPERS = [
 const DOC_EXTENSIONS = [
   {
     id: 'onboarding',
-    label: 'entry-point.md — onboarding paths',
-    userLabel: 'Reading guide for new team members',
-    userHint: 'entry-point.md — who should read what',
+    label: 'entry-point.md — graph index',
+    userLabel: 'Documentation graph index (entry-point)',
+    userHint: 'Linked map the agent traverses each session — not architecture body text',
     docPaths: 'entry-point.md, context/always-on.md',
-    hint: 'Create/update reading guides for humans in your doc graph — not the Assistant or prompts/',
+    hint: 'entry-point.md is the agent’s navigation hub for the doc graph (workflows traverse from here)',
     bootstrap: [
-      'entry-point.md: add ## Onboarding with recommended reading order by role (developer, architect, ops).',
-      'always-on.md: link to entry-point ## Onboarding.',
+      'entry-point.md: graph index — navigation table to all template sections, interfaces/, ops/, work/, and source paths; optional short overview.',
+      'always-on.md: link to entry-point.md as graph entry (with blueprint.md).',
     ],
     evolve: [
-      'After structural doc changes: update ## Onboarding paths and role-based reading order in entry-point.md.',
-      'Ensure always-on.md still points to the onboarding section.',
+      'When sections or links change: update entry-point.md navigation table so agents can traverse the full graph.',
+      'Ensure always-on.md still points to entry-point.md.',
     ],
   },
   {
@@ -431,7 +431,9 @@ const TEMPLATE_SECTIONS = {
 };
 
 const FOCUS_SCOPE_PRESETS = {
-  onboarding: (root) => [{ value: `${root}entry-point.md`, label: 'Onboarding paths (entry-point.md)' }],
+  onboarding: (root) => [
+    { value: `${root}entry-point.md`, label: 'Graph index (entry-point.md) — agent link table' },
+  ],
   operations: (root) => [
     { value: `${root}ops/`, label: 'Operations folder (ops/)' },
     { value: `${root}ops/runbooks/`, label: 'Runbooks (ops/runbooks/)' },
@@ -544,7 +546,7 @@ function buildRefinementScopeOptions(params) {
 
   addAdvanced(
     `${root}entry-point.md`,
-    'Navigation only (entry-point) — reading links, not technical body text'
+    'Graph index (entry-point) — agent link table, not section body text'
   );
   addAdvanced(
     `${root}context/always-on.md`,
@@ -687,7 +689,9 @@ function buildParameterBlock(params) {
   lines.push('## File roles (create all three under documentation root — do not merge)');
   lines.push(`- ${docRoot}context/always-on.md — session context (name, stack, source map)`);
   lines.push(`- ${docRoot}blueprint.md — construction plan: phase rows → target files, status, WRK, reviews, session log`);
-  lines.push(`- ${docRoot}entry-point.md — human entry: overview, navigation, source links; no phase status`);
+  lines.push(
+    `- ${docRoot}entry-point.md — graph index for agent traversal: links to all sections and sources; optional overview; no phase status`
+  );
   lines.push('');
   lines.push(`Template folder: "${template}/" under ${docRoot}. Interview only for missing facts.`);
   lines.push('');
@@ -1297,7 +1301,7 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
     const guide = document.createElement('p');
     guide.className = 'workflow-field-guide';
     guide.textContent =
-      'What = outcome of this chat (e.g. add a diagram, fill gaps from code). Which section = where architecture text lives (runtime, APIs, structure). entry-point, always-on, and blueprint are not for that — they are navigation and progress; the agent maintains them when the graph changes.';
+      'What = outcome of this chat (e.g. add a diagram, fill gaps from code). Which section = template/ops/interfaces content. entry-point = agent graph index (links only); always-on = session context; blueprint = progress table — agent maintains those when the graph changes.';
     container.prepend(guide);
   }
 }
