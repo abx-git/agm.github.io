@@ -32,7 +32,6 @@ const REVIEW_MODES = [
 /** Evolve workflows that receive the architecture documentation areas block. */
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
-/** Display order for documentation area checkboxes (general categories). */
 /** IDs the human may select in Plan / Evolve (architecture content only). */
 const DOC_AREA_ORDER = [
   'implementation',
