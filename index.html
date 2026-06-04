@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=19" />
+  <link rel="stylesheet" href="app.css?v=20" />
 </head>
 <body>
   <main class="app">
@@ -48,186 +48,200 @@
       <p class="glossary-note">Blueprint and entry-point link to the same docs: blueprint = <em>plan &amp; progress</em>; entry-point = <em>read &amp; navigate</em>.</p>
     </details>
 
-    <form id="setup-form" class="adopt-form setup-form">
-      <div class="setup-grid">
-        <label class="field">
-          <span>Operating system</span>
-          <select name="os">
-            <option value="macos">macOS</option>
-            <option value="linux">Linux</option>
-            <option value="windows">Windows</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>AI tool</span>
-          <select name="aiTool">
-            <option value="cursor">Cursor</option>
-            <option value="claude">Claude Code</option>
-            <option value="copilot">GitHub Copilot</option>
-            <option value="generic">Other / generic (AGENTS.md)</option>
-          </select>
-          <span class="field-hint">Install script wires core prompt + doc paths for your tool.</span>
-        </label>
-      </div>
-      <label class="field">
-        <span>Project name <em>(required)</em></span>
-        <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
-      </label>
-      <p id="template-active" class="template-active" hidden aria-live="polite"></p>
-      <label class="field">
-        <span>Documentation template</span>
-        <select name="template">
-          <option value="arc42">arc42 (default)</option>
-          <option value="c4-light">c4-light</option>
-          <option value="adr-first">adr-first</option>
-          <option value="lean-service">lean-service</option>
-          <option value="custom">custom</option>
-        </select>
-      </label>
-      <label class="field field-custom" hidden>
-        <span>Custom template name</span>
-        <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
-      </label>
-      <label class="field">
-        <span>Documentation root <em>(relative to repo root)</em></span>
-        <input type="text" name="docRoot" value="docs/architecture/" />
-      </label>
-      <fieldset class="focus-fieldset">
-        <legend>Documentation focus <span class="legend-note">(Build, Evolve, and Work prompts)</span></legend>
-        <p class="field-hint">Orientations for bootstrap and for evolve/maintenance sessions. Reference: <code>prompts/reference/doc-extensions.md</code></p>
-        <div id="doc-focus-grid" class="focus-grid"></div>
-      </fieldset>
-      <details class="field-advanced">
-        <summary>Adoption context (Build step 2)</summary>
-        <label class="field">
-          <span>Purpose / domain</span>
-          <input type="text" name="purpose" placeholder="One sentence — what the system does" />
-        </label>
-        <label class="field">
-          <span>Stack</span>
-          <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
-        </label>
-        <label class="field">
-          <span>Primary source path</span>
-          <input type="text" name="sourceRoot" placeholder="e.g. src/main/kotlin" />
-        </label>
-        <label class="field">
-          <span>External systems</span>
-          <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
-        </label>
-      </details>
-    </form>
+    <form id="setup-form" class="setup-form">
+      <nav class="phase-nav" role="tablist" aria-label="Lifecycle">
+        <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Build</button>
+        <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Evolve</button>
+        <button type="button" class="phase-tab" data-phase="work" role="tab">3 · Work</button>
+      </nav>
 
-    <nav class="phase-nav" role="tablist" aria-label="Lifecycle">
-      <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Build</button>
-      <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Evolve</button>
-      <button type="button" class="phase-tab" data-phase="work" role="tab">3 · Work</button>
-    </nav>
+      <section id="phase-build" class="phase active" role="tabpanel">
+        <p class="phase-intro">Install prompts with a script (no git clone), then adopt in a new chat. Continue via <code>blueprint.md</code> until bootstrap is complete.</p>
 
-    <section id="phase-build" class="phase active" role="tabpanel">
-      <p class="phase-intro">Install prompts with a script (no git clone), then adopt in a new chat. Continue via <code>blueprint.md</code> until bootstrap is complete.</p>
+        <div class="setup-shared">
+          <label class="field">
+            <span>Project name <em>(required)</em></span>
+            <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
+          </label>
+          <p id="template-active" class="template-active" hidden aria-live="polite"></p>
+          <label class="field">
+            <span>Documentation template</span>
+            <select name="template">
+              <option value="arc42">arc42 (default)</option>
+              <option value="c4-light">c4-light</option>
+              <option value="adr-first">adr-first</option>
+              <option value="lean-service">lean-service</option>
+              <option value="custom">custom</option>
+            </select>
+          </label>
+          <label class="field field-custom" hidden>
+            <span>Custom template name</span>
+            <input type="text" name="customTemplate" placeholder="e.g. internal-standard" />
+          </label>
+          <label class="field">
+            <span>Documentation root <em>(relative to repo root)</em></span>
+            <input type="text" name="docRoot" value="docs/architecture/" />
+          </label>
+        </div>
 
-      <ol class="steps">
-        <li class="step step-hero">
-          <div class="step-head">
-            <span class="step-n">1</span>
-            <div>
-              <strong>Install</strong>
-              <p>Downloads prompts and scaffold via HTTPS — no git clone of blueprint-pattern.</p>
+        <ol class="steps">
+          <li class="step step-hero">
+            <div class="step-head">
+              <span class="step-n">1</span>
+              <div>
+                <strong>Install</strong>
+                <p>Downloads prompts and scaffold via HTTPS — no git clone of blueprint-pattern.</p>
+              </div>
             </div>
-          </div>
-          <div class="install-hint" role="note">
-            <p class="install-hint-title">Where to run the script</p>
-            <p>Run it in the <strong>root of your application repository</strong> — the project you document (where your source code and <code>.git</code> live).</p>
-            <p class="install-hint-not">Not in the blueprint-pattern repository. Not from the Assistant URL folder.</p>
-            <ol class="install-hint-steps">
-              <li><code>cd /path/to/your-app</code> (repo root)</li>
-              <li>Copy script → save as <code>bp-install-run.sh</code></li>
-              <li><code>chmod +x bp-install-run.sh && ./bp-install-run.sh</code> (macOS/Linux) or follow the Windows note in the script</li>
-            </ol>
-            <p class="install-hint-foot">After success you should see <code>prompts/</code> and your documentation root (e.g. <code>docs/architecture/</code>) in that repo.</p>
-          </div>
-          <details class="prompt-preview" open>
-            <summary>Generated install script</summary>
-            <pre id="install-script-preview" class="preview-box install-box" aria-live="polite"></pre>
-          </details>
-          <button type="button" class="btn primary btn-install" id="copy-install">Copy install script</button>
-        </li>
-        <li class="step step-hero">
-          <div class="step-head">
-            <span class="step-n">2</span>
-            <div>
-              <strong>Adopt</strong>
-              <p>After install: copy adoption prompt → new chat. Agent creates <code>blueprint.md</code>, <code>entry-point.md</code>, configures <code>always-on.md</code>, first evidence-based section.</p>
+            <div class="step-fields">
+              <div class="setup-grid">
+                <label class="field">
+                  <span>Operating system</span>
+                  <select name="os">
+                    <option value="macos">macOS</option>
+                    <option value="linux">Linux</option>
+                    <option value="windows">Windows</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>AI tool</span>
+                  <select name="aiTool">
+                    <option value="cursor">Cursor</option>
+                    <option value="claude">Claude Code</option>
+                    <option value="copilot">GitHub Copilot</option>
+                    <option value="generic">Other / generic (AGENTS.md)</option>
+                  </select>
+                </label>
+              </div>
+              <fieldset class="focus-fieldset">
+                <legend>Documentation focus <span class="legend-note">(step 1 — install)</span></legend>
+                <p class="field-hint">Select orientations to scaffold via <code>bp-install.sh</code> (e.g. <code>ops/</code> for operations).</p>
+                <div class="focus-grid" data-doc-focus-grid="install"></div>
+              </fieldset>
             </div>
-          </div>
+            <div class="install-hint" role="note">
+              <p class="install-hint-title">Where to run the script</p>
+              <p>Run it in the <strong>root of your application repository</strong> — the project you document (where your source code and <code>.git</code> live).</p>
+              <p class="install-hint-not">Not in the blueprint-pattern repository. Not from the Assistant URL folder.</p>
+              <ol class="install-hint-steps">
+                <li><code>cd /path/to/your-app</code> (repo root)</li>
+                <li>Copy script → save as <code>bp-install-run.sh</code></li>
+                <li><code>chmod +x bp-install-run.sh && ./bp-install-run.sh</code> (macOS/Linux) or follow the Windows note in the script</li>
+              </ol>
+              <p class="install-hint-foot">After success you should see <code>prompts/</code> and your documentation root (e.g. <code>docs/architecture/</code>) in that repo.</p>
+            </div>
+            <details class="prompt-preview" open>
+              <summary>Generated install script</summary>
+              <pre id="install-script-preview" class="preview-box install-box" aria-live="polite"></pre>
+            </details>
+            <button type="button" class="btn primary btn-install" id="copy-install">Copy install script</button>
+          </li>
+          <li class="step step-hero">
+            <div class="step-head">
+              <span class="step-n">2</span>
+              <div>
+                <strong>Adopt</strong>
+                <p>After install: copy adoption prompt → new chat. Agent creates <code>blueprint.md</code>, <code>entry-point.md</code>, configures <code>always-on.md</code>, first evidence-based section.</p>
+              </div>
+            </div>
+            <div class="step-fields">
+              <fieldset class="adopt-context-fieldset">
+                <legend>Adoption context</legend>
+                <label class="field">
+                  <span>Purpose / domain</span>
+                  <input type="text" name="purpose" placeholder="One sentence — what the system does" />
+                </label>
+                <label class="field">
+                  <span>Stack</span>
+                  <input type="text" name="stack" placeholder="e.g. Kotlin / Spring Boot, PostgreSQL" />
+                </label>
+                <label class="field">
+                  <span>Primary source path</span>
+                  <input type="text" name="sourceRoot" placeholder="e.g. src/main/kotlin" />
+                </label>
+                <label class="field">
+                  <span>External systems</span>
+                  <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
+                </label>
+              </fieldset>
+              <fieldset class="focus-fieldset">
+                <legend>Documentation focus <span class="legend-note">(step 2 — bootstrap)</span></legend>
+                <p class="field-hint">Same selections apply to Evolve. Extends <code>blueprint.md</code> during adoption. <code>prompts/reference/doc-extensions.md</code></p>
+                <div class="focus-grid" data-doc-focus-grid="adopt"></div>
+              </fieldset>
+            </div>
+            <details class="prompt-preview">
+              <summary>Preview adoption parameters</summary>
+              <pre id="prompt-preview" class="preview-box" aria-live="polite"></pre>
+            </details>
+            <button type="submit" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
+          </li>
+          <li class="step" data-workflow="bootstrap-continue">
+            <div class="step-head">
+              <span class="step-n">3</span>
+              <div>
+                <strong>Continue building</strong>
+                <p>Next open row in <code>blueprint.md</code> → copy prompt → new chat. Sync <code>entry-point.md</code> when sections appear.</p>
+              </div>
+            </div>
+            <div class="cmd-row">
+              <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+            </div>
+          </li>
+          <li class="step" data-workflow="review-milestone">
+            <div class="step-head">
+              <span class="step-n">4</span>
+              <div>
+                <strong>Close build phase</strong>
+                <p>Report-only: validate construction plan vs. graph, links, redistribute follow-up insights into template sections.</p>
+              </div>
+            </div>
+            <div class="cmd-row">
+              <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section id="phase-evolve" class="phase" role="tabpanel" hidden>
+        <p class="phase-intro">Deepen sections or keep docs aligned with code. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
+        <fieldset class="focus-fieldset focus-fieldset-evolve">
+          <legend>Documentation focus <span class="legend-note">(Evolve — refinement &amp; maintenance)</span></legend>
+          <p class="field-hint">Synced with step 2 selections. Injected into copied Evolve prompts.</p>
+          <div class="focus-grid" data-doc-focus-grid="evolve"></div>
+        </fieldset>
+        <div class="modes" id="evolve-grid"></div>
+        <div id="evolve-panel" class="mode-panel" hidden>
+          <p class="mode-label" id="evolve-label"></p>
+          <div id="evolve-inputs" class="workflow-inputs" hidden></div>
           <details class="prompt-preview">
-            <summary>Preview adoption parameters</summary>
-            <pre id="prompt-preview" class="preview-box" aria-live="polite"></pre>
+            <summary>Preview prompt</summary>
+            <pre id="evolve-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
           </details>
-          <button type="submit" form="setup-form" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
-        </li>
-        <li class="step" data-workflow="bootstrap-continue">
-          <div class="step-head">
-            <span class="step-n">3</span>
-            <div>
-              <strong>Continue building</strong>
-              <p>Next open row in <code>blueprint.md</code> → copy prompt → new chat. Sync <code>entry-point.md</code> when sections appear.</p>
-            </div>
-          </div>
           <div class="cmd-row">
-            <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+            <button type="button" class="btn primary mode-copy" data-panel="evolve">Copy prompt</button>
           </div>
-        </li>
-        <li class="step" data-workflow="review-milestone">
-          <div class="step-head">
-            <span class="step-n">4</span>
-            <div>
-              <strong>Close build phase</strong>
-              <p>Report-only: validate construction plan vs. graph, links, redistribute follow-up insights into template sections.</p>
-            </div>
-          </div>
+          <p class="mode-note" id="evolve-note" hidden></p>
+        </div>
+      </section>
+
+      <section id="phase-work" class="phase" role="tabpanel" hidden>
+        <p class="phase-intro">Use the compiled graph for architecture work — traverse links, write to <code>work/</code>, register WRK in <code>blueprint.md</code>.</p>
+        <div class="modes" id="work-grid"></div>
+        <div id="work-panel" class="mode-panel" hidden>
+          <p class="mode-label" id="work-label"></p>
+          <div id="work-inputs" class="workflow-inputs" hidden></div>
+          <details class="prompt-preview">
+            <summary>Preview prompt</summary>
+            <pre id="work-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
+          </details>
           <div class="cmd-row">
-            <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+            <button type="button" class="btn primary mode-copy" data-panel="work">Copy prompt</button>
           </div>
-        </li>
-      </ol>
-    </section>
-
-    <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-      <p class="phase-intro">Deepen sections or keep docs aligned with code. Selected <strong>Documentation focus</strong> above is injected into copied prompts. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
-      <p id="evolve-focus-summary" class="evolve-focus-summary" hidden aria-live="polite"></p>
-      <div class="modes" id="evolve-grid"></div>
-      <div id="evolve-panel" class="mode-panel" hidden>
-        <p class="mode-label" id="evolve-label"></p>
-        <div id="evolve-inputs" class="workflow-inputs" hidden></div>
-        <details class="prompt-preview">
-          <summary>Preview prompt</summary>
-          <pre id="evolve-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
-        </details>
-        <div class="cmd-row">
-          <button type="button" class="btn primary mode-copy" data-panel="evolve">Copy prompt</button>
+          <p class="mode-note" id="work-note" hidden></p>
         </div>
-        <p class="mode-note" id="evolve-note" hidden></p>
-      </div>
-    </section>
-
-    <section id="phase-work" class="phase" role="tabpanel" hidden>
-      <p class="phase-intro">Use the compiled graph for architecture work — traverse links, write to <code>work/</code>, register WRK in <code>blueprint.md</code>.</p>
-      <div class="modes" id="work-grid"></div>
-      <div id="work-panel" class="mode-panel" hidden>
-        <p class="mode-label" id="work-label"></p>
-        <div id="work-inputs" class="workflow-inputs" hidden></div>
-        <details class="prompt-preview">
-          <summary>Preview prompt</summary>
-          <pre id="work-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
-        </details>
-        <div class="cmd-row">
-          <button type="button" class="btn primary mode-copy" data-panel="work">Copy prompt</button>
-        </div>
-        <p class="mode-note" id="work-note" hidden></p>
-      </div>
-    </section>
+      </section>
+    </form>
 
     <details class="review-block">
       <summary>Review (all phases — report-only, new chat)</summary>
@@ -242,13 +256,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v19</span>
+      <span class="deploy-id">Lifecycle · v20</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=19" type="module"></script>
+  <script src="app.js?v=20" type="module"></script>
 </body>
 </html>

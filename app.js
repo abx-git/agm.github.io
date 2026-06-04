@@ -237,9 +237,21 @@ function normDocRoot(raw) {
 }
 
 function readDocFocus(form) {
-  return Array.from(form.querySelectorAll('input[name="docFocus"]:checked')).map(
-    (cb) => cb.value
-  );
+  const seen = new Set();
+  const out = [];
+  form.querySelectorAll('input[name="docFocus"]:checked').forEach((cb) => {
+    if (!seen.has(cb.value)) {
+      seen.add(cb.value);
+      out.push(cb.value);
+    }
+  });
+  return out;
+}
+
+function setDocFocusChecked(form, value, checked) {
+  form.querySelectorAll(`input[name="docFocus"][value="${value}"]`).forEach((cb) => {
+    cb.checked = checked;
+  });
 }
 
 function readForm(form) {
@@ -646,9 +658,9 @@ function applyParams(form, params) {
     const el = form.elements.namedItem(key);
     if (el && value != null) el.value = value;
   }
-  const focus = params.docFocus || [];
+  const focus = new Set(params.docFocus || []);
   form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
-    cb.checked = focus.includes(cb.value);
+    cb.checked = focus.has(cb.value);
   });
   toggleCustomField(form);
 }
@@ -661,56 +673,42 @@ function toggleCustomField(form) {
   }
 }
 
-function initDocFocusGrid(form) {
-  const host = document.getElementById('doc-focus-grid');
-  if (!host) return;
-  host.replaceChildren();
-  for (const ext of DOC_EXTENSIONS) {
-    const label = document.createElement('label');
-    label.className = 'focus-option';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.name = 'docFocus';
-    cb.value = ext.id;
-    const text = document.createElement('span');
-    const strong = document.createElement('strong');
-    strong.textContent = ext.label;
-    const small = document.createElement('small');
-    small.textContent = ext.hint;
-    text.append(strong, small);
-    label.append(cb, text);
-    cb.addEventListener('change', () => {
-      const form = document.getElementById('setup-form');
-      if (form) {
-        saveParams(readForm(form));
-        refreshEvolveFocusSummary();
-        refreshOpenWorkflowPanels();
-      }
-    });
-    host.append(label);
-  }
+function onDocFocusChange(form) {
+  saveParams(readForm(form));
+  refreshOpenWorkflowPanels();
 }
 
-function refreshEvolveFocusSummary() {
-  const el = document.getElementById('evolve-focus-summary');
-  if (!el) return;
-  const form = document.getElementById('setup-form');
-  const ids = form ? readDocFocus(form) : loadParams()?.docFocus || [];
-  if (!ids.length) {
-    el.hidden = true;
-    el.textContent = '';
-    return;
-  }
-  const labels = ids.map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.label || id);
-  el.hidden = false;
-  el.textContent = `Active documentation focus (included in copied Evolve prompts): ${labels.join(' · ')}. Change selections above.`;
+function initDocFocusGrids(form) {
+  document.querySelectorAll('[data-doc-focus-grid]').forEach((host) => {
+    host.replaceChildren();
+    for (const ext of DOC_EXTENSIONS) {
+      const label = document.createElement('label');
+      label.className = 'focus-option';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.name = 'docFocus';
+      cb.value = ext.id;
+      const text = document.createElement('span');
+      const strong = document.createElement('strong');
+      strong.textContent = ext.label;
+      const small = document.createElement('small');
+      small.textContent = ext.hint;
+      text.append(strong, small);
+      label.append(cb, text);
+      cb.addEventListener('change', () => {
+        setDocFocusChecked(form, ext.id, cb.checked);
+        onDocFocusChange(form);
+      });
+      host.append(label);
+    }
+  });
 }
 
 function initSetupForm(adoptBase) {
   const form = document.getElementById('setup-form');
   if (!form) return;
 
-  initDocFocusGrid(form);
+  initDocFocusGrids(form);
   applyParams(form, loadParams());
   const installPreview = document.getElementById('install-script-preview');
   const adoptPreview = document.getElementById('prompt-preview');
@@ -749,20 +747,17 @@ function initSetupForm(adoptBase) {
     refreshInstallPreview();
     refreshAdoptPreview();
     refreshTemplateBadge();
-    refreshEvolveFocusSummary();
     refreshOpenWorkflowPanels();
   });
   form.addEventListener('input', () => {
     refreshInstallPreview();
     refreshAdoptPreview();
     refreshTemplateBadge();
-    refreshEvolveFocusSummary();
     refreshOpenWorkflowPanels();
   });
   refreshInstallPreview();
   refreshAdoptPreview();
   refreshTemplateBadge();
-  refreshEvolveFocusSummary();
 
   document.getElementById('copy-install')?.addEventListener('click', (e) => {
     e.preventDefault();
