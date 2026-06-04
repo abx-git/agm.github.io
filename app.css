@@ -393,6 +393,7 @@ body {
   display: none;
 }
 
+.workflow-inputs input[type="text"],
 .workflow-inputs textarea {
   width: 100%;
   padding: 0.45rem 0.55rem;
@@ -401,6 +402,17 @@ body {
   font: inherit;
   font-size: 0.88rem;
   resize: vertical;
+}
+
+.workflow-inputs .scope-preset {
+  width: 100%;
+  margin-bottom: 0.35rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.86rem;
+  background: #fafafa;
 }
 
 .btn-install {

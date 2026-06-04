@@ -288,6 +288,107 @@ const TEMPLATE_HINTS = {
   custom: { exampleSection: 'custom/overview.md' },
 };
 
+/** Typical section files per template (scope presets). */
+const TEMPLATE_SECTIONS = {
+  arc42: [
+    '01-introduction-and-goals.md',
+    '02-architecture-constraints.md',
+    '03-system-scope-and-context.md',
+    '04-solution-strategy.md',
+    '05-building-block-view.md',
+    '06-runtime-view.md',
+    '07-deployment-view.md',
+    '08-crosscutting-concepts.md',
+    '09-architectural-decisions.md',
+    '10-quality-requirements.md',
+    '11-risks-and-technical-debt.md',
+    '12-glossary.md',
+  ],
+  'c4-light': ['context.md', 'containers.md', 'components.md', 'decisions/'],
+  'adr-first': ['context.md', 'views.md', 'decisions/'],
+  'lean-service': ['overview.md', 'runtime.md', 'decisions/'],
+};
+
+const FOCUS_SCOPE_PRESETS = {
+  onboarding: (root) => [{ value: `${root}entry-point.md`, label: 'Onboarding paths (entry-point.md)' }],
+  operations: (root) => [
+    { value: `${root}ops/`, label: 'Operations folder (ops/)' },
+    { value: `${root}ops/runbooks/`, label: 'Runbooks (ops/runbooks/)' },
+    { value: `${root}ops/pitfalls.md`, label: 'Pitfalls (ops/pitfalls.md)' },
+    { value: `${root}ops/troubleshooting.md`, label: 'Troubleshooting (ops/troubleshooting.md)' },
+  ],
+  persistence: (root, template) => [
+    { value: `${root}${template}/`, label: `Data-related sections in ${template}/` },
+    { value: `${root}context/on-demand.md`, label: 'On-demand data stores (context/on-demand.md)' },
+  ],
+  interfaces: (root) => [
+    { value: `${root}interfaces/`, label: 'Interfaces folder (interfaces/)' },
+    { value: `${root}interfaces/exports.md`, label: 'Exports (interfaces/exports.md)' },
+    { value: `${root}interfaces/imports.md`, label: 'Imports (interfaces/imports.md)' },
+  ],
+  security: (root, template) => [
+    {
+      value: `${root}${template}/`,
+      label: `Security-related sections in ${template}/ (constraints, quality, risks)`,
+    },
+  ],
+  deployment: (root) => [
+    { value: `${root}ops/environments.md`, label: 'Environments (ops/environments.md)' },
+  ],
+  observability: (root, template) => [
+    { value: `${root}${template}/`, label: `Runtime / observability in ${template}/` },
+    { value: `${root}ops/troubleshooting.md`, label: 'Troubleshooting (ops/troubleshooting.md)' },
+  ],
+  decisions: (root, template) => [
+    { value: `${root}${template}/decisions/`, label: `ADRs (${template}/decisions/)` },
+  ],
+  ecosystem: (root) => [
+    { value: `${root}ecosystem-index.md`, label: 'Ecosystem index (ecosystem-index.md)' },
+    { value: `${root}interfaces/imports.md`, label: 'Partner imports (interfaces/imports.md)' },
+  ],
+  'domain-glossary': (root, template) => [
+    { value: `${root}context/on-demand.md`, label: 'Domain concepts (context/on-demand.md)' },
+    { value: `${root}${template}/`, label: `Glossary / terminology in ${template}/` },
+  ],
+};
+
+function buildScopeSuggestions(params) {
+  const template = resolvedTemplate(params);
+  const root = normDocRoot(params.docRoot);
+  const tp = `${root}${template}/`;
+  const seen = new Set();
+  const out = [];
+
+  function add(value, label) {
+    if (!value || seen.has(value)) return;
+    seen.add(value);
+    out.push({ value, label: label || value });
+  }
+
+  add(`${root}blueprint.md`, 'Construction plan (blueprint.md)');
+  add(`${root}entry-point.md`, 'Navigation (entry-point.md)');
+  add(`${root}context/always-on.md`, 'Session context (always-on.md)');
+  add(tp, `Full template folder (${template}/)`);
+  add(`${root}work/`, 'Architecture work (work/)');
+
+  for (const file of TEMPLATE_SECTIONS[template] || []) {
+    add(`${tp}${file}`, `${template}/${file}`);
+  }
+
+  add(`${root}interfaces/`, 'Integration contracts (interfaces/)');
+  add(`${root}ops/`, 'Operations (ops/)');
+
+  for (const id of params.docFocus || []) {
+    const fn = FOCUS_SCOPE_PRESETS[id];
+    if (fn) for (const item of fn(root, template)) add(item.value, item.label);
+  }
+
+  add('Next open row in blueprint.md only', 'Blueprint — next open phase only');
+  add('Source path from always-on.md (primary codebase)', 'Code traceability (per always-on.md)');
+
+  return out;
+}
+
 function templateExampleSection(templateId) {
   const t = templateId || 'arc42';
   return (TEMPLATE_HINTS[t] || { exampleSection: `${t}/overview.md` }).exampleSection;
@@ -574,6 +675,8 @@ function focusScopeHint(params) {
   return ` — or focus areas: ${labels}`;
 }
 
+const SCOPE_FIELD_WORKFLOWS = new Set(['refinement', 'architecture-work-analysis']);
+
 function workflowFields(workflowId, params) {
   const base = WORKFLOW_INPUTS[workflowId];
   if (!base) return [];
@@ -587,11 +690,16 @@ function workflowFields(workflowId, params) {
     if (workflowId === 'refinement' && field.name === 'scope') {
       return {
         ...field,
-        placeholder: `paths under ${t}/, ops/, modules, blueprint phases${scopeExtra}`,
+        placeholder: `Pick a preset or type a path${scopeExtra}`,
+        scopeSuggestions: buildScopeSuggestions(params),
       };
     }
     if (workflowId === 'architecture-work-analysis' && field.name === 'scope') {
-      return { ...field, placeholder: `modules, services, or ${t} sections` };
+      return {
+        ...field,
+        placeholder: `Pick a preset or type modules / ${t} sections`,
+        scopeSuggestions: buildScopeSuggestions(params),
+      };
     }
     return { ...field };
   });
@@ -749,11 +857,14 @@ function initSetupForm(adoptBase) {
     refreshTemplateBadge();
     refreshOpenWorkflowPanels();
   });
-  form.addEventListener('input', () => {
+  form.addEventListener('input', (e) => {
     refreshInstallPreview();
     refreshAdoptPreview();
     refreshTemplateBadge();
-    refreshOpenWorkflowPanels();
+    const n = e.target?.name;
+    if (n === 'template' || n === 'customTemplate' || n === 'docRoot') {
+      refreshOpenWorkflowPanels();
+    }
   });
   refreshInstallPreview();
   refreshAdoptPreview();
@@ -806,16 +917,78 @@ function initTabs() {
   });
 }
 
+function syncWorkflowFieldState(panelKey, workflowId, fieldName, value, params) {
+  inputState[panelKey][workflowId] = inputState[panelKey][workflowId] || {};
+  inputState[panelKey][workflowId][fieldName] = value;
+  updatePromptPreview(panelKey, workflowId, params);
+}
+
+function fillScopePresetSelect(select, suggestions) {
+  if (!select) return;
+  const current = select.value;
+  select.replaceChildren();
+  const first = document.createElement('option');
+  first.value = '';
+  first.textContent = 'Choose scope preset…';
+  select.appendChild(first);
+  for (const item of suggestions || []) {
+    const opt = document.createElement('option');
+    opt.value = item.value;
+    opt.textContent = item.label || item.value;
+    select.appendChild(opt);
+  }
+  if (current && [...select.options].some((o) => o.value === current)) {
+    select.value = current;
+  }
+}
+
+function fillScopeDatalist(list, suggestions) {
+  if (!list) return;
+  list.replaceChildren();
+  for (const item of suggestions || []) {
+    const opt = document.createElement('option');
+    opt.value = item.value;
+    if (item.label && item.label !== item.value) opt.label = item.label;
+    list.appendChild(opt);
+  }
+}
+
+function refreshWorkflowInputsInPlace(container, workflowId, panelKey, params) {
+  const fields = workflowFields(workflowId, params);
+  for (const field of fields) {
+    const input = container.querySelector(`[data-field="${field.name}"]`);
+    if (input) input.placeholder = field.placeholder || '';
+    if (field.name === 'scope' && field.scopeSuggestions) {
+      fillScopePresetSelect(
+        container.querySelector(`[data-scope-preset="${field.name}"]`),
+        field.scopeSuggestions
+      );
+      fillScopeDatalist(
+        container.querySelector(`[data-scope-list="${field.name}"]`),
+        field.scopeSuggestions
+      );
+    }
+  }
+}
+
 function renderWorkflowInputs(container, workflowId, panelKey) {
   if (!container) return;
-  container.innerHTML = '';
   const params = loadParams() || { docRoot: 'docs/architecture/', template: 'arc42' };
   const fields = workflowFields(workflowId, params);
   if (!fields?.length) {
     container.hidden = true;
+    container.dataset.workflowId = '';
     return;
   }
   container.hidden = false;
+
+  if (container.dataset.workflowId === workflowId && container.querySelector('[data-field]')) {
+    refreshWorkflowInputsInPlace(container, workflowId, panelKey, params);
+    return;
+  }
+
+  container.dataset.workflowId = workflowId;
+  container.innerHTML = '';
   const stored = inputState[panelKey][workflowId] || {};
 
   for (const field of fields) {
@@ -825,6 +998,23 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
     span.textContent = field.label + (field.required ? ' *' : '');
     label.appendChild(span);
 
+    if (field.name === 'scope' && field.scopeSuggestions?.length) {
+      const pick = document.createElement('select');
+      pick.className = 'scope-preset';
+      pick.dataset.scopePreset = field.name;
+      fillScopePresetSelect(pick, field.scopeSuggestions);
+      pick.addEventListener('change', () => {
+        if (!pick.value) return;
+        const input = label.querySelector(`[data-field="${field.name}"]`);
+        if (input) {
+          input.value = pick.value;
+          syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params);
+        }
+        pick.value = '';
+      });
+      label.appendChild(pick);
+    }
+
     let input;
     if (field.multiline) {
       input = document.createElement('textarea');
@@ -833,15 +1023,28 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
       input = document.createElement('input');
       input.type = 'text';
     }
+    input.dataset.field = field.name;
     input.name = `${panelKey}-${workflowId}-${field.name}`;
     input.placeholder = field.placeholder || '';
     input.value = stored[field.name] || '';
+    input.autocomplete = 'off';
+
+    if (field.name === 'scope' && field.scopeSuggestions?.length) {
+      const listId = `${panelKey}-${workflowId}-scope-list`;
+      input.setAttribute('list', listId);
+      const list = document.createElement('datalist');
+      list.id = listId;
+      list.dataset.scopeList = field.name;
+      fillScopeDatalist(list, field.scopeSuggestions);
+      label.appendChild(input);
+      label.appendChild(list);
+    } else {
+      label.appendChild(input);
+    }
+
     input.addEventListener('input', () => {
-      inputState[panelKey][workflowId] = inputState[panelKey][workflowId] || {};
-      inputState[panelKey][workflowId][field.name] = input.value;
-      updatePromptPreview(panelKey, workflowId, params);
+      syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params);
     });
-    label.appendChild(input);
     container.appendChild(label);
   }
 }
