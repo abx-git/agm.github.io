@@ -288,6 +288,59 @@ body {
   font-size: 0.9em;
 }
 
+.focus-fieldset {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.focus-fieldset legend {
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0 0.25rem;
+}
+
+.legend-note {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.focus-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.focus-option {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  cursor: pointer;
+  line-height: 1.35;
+}
+
+.focus-option input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.focus-option strong {
+  display: block;
+  font-weight: 600;
+}
+
+.focus-option small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+}
+
 .workflow-inputs {
   display: flex;
   flex-direction: column;

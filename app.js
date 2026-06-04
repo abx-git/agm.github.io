@@ -25,6 +25,104 @@ const REVIEW_MODES = [
   { id: 'review-maintenance', label: 'Review all docs' },
 ];
 
+/** Documentation focus — extends blueprint.md from bootstrap (see prompts/reference/doc-extensions.md). */
+const DOC_EXTENSIONS = [
+  {
+    id: 'onboarding',
+    label: 'Onboarding & navigation',
+    hint: 'Reading paths in entry-point for developers and architects',
+    bootstrap: [
+      'entry-point.md: add ## Onboarding with recommended reading order by role (developer, architect, ops).',
+      'always-on.md: link to entry-point ## Onboarding.',
+    ],
+  },
+  {
+    id: 'operations',
+    label: 'Operations & incidents',
+    hint: 'ops/: runbooks, pitfalls, troubleshooting, environments',
+    bootstrap: [
+      'blueprint.md: phase row for ops/ ([ ] open) if not already present (arc42 phase 13).',
+      'entry-point.md: ## Operations linking ops/pitfalls.md, ops/troubleshooting.md, ops/runbooks/.',
+    ],
+  },
+  {
+    id: 'persistence',
+    label: 'Persistence & data',
+    hint: 'Data stores, schema, migrations',
+    bootstrap: [
+      'Prioritize template sections for data model (runtime, concepts, overview — per template).',
+      'context/on-demand.md: ## Data stores table (technology, ownership, links to code).',
+      'blueprint.md: note persistence as elevated priority in session log / phase rationale.',
+    ],
+  },
+  {
+    id: 'interfaces',
+    label: 'Integration contracts',
+    hint: 'interfaces/exports.md and imports.md',
+    bootstrap: [
+      'blueprint.md: early priority for interfaces/ phase (after context or in phase 3).',
+      'Populate interfaces/ stubs with first known APIs/events; link from building blocks / runtime.',
+    ],
+  },
+  {
+    id: 'security',
+    label: 'Security & compliance',
+    hint: 'Constraints, quality, risks',
+    bootstrap: [
+      'Elevate constraints, quality, and risks phases in blueprint.md ordering notes.',
+      'context/on-demand.md: ## Security & compliance assumptions (short, evidence-linked).',
+    ],
+  },
+  {
+    id: 'deployment',
+    label: 'Deployment & environments',
+    hint: 'Deployment view + environment map',
+    bootstrap: [
+      'Template deployment section + ops/environments.md (if installed).',
+      'entry-point.md: link environments and deployment docs.',
+    ],
+  },
+  {
+    id: 'observability',
+    label: 'Observability',
+    hint: 'Logs, metrics, traces',
+    bootstrap: [
+      'Template runtime section: observability subsection stub.',
+      'ops/troubleshooting.md (if installed): link dashboards/runbooks.',
+      'entry-point.md: ## Observability links.',
+    ],
+  },
+  {
+    id: 'decisions',
+    label: 'Architecture decisions (ADRs)',
+    hint: '<template>/decisions/',
+    bootstrap: [
+      'blueprint.md: dedicated phase row for <template>/decisions/ near top of plan.',
+      'entry-point.md: ## Decisions index linking decisions/README.md and 001-template.md.',
+    ],
+  },
+  {
+    id: 'ecosystem',
+    label: 'Multi-service ecosystem',
+    hint: 'Partner services and cross-repo links',
+    bootstrap: [
+      'interfaces/imports.md: partner export links as primary work.',
+      'ecosystem-index.md (if installed): table of services, entry-point, exports.',
+      'entry-point.md: ## Ecosystem links.',
+    ],
+  },
+  {
+    id: 'domain-glossary',
+    label: 'Domain language & glossary',
+    hint: 'Ubiquitous language, glossary phase',
+    bootstrap: [
+      'context/on-demand.md: ## Key domain concepts table.',
+      'blueprint.md: prioritize glossary / context terminology phase.',
+      'entry-point.md: link glossary and domain terms.',
+    ],
+  },
+];
+
 /** Per-workflow user fields (name → placeholder in workflow prompt). */
 const WORKFLOW_INPUTS = {
   'architecture-work-query': [
@@ -102,6 +200,12 @@ function normDocRoot(raw) {
   return `${r}/`;
 }
 
+function readDocFocus(form) {
+  return Array.from(form.querySelectorAll('input[name="docFocus"]:checked')).map(
+    (cb) => cb.value
+  );
+}
+
 function readForm(form) {
   const data = new FormData(form);
   const template = String(data.get('template') || 'arc42');
@@ -116,6 +220,7 @@ function readForm(form) {
     docRoot: normDocRoot(data.get('docRoot')),
     sourceRoot: String(data.get('sourceRoot') || '').trim(),
     externalSystems: String(data.get('externalSystems') || '').trim(),
+    docFocus: readDocFocus(form),
   };
 }
 
@@ -178,6 +283,28 @@ function workflowRole(workflow) {
   return r.split('`')[0].split('(')[0].trim() || 'bootstrap';
 }
 
+function buildDocFocusBlock(params) {
+  const ids = params.docFocus || [];
+  if (!ids.length) return '';
+  const template = resolvedTemplate(params);
+  const lines = [
+    '## Documentation focus (bootstrap — extend blueprint.md)',
+    '',
+    'Selected orientations (implement all; see prompts/reference/doc-extensions.md):',
+    '',
+  ];
+  for (const ext of DOC_EXTENSIONS) {
+    if (!ids.includes(ext.id)) continue;
+    lines.push(`### ${ext.label} (\`${ext.id}\`)`);
+    lines.push(`_${ext.hint}_`);
+    for (const step of ext.bootstrap) {
+      lines.push(`- ${substituteTemplate(step, template)}`);
+    }
+    lines.push('');
+  }
+  return `${lines.join('\n')}\n`;
+}
+
 function buildParameterBlock(params) {
   const template = resolvedTemplate(params);
   const docRoot = normDocRoot(params.docRoot);
@@ -193,7 +320,12 @@ function buildParameterBlock(params) {
   if (params.stack) lines.push(`- Stack: ${params.stack}`);
   if (params.sourceRoot) lines.push(`- Primary source path: ${params.sourceRoot}`);
   if (params.externalSystems) lines.push(`- External systems: ${params.externalSystems}`);
+  if (params.docFocus?.length) {
+    lines.push(`- Documentation focus: ${params.docFocus.join(', ')}`);
+  }
   lines.push('');
+  const focusBlock = buildDocFocusBlock(params);
+  if (focusBlock) lines.push(focusBlock.trimEnd(), '');
   lines.push('## File roles (create all three under documentation root — do not merge)');
   lines.push(`- ${docRoot}context/always-on.md — session context (name, stack, source map)`);
   lines.push(`- ${docRoot}blueprint.md — construction plan: phase rows → target files, status, WRK, reviews, session log`);
@@ -234,7 +366,13 @@ function buildInstallScript(params) {
   const os = params.os;
 
   if (os === 'windows') {
-    return buildInstallScriptWindows({ docRoot, template, project, aiTool });
+    return buildInstallScriptWindows({
+      docRoot,
+      template,
+      project,
+      aiTool,
+      docFocus: params.docFocus || [],
+    });
   }
 
   const lines = [
@@ -248,6 +386,7 @@ function buildInstallScript(params) {
     bashAssign('DOC_ROOT', docRoot),
     bashAssign('TEMPLATE', template),
     bashAssign('AI_TOOL', aiTool),
+    bashAssign('DOC_FOCUS', (params.docFocus || []).join(',')),
     '',
     'INSTALLER="$(mktemp -t bp-install.XXXXXX.sh)"',
     'cleanup_installer() { rm -f -- "${INSTALLER:-}"; }',
@@ -258,7 +397,8 @@ function buildInstallScript(params) {
     '  --project "$PROJECT" \\',
     '  --doc-root "$DOC_ROOT" \\',
     '  --template "$TEMPLATE" \\',
-    '  --ai-tool "$AI_TOOL"',
+    '  --ai-tool "$AI_TOOL" \\',
+    '  --focus "$DOC_FOCUS"',
     '',
     'echo "Install finished. Open Assistant UI -> Build -> Adopt."',
     '',
@@ -266,8 +406,9 @@ function buildInstallScript(params) {
   return lines.join('\n');
 }
 
-function buildInstallScriptWindows({ docRoot, template, project, aiTool }) {
+function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocus }) {
   const q = (s) => `"${String(s).replace(/"/g, '""')}"`;
+  const focus = (docFocus || []).join(',');
   return [
     '# Blueprint Pattern — generated install script (Windows)',
     '# Run in PowerShell from your application repository root.',
@@ -278,6 +419,7 @@ function buildInstallScriptWindows({ docRoot, template, project, aiTool }) {
     `$DocRoot = ${q(docRoot)}`,
     `$Template = ${q(template)}`,
     `$AiTool = ${q(aiTool)}`,
+    `$DocFocus = ${q(focus)}`,
     '',
     '$Installer = Join-Path $env:TEMP ("bp-install-" + [guid]::NewGuid().ToString("n") + ".sh")',
     `curl.exe -fsSL ${q(BP_INSTALL_URL)} -o $Installer`,
@@ -294,7 +436,8 @@ function buildInstallScriptWindows({ docRoot, template, project, aiTool }) {
     '  --project $Project `',
     '  --doc-root $DocRoot `',
     '  --template $Template `',
-    '  --ai-tool $AiTool',
+    '  --ai-tool $AiTool `',
+    '  --focus $DocFocus',
     'Remove-Item -Force $Installer -ErrorAction SilentlyContinue',
     '',
     'Write-Host "Install finished. Open Assistant UI → Build → Adopt."',
@@ -421,9 +564,14 @@ function loadParams() {
 function applyParams(form, params) {
   if (!params) return;
   for (const [key, value] of Object.entries(params)) {
+    if (key === 'docFocus') continue;
     const el = form.elements.namedItem(key);
     if (el && value != null) el.value = value;
   }
+  const focus = params.docFocus || [];
+  form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
+    cb.checked = focus.includes(cb.value);
+  });
   toggleCustomField(form);
 }
 
@@ -435,10 +583,33 @@ function toggleCustomField(form) {
   }
 }
 
+function initDocFocusGrid(form) {
+  const host = document.getElementById('doc-focus-grid');
+  if (!host) return;
+  host.replaceChildren();
+  for (const ext of DOC_EXTENSIONS) {
+    const label = document.createElement('label');
+    label.className = 'focus-option';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.name = 'docFocus';
+    cb.value = ext.id;
+    const text = document.createElement('span');
+    const strong = document.createElement('strong');
+    strong.textContent = ext.label;
+    const small = document.createElement('small');
+    small.textContent = ext.hint;
+    text.append(strong, small);
+    label.append(cb, text);
+    host.append(label);
+  }
+}
+
 function initSetupForm(adoptBase) {
   const form = document.getElementById('setup-form');
   if (!form) return;
 
+  initDocFocusGrid(form);
   applyParams(form, loadParams());
   const installPreview = document.getElementById('install-script-preview');
   const adoptPreview = document.getElementById('prompt-preview');

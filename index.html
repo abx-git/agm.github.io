@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=17" />
+  <link rel="stylesheet" href="app.css?v=18" />
 </head>
 <body>
   <main class="app">
@@ -101,6 +101,11 @@
           <span>Documentation root <em>(relative to repo root)</em></span>
           <input type="text" name="docRoot" value="docs/architecture/" />
         </label>
+        <fieldset class="focus-fieldset">
+          <legend>Documentation focus <span class="legend-note">(extends blueprint from bootstrap)</span></legend>
+          <p class="field-hint">Select orientations to add phase rows, stubs, and entry-point sections. Reference: <code>prompts/reference/doc-extensions.md</code></p>
+          <div id="doc-focus-grid" class="focus-grid"></div>
+        </fieldset>
         <details class="field-advanced">
           <summary>Adoption context (for step 2)</summary>
           <label class="field">
@@ -236,13 +241,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v17</span>
+      <span class="deploy-id">Lifecycle · v18</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=17" type="module"></script>
+  <script src="app.js?v=18" type="module"></script>
 </body>
 </html>
