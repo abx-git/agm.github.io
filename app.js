@@ -241,9 +241,9 @@ const WORKFLOW_INPUTS = {
     },
     {
       name: 'scope',
-      label: 'Where may the agent edit?',
-      help: 'Boundary for this session — which files or sections. Prevents rewriting unrelated docs. Use the dropdown or type a path under your documentation root.',
-      placeholder: 'Pick a file/section below, or type a path',
+      label: 'Which documentation section?',
+      help: 'Pick the architecture topic to improve (runtime, APIs, structure, …). Not entry-point or always-on — those are navigation and session setup; the agent updates them when structure changes.',
+      placeholder: 'Pick a section below',
       required: true,
     },
   ],
@@ -473,41 +473,105 @@ const FOCUS_SCOPE_PRESETS = {
   ],
 };
 
-function buildScopeSuggestions(params) {
+/** Human labels for template section files (refinement scope picker). */
+const SECTION_FRIENDLY = {
+  '01-introduction-and-goals.md': 'Introduction & goals',
+  '02-architecture-constraints.md': 'Constraints',
+  '03-system-scope-and-context.md': 'Scope & context',
+  '04-solution-strategy.md': 'Solution strategy',
+  '05-building-block-view.md': 'Structure & building blocks',
+  '06-runtime-view.md': 'Runtime & behaviour',
+  '07-deployment-view.md': 'Deployment',
+  '08-crosscutting-concepts.md': 'Cross-cutting concepts',
+  '09-architectural-decisions.md': 'Decisions (in template)',
+  '10-quality-requirements.md': 'Quality requirements',
+  '11-risks-and-technical-debt.md': 'Risks & technical debt',
+  '12-glossary.md': 'Glossary',
+  'context.md': 'System context',
+  'containers.md': 'Containers',
+  'components.md': 'Components',
+  'views.md': 'Views',
+  'overview.md': 'Overview',
+  'runtime.md': 'Runtime & behaviour',
+  'decisions/': 'Architecture decisions (ADRs)',
+};
+
+function sectionFriendlyLabel(file) {
+  if (SECTION_FRIENDLY[file]) return SECTION_FRIENDLY[file];
+  const base = file.replace(/\/$/, '').replace(/\.md$/, '').replace(/^\d+-/, '');
+  return base.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Deepen content: architecture body sections only; meta files in a separate group. */
+function buildRefinementScopeOptions(params) {
   const template = resolvedTemplate(params);
   const root = normDocRoot(params.docRoot);
   const tp = `${root}${template}/`;
   const seen = new Set();
-  const out = [];
+  const content = [];
+  const advanced = [];
 
-  function add(value, label) {
+  function addContent(value, label) {
     if (!value || seen.has(value)) return;
     seen.add(value);
-    out.push({ value, label: label || value });
+    content.push({ value, label });
   }
 
-  add(`${root}blueprint.md`, 'Construction plan (blueprint.md)');
-  add(`${root}entry-point.md`, 'Navigation (entry-point.md)');
-  add(`${root}context/always-on.md`, 'Session context (always-on.md)');
-  add(tp, `Full template folder (${template}/)`);
-  add(`${root}work/`, 'Architecture work (work/)');
+  function addAdvanced(value, label) {
+    if (!value || seen.has(value)) return;
+    seen.add(value);
+    advanced.push({ value, label });
+  }
+
+  addContent(
+    'Next open row in blueprint.md (agent picks target section from construction plan)',
+    'Not sure — next open task from blueprint.md'
+  );
 
   for (const file of TEMPLATE_SECTIONS[template] || []) {
-    add(`${tp}${file}`, `${template}/${file}`);
+    addContent(`${tp}${file}`, sectionFriendlyLabel(file));
   }
 
-  add(`${root}interfaces/`, 'Integration contracts (interfaces/)');
-  add(`${root}ops/`, 'Operations (ops/)');
+  addContent(`${root}interfaces/`, 'APIs & integration (interfaces/)');
+  addContent(`${root}ops/`, 'Operations (ops/)');
+  addContent(`${tp}decisions/`, 'Architecture decisions (ADRs)');
+  addContent(`${root}work/`, 'Architecture analysis / design notes (work/)');
 
-  for (const id of params.docFocus || []) {
-    const fn = FOCUS_SCOPE_PRESETS[id];
-    if (fn) for (const item of fn(root, template)) add(item.value, item.label);
+  const focus = params.docFocus || [];
+  if (focus.includes('persistence')) {
+    addContent(tp, 'Data & storage (all related template sections)');
   }
 
-  add('Next open row in blueprint.md only', 'Blueprint — next open phase only');
-  add('Source path from always-on.md (primary codebase)', 'Code traceability (per always-on.md)');
+  addAdvanced(
+    `${root}entry-point.md`,
+    'Navigation only (entry-point) — reading links, not technical body text'
+  );
+  addAdvanced(
+    `${root}context/always-on.md`,
+    'Session setup (always-on) — app name, stack, code paths'
+  );
+  addAdvanced(
+    `${root}blueprint.md`,
+    'Progress table only (blueprint) — phase status, not architecture content'
+  );
+  addAdvanced(
+    `${root}context/on-demand.md`,
+    'Supplementary notes (on-demand) — small tables, not main sections'
+  );
 
-  return out;
+  return { content, advanced };
+}
+
+function flattenScopeOptions(suggestions) {
+  if (!suggestions) return [];
+  if (Array.isArray(suggestions)) return suggestions;
+  return [...(suggestions.content || []), ...(suggestions.advanced || [])];
+}
+
+/** Analysis / other workflows — content paths without meta files at the top. */
+function buildScopeSuggestions(params) {
+  const { content, advanced } = buildRefinementScopeOptions(params);
+  return [...content, ...advanced];
 }
 
 function templateExampleSection(templateId) {
@@ -816,8 +880,9 @@ function workflowFields(workflowId, params) {
     if (workflowId === 'refinement' && field.name === 'scope') {
       return {
         ...field,
-        placeholder: `e.g. ${ex} — or pick from list${scopeExtra}`,
-        scopeSuggestions: buildScopeSuggestions(params),
+        placeholder: 'Pick a section — usually runtime, structure, APIs, …',
+        scopeSuggestions: buildRefinementScopeOptions(params),
+        scopeGrouped: true,
       };
     }
     if (workflowId === 'architecture-work-analysis' && field.name === 'scope') {
@@ -1084,14 +1149,33 @@ function fillScopePresetSelect(select, suggestions) {
   select.replaceChildren();
   const first = document.createElement('option');
   first.value = '';
-  first.textContent = 'Pick file or section to edit…';
+  first.textContent = 'Choose section to improve…';
   select.appendChild(first);
-  for (const item of suggestions || []) {
-    const opt = document.createElement('option');
-    opt.value = item.value;
-    opt.textContent = item.label || item.value;
-    select.appendChild(opt);
+
+  const appendOptions = (parent, items) => {
+    for (const item of items || []) {
+      const opt = document.createElement('option');
+      opt.value = item.value;
+      opt.textContent = item.label || item.value;
+      parent.appendChild(opt);
+    }
+  };
+
+  if (suggestions?.content) {
+    const g1 = document.createElement('optgroup');
+    g1.label = 'Architecture content (usual choice)';
+    appendOptions(g1, suggestions.content);
+    select.appendChild(g1);
+    if (suggestions.advanced?.length) {
+      const g2 = document.createElement('optgroup');
+      g2.label = 'Navigation & progress (unusual for Deepen)';
+      appendOptions(g2, suggestions.advanced);
+      select.appendChild(g2);
+    }
+  } else {
+    appendOptions(select, suggestions);
   }
+
   if (current && [...select.options].some((o) => o.value === current)) {
     select.value = current;
   }
@@ -1100,7 +1184,7 @@ function fillScopePresetSelect(select, suggestions) {
 function fillScopeDatalist(list, suggestions) {
   if (!list) return;
   list.replaceChildren();
-  for (const item of suggestions || []) {
+  for (const item of flattenScopeOptions(suggestions)) {
     const opt = document.createElement('option');
     opt.value = item.value;
     if (item.label && item.label !== item.value) opt.label = item.label;
@@ -1213,7 +1297,7 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
     const guide = document.createElement('p');
     guide.className = 'workflow-field-guide';
     guide.textContent =
-      'Goal = what to achieve in this chat. Where = which files the agent may change. Documentation areas (above) = long-term topics you document — optional overlap, but Where is the limit for this single session.';
+      'What = outcome of this chat (e.g. add a diagram, fill gaps from code). Which section = where architecture text lives (runtime, APIs, structure). entry-point, always-on, and blueprint are not for that — they are navigation and progress; the agent maintains them when the graph changes.';
     container.prepend(guide);
   }
 }

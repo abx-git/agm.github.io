@@ -246,7 +246,7 @@
     ],
     "steps": [
       "Goal: <goal>",
-      "Scope: <scope>",
+      "Scope: <scope> (architecture **content** section — template file, interfaces/, ops/, or “next open row in blueprint.md”; not entry-point/always-on unless the human explicitly chose navigation/session setup)",
       "Follow <doc-root>prompts/role-bootstrap.md for evidence and link rules.",
       "Read always-on.md → blueprint.md. Update only the scoped sections and blueprint states.",
       "If **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).",
@@ -257,7 +257,7 @@
       "goal",
       "scope"
     ],
-    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope>\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope> (architecture **content** section — template file, interfaces/, ops/, or “next open row in blueprint.md”; not entry-point/always-on unless the human explicitly chose navigation/session setup)\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",
