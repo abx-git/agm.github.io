@@ -28,11 +28,76 @@ const REVIEW_MODES = [
 /** Evolve workflows that receive the architecture documentation areas block. */
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
+/** Quick picks — plain language; maps to docFocus IDs (see prompts/reference/doc-extensions.md). */
+const DOC_PRESETS = [
+  {
+    id: 'minimal',
+    label: 'Start simple',
+    blurb: 'Core template only — best for first install',
+    focus: [],
+    nextStep: null,
+  },
+  {
+    id: 'data-model',
+    label: 'ER diagram & database',
+    blurb: 'Tables, entities, schema in your architecture docs',
+    focus: ['persistence'],
+    nextStep: {
+      title: 'Add an ER diagram after bootstrap',
+      body: [
+        '1. Finish **Build** → Install, then Adopt (steps below).',
+        '2. Open tab **Evolve** → **Deepen section**.',
+        '3. Goal: Add an ER diagram (Mermaid) and entity table from code, migrations, or schema files.',
+        '4. Scope: choose the data-model preset, or your template’s persistence section.',
+      ],
+      prefillGoal:
+        'Add an ER diagram (Mermaid) and entity/table overview from evidence in the codebase',
+    },
+  },
+  {
+    id: 'apis',
+    label: 'APIs & integrations',
+    blurb: 'REST/events between services — exports & imports docs',
+    focus: ['interfaces'],
+    nextStep: {
+      title: 'Document APIs',
+      body: [
+        'After bootstrap: **Evolve** → **Deepen section** or **Paste git diff** when APIs change.',
+        'Goal: Document public APIs and integration points with evidence from code.',
+      ],
+      prefillGoal: 'Document public APIs and integration contracts from code',
+    },
+  },
+  {
+    id: 'operations',
+    label: 'Operations & runbooks',
+    blurb: 'Deploy, incidents, troubleshooting',
+    focus: ['operations', 'deployment', 'observability'],
+    nextStep: null,
+  },
+  {
+    id: 'decisions',
+    label: 'Architecture decisions (ADRs)',
+    blurb: 'Why the system is built this way',
+    focus: ['decisions'],
+    nextStep: null,
+  },
+  {
+    id: 'team',
+    label: 'Onboarding new readers',
+    blurb: 'Reading paths in entry-point for devs & architects',
+    focus: ['onboarding'],
+    nextStep: null,
+  },
+];
+
 /** Which architecture Markdown areas to scaffold/maintain (see prompts/reference/doc-extensions.md). */
 const DOC_EXTENSIONS = [
   {
     id: 'onboarding',
     label: 'entry-point.md — onboarding paths',
+    userLabel: 'Reading guide for new team members',
+    userHint: 'entry-point.md — who should read what',
     docPaths: 'entry-point.md, context/always-on.md',
     hint: 'Create/update reading guides for humans in your doc graph — not the Assistant or prompts/',
     bootstrap: [
@@ -47,6 +112,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'operations',
     label: 'ops/ — operations & incidents',
+    userLabel: 'Runbooks & incident notes',
+    userHint: 'ops/ folder — how to run and fix the system',
     docPaths: 'ops/ (runbooks, pitfalls, troubleshooting, environments)',
     hint: 'Scaffold and maintain operational Markdown under your documentation root',
     bootstrap: [
@@ -61,6 +128,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'persistence',
     label: 'Template + on-demand — data & persistence',
+    userLabel: 'Database & ER diagram',
+    userHint: 'Data model section — tables, entities, schema',
     docPaths: '<template>/ (data sections), context/on-demand.md',
     hint: 'Document databases, schemas, migrations in your architecture files',
     bootstrap: [
@@ -76,6 +145,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'interfaces',
     label: 'interfaces/ — APIs & events',
+    userLabel: 'APIs & service contracts',
+    userHint: 'interfaces/ — what you expose and consume',
     docPaths: 'interfaces/exports.md, interfaces/imports.md',
     hint: 'Maintain contract docs when public APIs or integrations change',
     bootstrap: [
@@ -89,6 +160,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'security',
     label: '<template>/ — security & compliance',
+    userLabel: 'Security & compliance',
+    userHint: 'Auth, policies, risks in template sections',
     docPaths: 'constraints, quality, risks sections; context/on-demand.md',
     hint: 'Document auth, policy, and compliance in template sections you already use',
     bootstrap: [
@@ -102,6 +175,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'deployment',
     label: 'Deployment docs + ops/environments.md',
+    userLabel: 'Deployment & environments',
+    userHint: 'Where it runs — dev, staging, prod',
     docPaths: '<template>/ deployment section, ops/environments.md',
     hint: 'Describe how and where the system runs — in your Markdown, not CI config alone',
     bootstrap: [
@@ -115,6 +190,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'observability',
     label: 'Runtime + ops/troubleshooting — observability',
+    userLabel: 'Logs, metrics & tracing',
+    userHint: 'How you observe the running system',
     docPaths: '<template>/ runtime notes, ops/troubleshooting.md',
     hint: 'Document logging, metrics, tracing in architecture Markdown',
     bootstrap: [
@@ -129,6 +206,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'decisions',
     label: '<template>/decisions/ — ADRs',
+    userLabel: 'Architecture decision records (ADRs)',
+    userHint: 'Why important choices were made',
     docPaths: '<template>/decisions/, entry-point index',
     hint: 'Create and update decision records as Markdown ADRs in your repo',
     bootstrap: [
@@ -142,6 +221,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'ecosystem',
     label: 'ecosystem-index.md + interfaces/imports.md',
+    userLabel: 'Other services in the landscape',
+    userHint: 'Partner systems and cross-repo links',
     docPaths: 'ecosystem-index.md, interfaces/imports.md, entry-point.md',
     hint: 'Document partner services and cross-repo links in your architecture graph',
     bootstrap: [
@@ -156,6 +237,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'domain-glossary',
     label: 'Glossary & domain terms',
+    userLabel: 'Business terms & glossary',
+    userHint: 'Domain language used in code and APIs',
     docPaths: 'glossary / context sections, context/on-demand.md',
     hint: 'Capture ubiquitous language in your template and on-demand context files',
     bootstrap: [
@@ -279,7 +362,133 @@ function readForm(form) {
     sourceRoot: String(data.get('sourceRoot') || '').trim(),
     externalSystems: String(data.get('externalSystems') || '').trim(),
     docFocus: readDocFocus(form),
+    docPreset: String(data.get('docPreset') || '').trim() || inferDocPreset(readDocFocus(form)),
   };
+}
+
+function focusSetsEqual(a, b) {
+  const sa = new Set(a || []);
+  const sb = new Set(b || []);
+  if (sa.size !== sb.size) return false;
+  for (const id of sa) if (!sb.has(id)) return false;
+  return true;
+}
+
+function inferDocPreset(focusIds) {
+  const match = DOC_PRESETS.find((p) => focusSetsEqual(p.focus, focusIds));
+  return match ? match.id : focusIds?.length ? 'custom' : 'minimal';
+}
+
+function applyDocPreset(form, presetId) {
+  const preset = DOC_PRESETS.find((p) => p.id === presetId);
+  if (!preset) return;
+  form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
+    cb.checked = preset.focus.includes(cb.value);
+  });
+  const hidden = form.elements.namedItem('docPreset');
+  if (hidden) hidden.value = presetId;
+  if (preset.nextStep?.prefillGoal) {
+    const params = readForm(form);
+    const suggestions = buildScopeSuggestions(params);
+    const dataScope =
+      presetId === 'data-model'
+        ? suggestions.find((s) => /on-demand|data|persistence/i.test(s.label || s.value))
+        : null;
+    inputState.evolve = inputState.evolve || {};
+    inputState.evolve.refinement = {
+      ...(inputState.evolve.refinement || {}),
+      goal: preset.nextStep.prefillGoal,
+      ...(dataScope ? { scope: dataScope.value } : {}),
+    };
+  }
+  saveParams(readForm(form));
+  updateDocNeedsUI(form);
+  refreshInstallPreviewFromForm(form);
+  refreshOpenWorkflowPanels();
+}
+
+function refreshInstallPreviewFromForm(form) {
+  const pre = document.getElementById('install-script-preview');
+  if (pre) pre.textContent = buildInstallScript(readForm(form));
+}
+
+function updateDocNeedsUI(form) {
+  const params = readForm(form);
+  const presetId = params.docPreset || 'minimal';
+  const preset = DOC_PRESETS.find((p) => p.id === presetId);
+
+  document.querySelectorAll('.doc-preset-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.preset === presetId);
+  });
+
+  const recap = document.getElementById('doc-needs-recap');
+  if (recap) {
+    if (preset && presetId !== 'custom') {
+      recap.textContent = `Selected: ${preset.label} — used for install script, adoption, and Evolve.`;
+    } else if (params.docFocus?.length) {
+      const names = params.docFocus
+        .map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.userLabel || id)
+        .join(', ');
+      recap.textContent = `Selected (custom): ${names}`;
+    } else {
+      recap.textContent = 'Selected: Start simple — core template only.';
+    }
+  }
+
+  const evolveRecap = document.getElementById('doc-needs-recap-evolve');
+  if (evolveRecap) evolveRecap.textContent = recap?.textContent || '';
+
+  const nextBox = document.getElementById('doc-next-step');
+  if (!nextBox) return;
+  const step = preset?.nextStep;
+  if (!step) {
+    nextBox.hidden = true;
+    nextBox.replaceChildren();
+    return;
+  }
+  nextBox.hidden = false;
+  const title = document.createElement('p');
+  title.className = 'doc-next-step-title';
+  title.textContent = step.title;
+  const list = document.createElement('ol');
+  list.className = 'doc-next-step-list';
+  for (const line of step.body) {
+    const li = document.createElement('li');
+    li.textContent = line;
+    list.appendChild(li);
+  }
+  nextBox.replaceChildren(title, list);
+}
+
+function initDocPresets(form) {
+  const grid = document.getElementById('doc-preset-grid');
+  if (!grid) return;
+  grid.replaceChildren();
+  for (const preset of DOC_PRESETS) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'doc-preset-btn';
+    btn.dataset.preset = preset.id;
+    const strong = document.createElement('strong');
+    strong.textContent = preset.label;
+    const span = document.createElement('span');
+    span.textContent = preset.blurb;
+    btn.append(strong, span);
+    btn.addEventListener('click', () => applyDocPreset(form, preset.id));
+    grid.appendChild(btn);
+  }
+  let hidden = form.elements.namedItem('docPreset');
+  if (!hidden) {
+    hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.name = 'docPreset';
+    form.appendChild(hidden);
+  }
+  document.getElementById('goto-build-tab')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelector('.phase-tab[data-phase="build"]')?.click();
+    document.getElementById('doc-needs-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 
 function resolvedTemplate(params) {
@@ -782,6 +991,8 @@ function applyParams(form, params) {
   form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
     cb.checked = focus.has(cb.value);
   });
+  const presetEl = form.elements.namedItem('docPreset');
+  if (presetEl) presetEl.value = params.docPreset || inferDocPreset(params.docFocus);
   toggleCustomField(form);
 }
 
@@ -794,7 +1005,10 @@ function toggleCustomField(form) {
 }
 
 function onDocFocusChange(form) {
+  const hidden = form.elements.namedItem('docPreset');
+  if (hidden) hidden.value = inferDocPreset(readDocFocus(form));
   saveParams(readForm(form));
+  updateDocNeedsUI(form);
   refreshOpenWorkflowPanels();
 }
 
@@ -805,18 +1019,9 @@ function refreshDocFocusLabels(form) {
     const ext = DOC_EXTENSIONS.find((e) => e.id === cb?.value);
     if (!ext) return;
     const strong = label.querySelector('strong');
-    if (strong) strong.textContent = substituteTemplate(ext.label, template);
-    let paths = label.querySelector('.focus-doc-paths');
-    if (ext.docPaths) {
-      if (!paths) {
-        paths = document.createElement('em');
-        paths.className = 'focus-doc-paths';
-        strong?.insertAdjacentElement('afterend', paths);
-      }
-      paths.textContent = substituteTemplate(ext.docPaths, template);
-    } else if (paths) {
-      paths.remove();
-    }
+    if (strong) strong.textContent = ext.userLabel || substituteTemplate(ext.label, template);
+    const hint = label.querySelector('.focus-hint');
+    if (hint) hint.textContent = ext.userHint || ext.hint;
   });
 }
 
@@ -832,17 +1037,11 @@ function initDocFocusGrids(form) {
       cb.value = ext.id;
       const text = document.createElement('span');
       const strong = document.createElement('strong');
-      strong.textContent = ext.label;
+      strong.textContent = ext.userLabel || ext.label;
       text.append(strong);
-      if (ext.docPaths) {
-        const paths = document.createElement('em');
-        paths.className = 'focus-doc-paths';
-        paths.textContent = ext.docPaths;
-        text.append(paths);
-      }
       const small = document.createElement('small');
       small.className = 'focus-hint';
-      small.textContent = ext.hint;
+      small.textContent = ext.userHint || ext.hint;
       text.append(small);
       label.append(cb, text);
       cb.addEventListener('change', () => {
@@ -859,8 +1058,10 @@ function initSetupForm(adoptBase) {
   const form = document.getElementById('setup-form');
   if (!form) return;
 
+  initDocPresets(form);
   initDocFocusGrids(form);
   applyParams(form, loadParams());
+  updateDocNeedsUI(form);
   const installPreview = document.getElementById('install-script-preview');
   const adoptPreview = document.getElementById('prompt-preview');
 
@@ -907,6 +1108,7 @@ function initSetupForm(adoptBase) {
     const n = e.target?.name;
     if (n === 'template' || n === 'customTemplate' || n === 'docRoot') {
       refreshDocFocusLabels(form);
+      updateDocNeedsUI(form);
       refreshOpenWorkflowPanels();
     }
   });

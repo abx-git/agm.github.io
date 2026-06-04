@@ -255,8 +255,159 @@ body {
   padding: 0 0.25rem;
 }
 
-.focus-fieldset-evolve {
-  margin-bottom: 1.25rem;
+.build-howto {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.build-howto-title {
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.build-howto-steps {
+  margin: 0 0 0.5rem 1.1rem;
+  padding: 0;
+}
+
+.build-howto-foot {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.doc-needs-panel {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid #c5daf5;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.doc-needs-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.doc-needs-lead {
+  margin: 0 0 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.doc-preset-grid {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 520px) {
+  .doc-preset-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.doc-preset-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.doc-preset-btn:hover {
+  border-color: var(--accent);
+}
+
+.doc-preset-btn.active {
+  border-color: var(--accent);
+  background: #eef5ff;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.doc-preset-btn strong {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.doc-preset-btn span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.doc-needs-recap {
+  margin: 0 0 0.5rem;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.doc-next-step {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.8rem;
+  background: #fff;
+  border: 1px solid #e8d48a;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.doc-next-step-title {
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+}
+
+.doc-next-step-list {
+  margin: 0 0 0 1.1rem;
+  padding: 0;
+}
+
+.doc-needs-advanced {
+  margin-top: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.doc-needs-advanced summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.doc-needs-evolve {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.doc-needs-evolve-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.step-uses-needs {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 .focus-fieldset-lead {

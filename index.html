@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=22" />
+  <link rel="stylesheet" href="app.css?v=23" />
 </head>
 <body>
   <main class="app">
@@ -84,6 +84,29 @@
           </label>
         </div>
 
+        <div class="build-howto" role="note">
+          <p class="build-howto-title">How Build works</p>
+          <ol class="build-howto-steps">
+            <li><strong>Choose what to document</strong> (once, below) — same choice for install and adoption.</li>
+            <li><strong>Step 1 — Install:</strong> copy script → run in your <em>application</em> repo root.</li>
+            <li><strong>Step 2 — Adopt:</strong> copy prompt → new chat; agent creates your architecture files.</li>
+          </ol>
+          <p class="build-howto-foot">Already ran install? Skip to step 2. Need only an ER diagram later? Pick it below, finish Build, then follow the hint under your choice.</p>
+        </div>
+
+        <section id="doc-needs-panel" class="doc-needs-panel">
+          <h2 class="doc-needs-title">What do you want to document?</h2>
+          <p class="doc-needs-lead">Pick one goal. We prepare the right <strong>Markdown files in your repo</strong> — not Blueprint prompts or workflows.</p>
+          <div id="doc-preset-grid" class="doc-preset-grid"></div>
+          <p id="doc-needs-recap" class="doc-needs-recap" aria-live="polite"></p>
+          <div id="doc-next-step" class="doc-next-step" hidden aria-live="polite"></div>
+          <details class="doc-needs-advanced">
+            <summary>Fine-tune individual doc areas (optional)</summary>
+            <p class="field-hint">Only if a preset does not fit. Same list is used for install, adopt, and Evolve.</p>
+            <div class="focus-grid" data-doc-focus-grid="build"></div>
+          </details>
+        </section>
+
         <ol class="steps">
           <li class="step step-hero">
             <div class="step-head">
@@ -113,11 +136,7 @@
                   </select>
                 </label>
               </div>
-              <fieldset class="focus-fieldset">
-                <legend>Architecture documentation areas <span class="legend-note">(step 1 — install)</span></legend>
-                <p class="field-hint focus-fieldset-lead">Which <strong>Markdown files</strong> to create under your documentation root (e.g. <code>ops/</code>). Does <em>not</em> change Blueprint prompts, workflows, or how adoption works.</p>
-                <div class="focus-grid" data-doc-focus-grid="install"></div>
-              </fieldset>
+              <p class="step-uses-needs">Uses your choice above in the install script (extra folders/files).</p>
             </div>
             <div class="install-hint" role="note">
               <p class="install-hint-title">Where to run the script</p>
@@ -164,11 +183,7 @@
                   <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
                 </label>
               </fieldset>
-              <fieldset class="focus-fieldset">
-                <legend>Architecture documentation areas <span class="legend-note">(step 2 — bootstrap)</span></legend>
-                <p class="field-hint focus-fieldset-lead">Same checkboxes as step 1: tell the agent which <strong>architecture docs</strong> to write in your repo (<code>entry-point.md</code>, <code>ops/</code>, template sections, …). Adds phases in <code>blueprint.md</code> — not changes to <code>prompts/</code>.</p>
-                <div class="focus-grid" data-doc-focus-grid="adopt"></div>
-              </fieldset>
+              <p class="step-uses-needs">Uses the <strong>same</strong> doc choice from above — fill in context about your app (helps the agent write accurate docs).</p>
             </div>
             <details class="prompt-preview">
               <summary>Preview adoption parameters</summary>
@@ -205,11 +220,10 @@
 
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
         <p class="phase-intro">Deepen sections or keep docs aligned with code. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
-        <fieldset class="focus-fieldset focus-fieldset-evolve">
-          <legend>Architecture documentation areas <span class="legend-note">(Evolve)</span></legend>
-          <p class="field-hint focus-fieldset-lead">Synced with Build. When code changes, the agent updates <strong>your</strong> selected architecture Markdown — still not prompts or workflows.</p>
-          <div class="focus-grid" data-doc-focus-grid="evolve"></div>
-        </fieldset>
+        <div class="doc-needs-evolve">
+          <p id="doc-needs-recap-evolve" class="doc-needs-recap" aria-live="polite"></p>
+          <p class="doc-needs-evolve-hint">To change what you document, use <a href="#doc-needs-panel" id="goto-build-tab">Build → What do you want to document?</a>. Then pick a workflow below (e.g. <strong>Deepen section</strong> for an ER diagram).</p>
+        </div>
         <div class="modes" id="evolve-grid"></div>
         <div id="evolve-panel" class="mode-panel" hidden>
           <p class="mode-label" id="evolve-label"></p>
@@ -256,13 +270,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v22</span>
+      <span class="deploy-id">Lifecycle · v23</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=22" type="module"></script>
+  <script src="app.js?v=23" type="module"></script>
 </body>
 </html>
