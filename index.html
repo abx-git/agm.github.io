@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=29" />
+  <link rel="stylesheet" href="app.css?v=30" />
 </head>
 <body>
   <main class="app">
@@ -136,13 +136,21 @@
             <div class="step-head">
               <span class="step-n">2</span>
               <div>
-                <strong>Plan — which areas to document</strong>
-                <p>Multi-select <strong>architecture content</strong> only (runtime, APIs, ops, …). <code>entry-point.md</code>, <code>blueprint.md</code>, and <code>always-on.md</code> are always maintained by the agent — not listed here.</p>
+                <strong>Plan — documentation focus</strong>
+                <p>Check topics for your project, or describe focus in text. Same control is used in <em>Deepen content</em> (Improve tab).</p>
               </div>
             </div>
             <div class="step-fields doc-areas-step-fields">
-              <div id="doc-area-helpers-build" class="doc-area-helpers"></div>
-              <div class="focus-grid focus-grid--open" data-doc-focus-grid="build"></div>
+              <fieldset class="doc-focus-unified">
+                <legend>Documentation focus</legend>
+                <p class="field-hint doc-focus-unified-hint">Check topics (primary). Optional text instead of or in addition to checks. <code>entry-point</code>, <code>blueprint</code>, <code>always-on</code> are agent-only.</p>
+                <div id="doc-area-helpers-build" class="doc-area-helpers"></div>
+                <div class="focus-grid focus-grid--open" data-doc-focus-grid="build"></div>
+                <label class="field">
+                  <span>Or describe focus in your own words (optional)</span>
+                  <input type="text" name="docFocusDetail" placeholder="e.g. runtime and APIs only, or a specific file path" autocomplete="off" />
+                </label>
+              </fieldset>
               <p id="doc-needs-recap" class="doc-needs-recap" aria-live="polite"></p>
             </div>
           </li>
@@ -211,16 +219,7 @@
       </section>
 
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Improve &amp; sync:</strong> deepen <strong>content</strong> docs or sync with code. Add areas you skipped in Foundation step 2. Graph files stay under agent control.</p>
-
-        <section class="doc-areas-panel doc-areas-panel--evolve">
-          <h2 class="doc-areas-subtitle">Documentation areas</h2>
-          <p class="doc-areas-lead">Tick more areas to extend your plan; use workflows below to improve content in those areas.</p>
-          <div id="doc-area-helpers-evolve" class="doc-area-helpers"></div>
-          <div class="focus-grid focus-grid--open" data-doc-focus-grid="evolve"></div>
-          <p id="doc-needs-recap-evolve" class="doc-needs-recap" aria-live="polite"></p>
-          <p class="doc-areas-link"><a href="#doc-areas-step" id="goto-build-areas">Jump to Foundation → step 2</a></p>
-        </section>
+        <p class="phase-intro"><strong>Improve &amp; sync:</strong> use <strong>Deepen content</strong> with the same documentation focus as Foundation step 2 (checkboxes or text). Maintenance workflows sync with code only.</p>
 
         <h2 class="evolve-workflows-title">How to improve</h2>
         <div class="modes" id="evolve-grid"></div>
@@ -269,13 +268,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v29</span>
+      <span class="deploy-id">Lifecycle · v30</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=29" type="module"></script>
+  <script src="app.js?v=30" type="module"></script>
 </body>
 </html>

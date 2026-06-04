@@ -7,7 +7,7 @@ const EVOLVE_MODES = [
   {
     id: 'refinement',
     label: 'Deepen content',
-    note: 'Improve one section (Goal + Scope) — e.g. more detail, diagrams, evidence.',
+    note: 'Check documentation focus (or type text), then what should improve.',
   },
   { id: 'maintenance', label: 'Sync with pasted diff', note: 'After code changes — paste git diff or PR summary.' },
   {
@@ -242,16 +242,16 @@ const WORKFLOW_INPUTS = {
     {
       name: 'goal',
       label: 'What should improve?',
-      help: 'One sentence: the result of this chat (e.g. “add a diagram”, “fill API section from code”, “clarify deployment steps”).',
+      help: 'One sentence: the result of this chat (e.g. add a diagram, fill gaps from code).',
       placeholder: 'e.g. document retry behaviour for outbound HTTP calls',
       required: true,
     },
     {
-      name: 'scope',
-      label: 'Which documentation section?',
-      help: 'Architecture content only (template section, interfaces/, ops/, …). entry-point, blueprint, and always-on are always agent-maintained — not listed here.',
-      placeholder: 'Pick a section below',
-      required: true,
+      name: 'sessionFocusDetail',
+      label: 'Or describe focus in your own words (optional)',
+      help: 'Overrides checkboxes for this prompt only — e.g. a specific template file path or “next open blueprint row”.',
+      placeholder: 'e.g. arc42/06-runtime-view.md — or leave empty to use checked areas above',
+      required: false,
     },
   ],
   maintenance: [
@@ -344,7 +344,20 @@ function readForm(form) {
     sourceRoot: String(data.get('sourceRoot') || '').trim(),
     externalSystems: String(data.get('externalSystems') || '').trim(),
     docFocus: readDocFocus(form),
+    docFocusDetail: String(data.get('docFocusDetail') || '').trim(),
   };
+}
+
+/** Single Scope line for refinement: optional text, else checked areas, else blueprint default. */
+function buildSessionScopeText(params, sessionDetail) {
+  const detail = String(sessionDetail ?? params.docFocusDetail ?? '').trim();
+  if (detail) return detail;
+  const ids = params.docFocus || [];
+  if (!ids.length) {
+    return 'Next open row in blueprint.md (agent picks content section from construction plan)';
+  }
+  const labels = ids.map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.userLabel || id);
+  return `Documentation focus: ${labels.join('; ')} — update matching architecture content with code evidence.`;
 }
 
 function applyDocFocusSet(form, focusIds, mode = 'set') {
@@ -361,22 +374,22 @@ function applyDocFocusSet(form, focusIds, mode = 'set') {
 function updateDocAreasRecap(form) {
   const params = readForm(form);
   const n = params.docFocus?.length || 0;
+  const detail = params.docFocusDetail;
   let text;
-  if (n === 0) {
-    text =
-      'No extra areas selected — you get the core template and blueprint only. You can tick areas here or in Evolve anytime.';
-  } else if (n === DOC_AREA_ORDER.length) {
-    text = `All ${n} documentation areas selected — install, adoption, and Evolve will include them.`;
+  if (n === 0 && !detail) {
+    text = 'No focus selected — core template only. Check topics below or use optional text.';
+  } else if (n === DOC_AREA_ORDER.length && !detail) {
+    text = `All ${n} topics selected for install, adopt, and improve sessions.`;
   } else {
     const names = params.docFocus
       .map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.userLabel || id)
       .join(' · ');
-    text = `${n} area${n > 1 ? 's' : ''} selected: ${names}`;
+    text = detail
+      ? `Focus: ${detail}${names ? ` (also checked: ${names})` : ''}`
+      : `${n} topic${n > 1 ? 's' : ''}: ${names}`;
   }
-  for (const id of ['doc-needs-recap', 'doc-needs-recap-evolve']) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = text;
-  }
+  const el = document.getElementById('doc-needs-recap');
+  if (el) el.textContent = text;
 }
 
 function initDocAreaHelpers(form, hostId, mode = 'set') {
@@ -416,168 +429,6 @@ const TEMPLATE_HINTS = {
   'lean-service': { exampleSection: 'lean-service/runtime.md' },
   custom: { exampleSection: 'custom/overview.md' },
 };
-
-/** Typical section files per template (scope presets). */
-const TEMPLATE_SECTIONS = {
-  arc42: [
-    '01-introduction-and-goals.md',
-    '02-architecture-constraints.md',
-    '03-system-scope-and-context.md',
-    '04-solution-strategy.md',
-    '05-building-block-view.md',
-    '06-runtime-view.md',
-    '07-deployment-view.md',
-    '08-crosscutting-concepts.md',
-    '09-architectural-decisions.md',
-    '10-quality-requirements.md',
-    '11-risks-and-technical-debt.md',
-    '12-glossary.md',
-  ],
-  'c4-light': ['context.md', 'containers.md', 'components.md', 'decisions/'],
-  'adr-first': ['context.md', 'views.md', 'decisions/'],
-  'lean-service': ['overview.md', 'runtime.md', 'decisions/'],
-};
-
-const FOCUS_SCOPE_PRESETS = {
-  implementation: (root, template) => {
-    const tp = `${root}${template}/`;
-    const picks = [
-      { value: `${tp}`, label: `Structure & runtime (${template}/)` },
-      { value: `${root}work/`, label: 'Implementation analysis / design (work/)' },
-    ];
-    const blocks =
-      template === 'arc42'
-        ? ['05-building-block-view.md', '06-runtime-view.md', '04-solution-strategy.md']
-        : template === 'c4-light'
-          ? ['components.md', 'containers.md', 'context.md']
-          : template === 'lean-service'
-            ? ['overview.md', 'runtime.md']
-            : template === 'adr-first'
-              ? ['views.md', 'context.md']
-              : [];
-    for (const f of blocks) {
-      picks.push({ value: `${tp}${f}`, label: sectionFriendlyLabel(f) });
-    }
-    return picks;
-  },
-  operations: (root) => [
-    { value: `${root}ops/`, label: 'Operations folder (ops/)' },
-    { value: `${root}ops/runbooks/`, label: 'Runbooks (ops/runbooks/)' },
-    { value: `${root}ops/pitfalls.md`, label: 'Pitfalls (ops/pitfalls.md)' },
-    { value: `${root}ops/troubleshooting.md`, label: 'Troubleshooting (ops/troubleshooting.md)' },
-  ],
-  persistence: (root, template) => [
-    { value: `${root}${template}/`, label: `Data & storage (${template}/ data sections)` },
-  ],
-  interfaces: (root) => [
-    { value: `${root}interfaces/`, label: 'Interfaces folder (interfaces/)' },
-    { value: `${root}interfaces/exports.md`, label: 'Exports (interfaces/exports.md)' },
-    { value: `${root}interfaces/imports.md`, label: 'Imports (interfaces/imports.md)' },
-  ],
-  security: (root, template) => [
-    {
-      value: `${root}${template}/`,
-      label: `Security-related sections in ${template}/ (constraints, quality, risks)`,
-    },
-  ],
-  deployment: (root) => [
-    { value: `${root}ops/environments.md`, label: 'Environments (ops/environments.md)' },
-  ],
-  observability: (root, template) => [
-    { value: `${root}${template}/`, label: `Runtime / observability in ${template}/` },
-    { value: `${root}ops/troubleshooting.md`, label: 'Troubleshooting (ops/troubleshooting.md)' },
-  ],
-  decisions: (root, template) => [
-    { value: `${root}${template}/decisions/`, label: `ADRs (${template}/decisions/)` },
-  ],
-  ecosystem: (root) => [
-    { value: `${root}ecosystem-index.md`, label: 'Ecosystem index (ecosystem-index.md)' },
-    { value: `${root}interfaces/imports.md`, label: 'Partner imports (interfaces/imports.md)' },
-  ],
-  'domain-glossary': (root, template) => [
-    { value: `${root}${template}/`, label: `Glossary / terminology (${template}/)` },
-  ],
-};
-
-/** Human labels for template section files (refinement scope picker). */
-const SECTION_FRIENDLY = {
-  '01-introduction-and-goals.md': 'Introduction & goals',
-  '02-architecture-constraints.md': 'Constraints',
-  '03-system-scope-and-context.md': 'Scope & context',
-  '04-solution-strategy.md': 'Solution strategy',
-  '05-building-block-view.md': 'Structure & building blocks',
-  '06-runtime-view.md': 'Runtime & behaviour',
-  '07-deployment-view.md': 'Deployment',
-  '08-crosscutting-concepts.md': 'Cross-cutting concepts',
-  '09-architectural-decisions.md': 'Decisions (in template)',
-  '10-quality-requirements.md': 'Quality requirements',
-  '11-risks-and-technical-debt.md': 'Risks & technical debt',
-  '12-glossary.md': 'Glossary',
-  'context.md': 'System context',
-  'containers.md': 'Containers',
-  'components.md': 'Components',
-  'views.md': 'Views',
-  'overview.md': 'Overview',
-  'runtime.md': 'Runtime & behaviour',
-  'decisions/': 'Architecture decisions (ADRs)',
-};
-
-function sectionFriendlyLabel(file) {
-  if (SECTION_FRIENDLY[file]) return SECTION_FRIENDLY[file];
-  const base = file.replace(/\/$/, '').replace(/\.md$/, '').replace(/^\d+-/, '');
-  return base.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-/** Deepen content: architecture content only — never entry-point / blueprint / always-on. */
-function buildRefinementScopeOptions(params) {
-  const template = resolvedTemplate(params);
-  const root = normDocRoot(params.docRoot);
-  const tp = `${root}${template}/`;
-  const seen = new Set();
-  const content = [];
-
-  function addContent(value, label) {
-    if (!value || seen.has(value)) return;
-    seen.add(value);
-    content.push({ value, label });
-  }
-
-  addContent(
-    'Next open row in blueprint.md (agent picks content section from construction plan)',
-    'Not sure — agent picks next content task from blueprint.md'
-  );
-
-  for (const file of TEMPLATE_SECTIONS[template] || []) {
-    addContent(`${tp}${file}`, sectionFriendlyLabel(file));
-  }
-
-  addContent(`${root}interfaces/`, 'APIs & integration (interfaces/)');
-  addContent(`${root}ops/`, 'Operations (ops/)');
-  addContent(`${tp}decisions/`, 'Architecture decisions (ADRs)');
-  addContent(`${root}work/`, 'Architecture analysis / design notes (work/)');
-
-  const focus = params.docFocus || [];
-  if (focus.includes('implementation')) {
-    const fn = FOCUS_SCOPE_PRESETS.implementation;
-    if (fn) for (const item of fn(root, template)) addContent(item.value, item.label);
-  }
-  if (focus.includes('persistence')) {
-    addContent(tp, 'Data & storage (all related template sections)');
-  }
-
-  return { content };
-}
-
-function flattenScopeOptions(suggestions) {
-  if (!suggestions) return [];
-  if (Array.isArray(suggestions)) return suggestions;
-  return suggestions.content || [];
-}
-
-/** Analysis / other workflows — same content-only scope list as refinement. */
-function buildScopeSuggestions(params) {
-  return flattenScopeOptions(buildRefinementScopeOptions(params));
-}
 
 function templateExampleSection(templateId) {
   const t = templateId || 'arc42';
@@ -856,6 +707,12 @@ function applyWorkflowInputs(prompt, workflowId, values) {
   if (values.question) {
     out = out.replace(/Question: <your question here>/, `Question: ${values.question}`);
   }
+  if (workflowId === 'refinement') {
+    const params = loadParams() || { docRoot: 'docs/architecture/' };
+    const scopeText = buildSessionScopeText(params, values.sessionFocusDetail);
+    out = out.replace(/Scope: <scope>[^\n]*/i, `Scope: ${scopeText}`);
+    out = out.replace(/<scope>/g, scopeText);
+  }
   if (values.gitDiff) {
     out = out.replace(/<paste git diff or PR diff summary>/, values.gitDiff);
     out = out.replace(
@@ -875,47 +732,39 @@ function applyWorkflowInputs(prompt, workflowId, values) {
   return out;
 }
 
-function focusScopeHint(params) {
-  const ids = params?.docFocus || [];
-  if (!ids.length) return '';
-  const labels = ids
-    .map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.id || id)
-    .join(', ');
-  return ` — or focus areas: ${labels}`;
-}
-
-const SCOPE_FIELD_WORKFLOWS = new Set(['refinement', 'architecture-work-analysis']);
-
 function workflowFields(workflowId, params) {
   const base = WORKFLOW_INPUTS[workflowId];
   if (!base) return [];
   const t = resolvedTemplate(params || {});
   const ex = templateExampleSection(t);
-  const scopeExtra = focusScopeHint(params);
   return base.map((field) => {
     if (workflowId === 'refinement' && field.name === 'goal') {
-      return {
-        ...field,
-        placeholder: `e.g. deepen ${ex} with evidence from code`,
-      };
-    }
-    if (workflowId === 'refinement' && field.name === 'scope') {
-      return {
-        ...field,
-        placeholder: 'Pick a section — usually runtime, structure, APIs, …',
-        scopeSuggestions: buildRefinementScopeOptions(params),
-        scopeGrouped: true,
-      };
-    }
-    if (workflowId === 'architecture-work-analysis' && field.name === 'scope') {
-      return {
-        ...field,
-        placeholder: `Pick a preset or type modules / ${t} sections`,
-        scopeSuggestions: buildScopeSuggestions(params),
-      };
+      return { ...field, placeholder: `e.g. deepen ${ex} with evidence from code` };
     }
     return { ...field };
   });
+}
+
+function appendDocFocusUnified(container, form, gridKey) {
+  const fieldset = document.createElement('fieldset');
+  fieldset.className = 'doc-focus-unified';
+  const legend = document.createElement('legend');
+  legend.textContent = 'Documentation focus';
+  fieldset.appendChild(legend);
+
+  const hint = document.createElement('p');
+  hint.className = 'field-hint doc-focus-unified-hint';
+  hint.textContent =
+    'Check topics to document (install, adopt, improve). Optional text overrides checkboxes for this prompt. Graph files (entry-point, blueprint, always-on) are always agent-maintained.';
+  fieldset.appendChild(hint);
+
+  const grid = document.createElement('div');
+  grid.className = 'focus-grid focus-grid--open';
+  grid.dataset.docFocusGrid = gridKey;
+  fieldset.appendChild(grid);
+
+  container.appendChild(fieldset);
+  initDocFocusGrids(form);
 }
 
 function personalizeWorkflowWhen(workflow, params) {
@@ -985,6 +834,8 @@ function applyParams(form, params) {
   form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
     cb.checked = focus.has(cb.value);
   });
+  const detailEl = form.elements.namedItem('docFocusDetail');
+  if (detailEl && params.docFocusDetail != null) detailEl.value = params.docFocusDetail;
   toggleCustomField(form);
   updateDocAreasRecap(form);
 }
@@ -1002,6 +853,10 @@ function onDocFocusChange(form) {
   updateDocAreasRecap(form);
   const pre = document.getElementById('install-script-preview');
   if (pre) pre.textContent = buildInstallScript(readForm(form));
+  const params = readForm(form);
+  if (panelState.evolve?.id === 'refinement') {
+    updatePromptPreview('evolve', 'refinement', params);
+  }
   refreshOpenWorkflowPanels();
 }
 
@@ -1052,13 +907,12 @@ function initSetupForm(adoptBase) {
   if (!form) return;
 
   initDocAreaHelpers(form, 'doc-area-helpers-build');
-  initDocAreaHelpers(form, 'doc-area-helpers-evolve');
   initDocFocusGrids(form);
   applyParams(form, loadParams());
-  document.getElementById('goto-build-areas')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector('.phase-tab[data-phase="build"]')?.click();
-    document.getElementById('doc-areas-step')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  form.elements.namedItem('docFocusDetail')?.addEventListener('input', () => {
+    saveParams(readForm(form));
+    updateDocAreasRecap(form);
+    refreshOpenWorkflowPanels();
   });
   const installPreview = document.getElementById('install-script-preview');
   const adoptPreview = document.getElementById('prompt-preview');
@@ -1167,63 +1021,44 @@ function syncWorkflowFieldState(panelKey, workflowId, fieldName, value, params) 
   updatePromptPreview(panelKey, workflowId, params);
 }
 
-function fillScopePresetSelect(select, suggestions) {
-  if (!select) return;
-  const current = select.value;
-  select.replaceChildren();
-  const first = document.createElement('option');
-  first.value = '';
-  first.textContent = 'Choose section to improve…';
-  select.appendChild(first);
+function renderWorkflowField(container, field, panelKey, workflowId, stored, params, form) {
+  const label = document.createElement('label');
+  label.className = 'field';
+  const span = document.createElement('span');
+  span.textContent = field.label + (field.required ? ' *' : '');
+  label.appendChild(span);
 
-  const appendOptions = (parent, items) => {
-    for (const item of items || []) {
-      const opt = document.createElement('option');
-      opt.value = item.value;
-      opt.textContent = item.label || item.value;
-      parent.appendChild(opt);
-    }
-  };
-
-  const items = suggestions?.content || suggestions;
-  appendOptions(select, items);
-
-  if (current && [...select.options].some((o) => o.value === current)) {
-    select.value = current;
+  let input;
+  if (field.multiline) {
+    input = document.createElement('textarea');
+    input.rows = 4;
+  } else {
+    input = document.createElement('input');
+    input.type = 'text';
   }
-}
+  input.dataset.field = field.name;
+  input.name = `${panelKey}-${workflowId}-${field.name}`;
+  input.placeholder = field.placeholder || '';
+  input.value = stored[field.name] || '';
+  input.autocomplete = 'off';
+  label.appendChild(input);
 
-function fillScopeDatalist(list, suggestions) {
-  if (!list) return;
-  list.replaceChildren();
-  for (const item of flattenScopeOptions(suggestions)) {
-    const opt = document.createElement('option');
-    opt.value = item.value;
-    if (item.label && item.label !== item.value) opt.label = item.label;
-    list.appendChild(opt);
+  input.addEventListener('input', () => {
+    syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params);
+    if (workflowId === 'refinement') updatePromptPreview(panelKey, workflowId, readForm(form));
+  });
+  if (field.help) {
+    const help = document.createElement('p');
+    help.className = 'field-help';
+    help.textContent = field.help;
+    label.appendChild(help);
   }
-}
-
-function refreshWorkflowInputsInPlace(container, workflowId, panelKey, params) {
-  const fields = workflowFields(workflowId, params);
-  for (const field of fields) {
-    const input = container.querySelector(`[data-field="${field.name}"]`);
-    if (input) input.placeholder = field.placeholder || '';
-    if (field.name === 'scope' && field.scopeSuggestions) {
-      fillScopePresetSelect(
-        container.querySelector(`[data-scope-preset="${field.name}"]`),
-        field.scopeSuggestions
-      );
-      fillScopeDatalist(
-        container.querySelector(`[data-scope-list="${field.name}"]`),
-        field.scopeSuggestions
-      );
-    }
-  }
+  container.appendChild(label);
 }
 
 function renderWorkflowInputs(container, workflowId, panelKey) {
   if (!container) return;
+  const form = document.getElementById('setup-form');
   const params = loadParams() || { docRoot: 'docs/architecture/', template: 'arc42' };
   const fields = workflowFields(workflowId, params);
   if (!fields?.length) {
@@ -1234,7 +1069,6 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
   container.hidden = false;
 
   if (container.dataset.workflowId === workflowId && container.querySelector('[data-field]')) {
-    refreshWorkflowInputsInPlace(container, workflowId, panelKey, params);
     return;
   }
 
@@ -1242,75 +1076,12 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
   container.innerHTML = '';
   const stored = inputState[panelKey][workflowId] || {};
 
-  for (const field of fields) {
-    const label = document.createElement('label');
-    label.className = 'field';
-    const span = document.createElement('span');
-    span.textContent = field.label + (field.required ? ' *' : '');
-    label.appendChild(span);
-
-    if (field.name === 'scope' && field.scopeSuggestions?.length) {
-      const pick = document.createElement('select');
-      pick.className = 'scope-preset';
-      pick.dataset.scopePreset = field.name;
-      fillScopePresetSelect(pick, field.scopeSuggestions);
-      pick.addEventListener('change', () => {
-        if (!pick.value) return;
-        const input = label.querySelector(`[data-field="${field.name}"]`);
-        if (input) {
-          input.value = pick.value;
-          syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params);
-        }
-        pick.value = '';
-      });
-      label.appendChild(pick);
-    }
-
-    let input;
-    if (field.multiline) {
-      input = document.createElement('textarea');
-      input.rows = 4;
-    } else {
-      input = document.createElement('input');
-      input.type = 'text';
-    }
-    input.dataset.field = field.name;
-    input.name = `${panelKey}-${workflowId}-${field.name}`;
-    input.placeholder = field.placeholder || '';
-    input.value = stored[field.name] || '';
-    input.autocomplete = 'off';
-
-    if (field.name === 'scope' && field.scopeSuggestions?.length) {
-      const listId = `${panelKey}-${workflowId}-scope-list`;
-      input.setAttribute('list', listId);
-      const list = document.createElement('datalist');
-      list.id = listId;
-      list.dataset.scopeList = field.name;
-      fillScopeDatalist(list, field.scopeSuggestions);
-      label.appendChild(input);
-      label.appendChild(list);
-    } else {
-      label.appendChild(input);
-    }
-
-    input.addEventListener('input', () => {
-      syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params);
-    });
-    if (field.help) {
-      const help = document.createElement('p');
-      help.className = 'field-help';
-      help.textContent = field.help;
-      label.appendChild(help);
-    }
-    container.appendChild(label);
+  if (workflowId === 'refinement' && form) {
+    appendDocFocusUnified(container, form, 'session');
   }
 
-  if (workflowId === 'refinement') {
-    const guide = document.createElement('p');
-    guide.className = 'workflow-field-guide';
-    guide.textContent =
-      'What = outcome of this chat. Which section = one architecture content area (dropdown). Graph files (entry-point, blueprint, always-on) are never chosen here — the agent maintains them automatically.';
-    container.prepend(guide);
+  for (const field of fields) {
+    renderWorkflowField(container, field, panelKey, workflowId, stored, params, form);
   }
 }
 

@@ -246,7 +246,7 @@
     ],
     "steps": [
       "Goal: <goal>",
-      "Scope: <scope> (architecture **content** only — template section, interfaces/, ops/, or “next open row in blueprint.md”; never entry-point.md, blueprint.md, or always-on.md — agent maintains those)",
+      "Scope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md)",
       "Follow <doc-root>prompts/role-bootstrap.md for evidence and link rules.",
       "Read always-on.md → blueprint.md. Update only the scoped sections and blueprint states.",
       "If **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).",
@@ -257,7 +257,7 @@
       "goal",
       "scope"
     ],
-    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope> (architecture **content** only — template section, interfaces/, ops/, or “next open row in blueprint.md”; never entry-point.md, blueprint.md, or always-on.md — agent maintains those)\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md)\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",
