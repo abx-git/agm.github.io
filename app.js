@@ -5,7 +5,12 @@ const BP_INSTALL_URL =
 
 const EVOLVE_MODES = [
   { id: 'refinement', label: 'Deepen section', note: 'Scoped refinement of one template section.' },
-  { id: 'maintenance', label: 'After code change', note: 'Paste git diff — update only impacted docs.' },
+  { id: 'maintenance', label: 'Paste git diff', note: 'You supply the diff text.' },
+  {
+    id: 'maintenance-diff-range',
+    label: 'Git range (MCP/shell)',
+    note: 'Agent fetches diff between start and end ref — pipeline-friendly.',
+  },
 ];
 
 const WORK_MODES = [
@@ -43,6 +48,20 @@ const WORKFLOW_INPUTS = {
   ],
   maintenance: [
     { name: 'gitDiff', label: 'Git diff or PR summary', placeholder: 'paste git diff …', required: true, multiline: true },
+  ],
+  'maintenance-diff-range': [
+    {
+      name: 'diffFrom',
+      label: 'Start ref (DIFF_FROM)',
+      placeholder: 'e.g. origin/main or abc1234',
+      required: true,
+    },
+    {
+      name: 'diffTo',
+      label: 'End ref (DIFF_TO)',
+      placeholder: 'HEAD',
+      required: false,
+    },
   ],
   'review-phase': [
     { name: 'slug', label: 'Review report slug', placeholder: 'e.g. phase-3-context', required: true },
@@ -197,8 +216,14 @@ function buildAdoptPrompt(base, params) {
   return prompt;
 }
 
-function shellQuote(s) {
-  return `'${String(s).replace(/'/g, `'\\''`)}`;
+function bashAssign(name, value) {
+  const s = String(value ?? '');
+  const escaped = s
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\$/g, '\\$')
+    .replace(/`/g, '\\`');
+  return `${name}="${escaped}"`;
 }
 
 function buildInstallScript(params) {
@@ -214,18 +239,20 @@ function buildInstallScript(params) {
 
   const lines = [
     '#!/usr/bin/env bash',
-    '# Blueprint Pattern — generated install script',
+    '# Blueprint Pattern - generated install script',
     '# Run from your application repository root. No git clone required.',
+    '# Save as bp-install-run.sh then: chmod +x bp-install-run.sh && ./bp-install-run.sh',
     'set -euo pipefail',
     '',
-    `PROJECT=${shellQuote(project)}`,
-    `DOC_ROOT=${shellQuote(docRoot)}`,
-    `TEMPLATE=${shellQuote(template)}`,
-    `AI_TOOL=${shellQuote(aiTool)}`,
+    bashAssign('PROJECT', project),
+    bashAssign('DOC_ROOT', docRoot),
+    bashAssign('TEMPLATE', template),
+    bashAssign('AI_TOOL', aiTool),
     '',
     'INSTALLER="$(mktemp -t bp-install.XXXXXX.sh)"',
-    'trap \'rm -f "$INSTALLER"\' EXIT',
-    `curl -fsSL ${shellQuote(BP_INSTALL_URL)} -o "$INSTALLER"`,
+    'cleanup_installer() { rm -f -- "${INSTALLER:-}"; }',
+    'trap cleanup_installer EXIT',
+    `curl -fsSL "${BP_INSTALL_URL}" -o "$INSTALLER"`,
     'chmod +x "$INSTALLER"',
     '"$INSTALLER" \\',
     '  --project "$PROJECT" \\',
@@ -233,7 +260,7 @@ function buildInstallScript(params) {
     '  --template "$TEMPLATE" \\',
     '  --ai-tool "$AI_TOOL"',
     '',
-    'echo "Install finished. Open Assistant UI → Build → Adopt."',
+    'echo "Install finished. Open Assistant UI -> Build -> Adopt."',
     '',
   ];
   return lines.join('\n');
@@ -289,6 +316,8 @@ function applyWorkflowInputs(prompt, workflowId, values) {
     goal: values.goal,
     scope: values.scope,
     slug: values.slug,
+    'diff-from': values.diffFrom,
+    'diff-to': values.diffTo || 'HEAD',
   };
   for (const [placeholder, val] of Object.entries(map)) {
     if (val == null || val === '') continue;
@@ -310,6 +339,15 @@ function applyWorkflowInputs(prompt, workflowId, values) {
       /Git diff:\n<paste git diff or PR diff summary>/,
       `Git diff:\n${values.gitDiff}`
     );
+  }
+  if (values.diffFrom) {
+    const to = values.diffTo || 'HEAD';
+    out = out.replace(/DIFF_FROM=<diff-from>/g, `DIFF_FROM=${values.diffFrom}`);
+    out = out.replace(/DIFF_TO=<diff-to>/g, `DIFF_TO=${to}`);
+    out = out.replace(/<diff-from>/g, values.diffFrom);
+    out = out.replace(/<diff-to>/g, to);
+    out = out.replace(/\$\{DIFF_FROM\}/g, values.diffFrom);
+    out = out.replace(/\$\{DIFF_TO\}/g, to);
   }
   return out;
 }
