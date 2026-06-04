@@ -7,13 +7,13 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=23" />
+  <link rel="stylesheet" href="app.css?v=24" />
 </head>
 <body>
   <main class="app">
     <header class="head">
       <h1>Blueprint Pattern</h1>
-      <p class="tagline">Three lifecycle phases — Build the graph, Evolve it, Work from it.</p>
+      <p class="tagline">Foundation in your repo → plan areas → improve &amp; sync over time.</p>
     </header>
 
     <details class="glossary" open>
@@ -50,13 +50,13 @@
 
     <form id="setup-form" class="setup-form">
       <nav class="phase-nav" role="tablist" aria-label="Lifecycle">
-        <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Build</button>
-        <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Evolve</button>
+        <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Foundation</button>
+        <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Improve &amp; sync</button>
         <button type="button" class="phase-tab" data-phase="work" role="tab">3 · Work</button>
       </nav>
 
       <section id="phase-build" class="phase active" role="tabpanel">
-        <p class="phase-intro">Install prompts with a script (no git clone), then adopt in a new chat. Continue via <code>blueprint.md</code> until bootstrap is complete.</p>
+        <p class="phase-intro"><strong>Foundation:</strong> install the scaffold, choose which parts of your architecture to document (multi-select), then adopt. <strong>Improve &amp; sync</strong> (next tab) is for deepening content or aligning docs with code later.</p>
 
         <div class="setup-shared">
           <label class="field">
@@ -84,36 +84,13 @@
           </label>
         </div>
 
-        <div class="build-howto" role="note">
-          <p class="build-howto-title">How Build works</p>
-          <ol class="build-howto-steps">
-            <li><strong>Choose what to document</strong> (once, below) — same choice for install and adoption.</li>
-            <li><strong>Step 1 — Install:</strong> copy script → run in your <em>application</em> repo root.</li>
-            <li><strong>Step 2 — Adopt:</strong> copy prompt → new chat; agent creates your architecture files.</li>
-          </ol>
-          <p class="build-howto-foot">Already ran install? Skip to step 2. Need only an ER diagram later? Pick it below, finish Build, then follow the hint under your choice.</p>
-        </div>
-
-        <section id="doc-needs-panel" class="doc-needs-panel">
-          <h2 class="doc-needs-title">What do you want to document?</h2>
-          <p class="doc-needs-lead">Pick one goal. We prepare the right <strong>Markdown files in your repo</strong> — not Blueprint prompts or workflows.</p>
-          <div id="doc-preset-grid" class="doc-preset-grid"></div>
-          <p id="doc-needs-recap" class="doc-needs-recap" aria-live="polite"></p>
-          <div id="doc-next-step" class="doc-next-step" hidden aria-live="polite"></div>
-          <details class="doc-needs-advanced">
-            <summary>Fine-tune individual doc areas (optional)</summary>
-            <p class="field-hint">Only if a preset does not fit. Same list is used for install, adopt, and Evolve.</p>
-            <div class="focus-grid" data-doc-focus-grid="build"></div>
-          </details>
-        </section>
-
         <ol class="steps">
           <li class="step step-hero">
             <div class="step-head">
               <span class="step-n">1</span>
               <div>
-                <strong>Install</strong>
-                <p>Downloads prompts and scaffold via HTTPS — no git clone of blueprint-pattern.</p>
+                <strong>Install — get the scaffold</strong>
+                <p>Downloads prompts and template into <em>your application repo</em>. No area selection required yet.</p>
               </div>
             </div>
             <div class="step-fields">
@@ -136,7 +113,6 @@
                   </select>
                 </label>
               </div>
-              <p class="step-uses-needs">Uses your choice above in the install script (extra folders/files).</p>
             </div>
             <div class="install-hint" role="note">
               <p class="install-hint-title">Where to run the script</p>
@@ -155,17 +131,33 @@
             </details>
             <button type="button" class="btn primary btn-install" id="copy-install">Copy install script</button>
           </li>
-          <li class="step step-hero">
+
+          <li class="step step-hero" id="doc-areas-step">
             <div class="step-head">
               <span class="step-n">2</span>
               <div>
-                <strong>Adopt</strong>
-                <p>After install: copy adoption prompt → new chat. Agent creates <code>blueprint.md</code>, <code>entry-point.md</code>, configures <code>always-on.md</code>, first evidence-based section.</p>
+                <strong>Plan — which areas to document</strong>
+                <p>Multi-select: general categories of <strong>your architecture Markdown</strong> (not Blueprint prompts). Tick none for template-only; add more later in tab <em>Improve &amp; sync</em>.</p>
+              </div>
+            </div>
+            <div class="step-fields doc-areas-step-fields">
+              <div id="doc-area-helpers-build" class="doc-area-helpers"></div>
+              <div class="focus-grid focus-grid--open" data-doc-focus-grid="build"></div>
+              <p id="doc-needs-recap" class="doc-needs-recap" aria-live="polite"></p>
+            </div>
+          </li>
+
+          <li class="step step-hero">
+            <div class="step-head">
+              <span class="step-n">3</span>
+              <div>
+                <strong>Adopt — start the construction plan</strong>
+                <p>Uses step 2 selections. Agent creates <code>blueprint.md</code>, <code>entry-point.md</code>, <code>always-on.md</code>, and plans phases for selected areas.</p>
               </div>
             </div>
             <div class="step-fields">
               <fieldset class="adopt-context-fieldset">
-                <legend>Adoption context</legend>
+                <legend>About your application</legend>
                 <label class="field">
                   <span>Purpose / domain</span>
                   <input type="text" name="purpose" placeholder="One sentence — what the system does" />
@@ -183,7 +175,6 @@
                   <input type="text" name="externalSystems" placeholder="e.g. Stripe, Kafka, Auth0" />
                 </label>
               </fieldset>
-              <p class="step-uses-needs">Uses the <strong>same</strong> doc choice from above — fill in context about your app (helps the agent write accurate docs).</p>
             </div>
             <details class="prompt-preview">
               <summary>Preview adoption parameters</summary>
@@ -191,9 +182,10 @@
             </details>
             <button type="submit" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
           </li>
+
           <li class="step" data-workflow="bootstrap-continue">
             <div class="step-head">
-              <span class="step-n">3</span>
+              <span class="step-n">4</span>
               <div>
                 <strong>Continue building</strong>
                 <p>Next open row in <code>blueprint.md</code> → copy prompt → new chat. Sync <code>entry-point.md</code> when sections appear.</p>
@@ -205,9 +197,9 @@
           </li>
           <li class="step" data-workflow="review-milestone">
             <div class="step-head">
-              <span class="step-n">4</span>
+              <span class="step-n">5</span>
               <div>
-                <strong>Close build phase</strong>
+                <strong>Close foundation phase</strong>
                 <p>Report-only: validate construction plan vs. graph, links, redistribute follow-up insights into template sections.</p>
               </div>
             </div>
@@ -219,11 +211,18 @@
       </section>
 
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro">Deepen sections or keep docs aligned with code. Humans read at <code>entry-point.md</code>; agent still updates <code>blueprint.md</code>.</p>
-        <div class="doc-needs-evolve">
+        <p class="phase-intro"><strong>Improve &amp; sync:</strong> deepen existing docs, align with code changes, or <strong>add documentation areas</strong> you did not select during foundation. Same checkboxes as Build step 2.</p>
+
+        <section class="doc-areas-panel doc-areas-panel--evolve">
+          <h2 class="doc-areas-subtitle">Documentation areas</h2>
+          <p class="doc-areas-lead">Tick more areas to extend your plan; use workflows below to improve content in those areas.</p>
+          <div id="doc-area-helpers-evolve" class="doc-area-helpers"></div>
+          <div class="focus-grid focus-grid--open" data-doc-focus-grid="evolve"></div>
           <p id="doc-needs-recap-evolve" class="doc-needs-recap" aria-live="polite"></p>
-          <p class="doc-needs-evolve-hint">To change what you document, use <a href="#doc-needs-panel" id="goto-build-tab">Build → What do you want to document?</a>. Then pick a workflow below (e.g. <strong>Deepen section</strong> for an ER diagram).</p>
-        </div>
+          <p class="doc-areas-link"><a href="#doc-areas-step" id="goto-build-areas">Jump to Foundation → step 2</a></p>
+        </section>
+
+        <h2 class="evolve-workflows-title">How to improve</h2>
         <div class="modes" id="evolve-grid"></div>
         <div id="evolve-panel" class="mode-panel" hidden>
           <p class="mode-label" id="evolve-label"></p>
@@ -240,7 +239,7 @@
       </section>
 
       <section id="phase-work" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro">Use the compiled graph for architecture work — traverse links, write to <code>work/</code>, register WRK in <code>blueprint.md</code>.</p>
+        <p class="phase-intro">Analysis and design work items (WRK) — separate from everyday doc maintenance.</p>
         <div class="modes" id="work-grid"></div>
         <div id="work-panel" class="mode-panel" hidden>
           <p class="mode-label" id="work-label"></p>
@@ -258,7 +257,7 @@
     </form>
 
     <details class="review-block">
-      <summary>Review (all phases — report-only, new chat)</summary>
+      <summary>Review (verification)</summary>
       <p class="review-intro">Separate verification from writing. Pick a review workflow:</p>
       <div class="modes review-modes" id="review-grid"></div>
       <div id="review-panel" class="mode-panel" hidden>
@@ -270,13 +269,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v23</span>
+      <span class="deploy-id">Lifecycle · v24</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=23" type="module"></script>
+  <script src="app.js?v=24" type="module"></script>
 </body>
 </html>

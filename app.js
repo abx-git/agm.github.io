@@ -4,12 +4,16 @@ const BP_INSTALL_URL =
   'https://raw.githubusercontent.com/abx-git/blueprint-pattern/main/scripts/bp-install.sh';
 
 const EVOLVE_MODES = [
-  { id: 'refinement', label: 'Deepen section', note: 'Scoped refinement of one template section.' },
-  { id: 'maintenance', label: 'Paste git diff', note: 'You supply the diff text.' },
+  {
+    id: 'refinement',
+    label: 'Deepen content',
+    note: 'Improve one section (Goal + Scope) — e.g. more detail, diagrams, evidence.',
+  },
+  { id: 'maintenance', label: 'Sync with pasted diff', note: 'After code changes — paste git diff or PR summary.' },
   {
     id: 'maintenance-diff-range',
-    label: 'Git range (MCP/shell)',
-    note: 'Agent fetches diff between start and end ref — pipeline-friendly.',
+    label: 'Sync with git range',
+    note: 'Agent loads diff between two refs (CI / MCP friendly).',
   },
 ];
 
@@ -28,67 +32,25 @@ const REVIEW_MODES = [
 /** Evolve workflows that receive the architecture documentation areas block. */
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
-/** Quick picks — plain language; maps to docFocus IDs (see prompts/reference/doc-extensions.md). */
-const DOC_PRESETS = [
-  {
-    id: 'minimal',
-    label: 'Start simple',
-    blurb: 'Core template only — best for first install',
-    focus: [],
-    nextStep: null,
-  },
-  {
-    id: 'data-model',
-    label: 'ER diagram & database',
-    blurb: 'Tables, entities, schema in your architecture docs',
-    focus: ['persistence'],
-    nextStep: {
-      title: 'Add an ER diagram after bootstrap',
-      body: [
-        '1. Finish **Build** → Install, then Adopt (steps below).',
-        '2. Open tab **Evolve** → **Deepen section**.',
-        '3. Goal: Add an ER diagram (Mermaid) and entity table from code, migrations, or schema files.',
-        '4. Scope: choose the data-model preset, or your template’s persistence section.',
-      ],
-      prefillGoal:
-        'Add an ER diagram (Mermaid) and entity/table overview from evidence in the codebase',
-    },
-  },
-  {
-    id: 'apis',
-    label: 'APIs & integrations',
-    blurb: 'REST/events between services — exports & imports docs',
-    focus: ['interfaces'],
-    nextStep: {
-      title: 'Document APIs',
-      body: [
-        'After bootstrap: **Evolve** → **Deepen section** or **Paste git diff** when APIs change.',
-        'Goal: Document public APIs and integration points with evidence from code.',
-      ],
-      prefillGoal: 'Document public APIs and integration contracts from code',
-    },
-  },
-  {
-    id: 'operations',
-    label: 'Operations & runbooks',
-    blurb: 'Deploy, incidents, troubleshooting',
-    focus: ['operations', 'deployment', 'observability'],
-    nextStep: null,
-  },
-  {
-    id: 'decisions',
-    label: 'Architecture decisions (ADRs)',
-    blurb: 'Why the system is built this way',
-    focus: ['decisions'],
-    nextStep: null,
-  },
-  {
-    id: 'team',
-    label: 'Onboarding new readers',
-    blurb: 'Reading paths in entry-point for devs & architects',
-    focus: ['onboarding'],
-    nextStep: null,
-  },
+/** Display order for documentation area checkboxes (general categories). */
+const DOC_AREA_ORDER = [
+  'onboarding',
+  'interfaces',
+  'persistence',
+  'security',
+  'deployment',
+  'observability',
+  'operations',
+  'decisions',
+  'domain-glossary',
+  'ecosystem',
+];
+
+/** Multi-select helpers — add to current selection, never replace. */
+const DOC_FOCUS_HELPERS = [
+  { id: 'starter', label: '+ Starter set', focus: ['onboarding', 'interfaces', 'decisions'] },
+  { id: 'full', label: 'Select all', focus: () => DOC_AREA_ORDER.slice() },
+  { id: 'clear', label: 'Clear all', focus: [] },
 ];
 
 /** Which architecture Markdown areas to scaffold/maintain (see prompts/reference/doc-extensions.md). */
@@ -128,8 +90,8 @@ const DOC_EXTENSIONS = [
   {
     id: 'persistence',
     label: 'Template + on-demand — data & persistence',
-    userLabel: 'Database & ER diagram',
-    userHint: 'Data model section — tables, entities, schema',
+    userLabel: 'Data & storage',
+    userHint: 'Any persistence: databases, files, caches, events — per your stack',
     docPaths: '<template>/ (data sections), context/on-demand.md',
     hint: 'Document databases, schemas, migrations in your architecture files',
     bootstrap: [
@@ -362,133 +324,61 @@ function readForm(form) {
     sourceRoot: String(data.get('sourceRoot') || '').trim(),
     externalSystems: String(data.get('externalSystems') || '').trim(),
     docFocus: readDocFocus(form),
-    docPreset: String(data.get('docPreset') || '').trim() || inferDocPreset(readDocFocus(form)),
   };
 }
 
-function focusSetsEqual(a, b) {
-  const sa = new Set(a || []);
-  const sb = new Set(b || []);
-  if (sa.size !== sb.size) return false;
-  for (const id of sa) if (!sb.has(id)) return false;
-  return true;
-}
-
-function inferDocPreset(focusIds) {
-  const match = DOC_PRESETS.find((p) => focusSetsEqual(p.focus, focusIds));
-  return match ? match.id : focusIds?.length ? 'custom' : 'minimal';
-}
-
-function applyDocPreset(form, presetId) {
-  const preset = DOC_PRESETS.find((p) => p.id === presetId);
-  if (!preset) return;
+function applyDocFocusSet(form, focusIds, mode = 'set') {
+  const target =
+    mode === 'add'
+      ? new Set([...readDocFocus(form), ...(focusIds || [])])
+      : new Set(focusIds || []);
   form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
-    cb.checked = preset.focus.includes(cb.value);
+    cb.checked = target.has(cb.value);
   });
-  const hidden = form.elements.namedItem('docPreset');
-  if (hidden) hidden.value = presetId;
-  if (preset.nextStep?.prefillGoal) {
-    const params = readForm(form);
-    const suggestions = buildScopeSuggestions(params);
-    const dataScope =
-      presetId === 'data-model'
-        ? suggestions.find((s) => /on-demand|data|persistence/i.test(s.label || s.value))
-        : null;
-    inputState.evolve = inputState.evolve || {};
-    inputState.evolve.refinement = {
-      ...(inputState.evolve.refinement || {}),
-      goal: preset.nextStep.prefillGoal,
-      ...(dataScope ? { scope: dataScope.value } : {}),
-    };
-  }
-  saveParams(readForm(form));
-  updateDocNeedsUI(form);
-  refreshInstallPreviewFromForm(form);
-  refreshOpenWorkflowPanels();
+  onDocFocusChange(form);
 }
 
-function refreshInstallPreviewFromForm(form) {
-  const pre = document.getElementById('install-script-preview');
-  if (pre) pre.textContent = buildInstallScript(readForm(form));
-}
-
-function updateDocNeedsUI(form) {
+function updateDocAreasRecap(form) {
   const params = readForm(form);
-  const presetId = params.docPreset || 'minimal';
-  const preset = DOC_PRESETS.find((p) => p.id === presetId);
-
-  document.querySelectorAll('.doc-preset-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.preset === presetId);
-  });
-
-  const recap = document.getElementById('doc-needs-recap');
-  if (recap) {
-    if (preset && presetId !== 'custom') {
-      recap.textContent = `Selected: ${preset.label} — used for install script, adoption, and Evolve.`;
-    } else if (params.docFocus?.length) {
-      const names = params.docFocus
-        .map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.userLabel || id)
-        .join(', ');
-      recap.textContent = `Selected (custom): ${names}`;
-    } else {
-      recap.textContent = 'Selected: Start simple — core template only.';
-    }
+  const n = params.docFocus?.length || 0;
+  let text;
+  if (n === 0) {
+    text =
+      'No extra areas selected — you get the core template and blueprint only. You can tick areas here or in Evolve anytime.';
+  } else if (n === DOC_AREA_ORDER.length) {
+    text = `All ${n} documentation areas selected — install, adoption, and Evolve will include them.`;
+  } else {
+    const names = params.docFocus
+      .map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.userLabel || id)
+      .join(' · ');
+    text = `${n} area${n > 1 ? 's' : ''} selected: ${names}`;
   }
-
-  const evolveRecap = document.getElementById('doc-needs-recap-evolve');
-  if (evolveRecap) evolveRecap.textContent = recap?.textContent || '';
-
-  const nextBox = document.getElementById('doc-next-step');
-  if (!nextBox) return;
-  const step = preset?.nextStep;
-  if (!step) {
-    nextBox.hidden = true;
-    nextBox.replaceChildren();
-    return;
+  for (const id of ['doc-needs-recap', 'doc-needs-recap-evolve']) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
   }
-  nextBox.hidden = false;
-  const title = document.createElement('p');
-  title.className = 'doc-next-step-title';
-  title.textContent = step.title;
-  const list = document.createElement('ol');
-  list.className = 'doc-next-step-list';
-  for (const line of step.body) {
-    const li = document.createElement('li');
-    li.textContent = line;
-    list.appendChild(li);
-  }
-  nextBox.replaceChildren(title, list);
 }
 
-function initDocPresets(form) {
-  const grid = document.getElementById('doc-preset-grid');
-  if (!grid) return;
-  grid.replaceChildren();
-  for (const preset of DOC_PRESETS) {
+function initDocAreaHelpers(form, hostId, mode = 'set') {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.replaceChildren();
+  for (const helper of DOC_FOCUS_HELPERS) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'doc-preset-btn';
-    btn.dataset.preset = preset.id;
-    const strong = document.createElement('strong');
-    strong.textContent = preset.label;
-    const span = document.createElement('span');
-    span.textContent = preset.blurb;
-    btn.append(strong, span);
-    btn.addEventListener('click', () => applyDocPreset(form, preset.id));
-    grid.appendChild(btn);
+    btn.className = 'doc-area-helper-btn';
+    btn.textContent = helper.label;
+    btn.addEventListener('click', () => {
+      const ids = typeof helper.focus === 'function' ? helper.focus() : helper.focus;
+      applyDocFocusSet(form, ids, helper.id === 'starter' ? 'add' : 'set');
+    });
+    host.appendChild(btn);
   }
-  let hidden = form.elements.namedItem('docPreset');
-  if (!hidden) {
-    hidden = document.createElement('input');
-    hidden.type = 'hidden';
-    hidden.name = 'docPreset';
-    form.appendChild(hidden);
-  }
-  document.getElementById('goto-build-tab')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector('.phase-tab[data-phase="build"]')?.click();
-    document.getElementById('doc-needs-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+}
+
+function orderedDocExtensions() {
+  const byId = Object.fromEntries(DOC_EXTENSIONS.map((e) => [e.id, e]));
+  return DOC_AREA_ORDER.map((id) => byId[id]).filter(Boolean);
 }
 
 function resolvedTemplate(params) {
@@ -991,9 +881,8 @@ function applyParams(form, params) {
   form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
     cb.checked = focus.has(cb.value);
   });
-  const presetEl = form.elements.namedItem('docPreset');
-  if (presetEl) presetEl.value = params.docPreset || inferDocPreset(params.docFocus);
   toggleCustomField(form);
+  updateDocAreasRecap(form);
 }
 
 function toggleCustomField(form) {
@@ -1005,10 +894,10 @@ function toggleCustomField(form) {
 }
 
 function onDocFocusChange(form) {
-  const hidden = form.elements.namedItem('docPreset');
-  if (hidden) hidden.value = inferDocPreset(readDocFocus(form));
   saveParams(readForm(form));
-  updateDocNeedsUI(form);
+  updateDocAreasRecap(form);
+  const pre = document.getElementById('install-script-preview');
+  if (pre) pre.textContent = buildInstallScript(readForm(form));
   refreshOpenWorkflowPanels();
 }
 
@@ -1028,7 +917,7 @@ function refreshDocFocusLabels(form) {
 function initDocFocusGrids(form) {
   document.querySelectorAll('[data-doc-focus-grid]').forEach((host) => {
     host.replaceChildren();
-    for (const ext of DOC_EXTENSIONS) {
+    for (const ext of orderedDocExtensions()) {
       const label = document.createElement('label');
       label.className = 'focus-option';
       const cb = document.createElement('input');
@@ -1058,10 +947,15 @@ function initSetupForm(adoptBase) {
   const form = document.getElementById('setup-form');
   if (!form) return;
 
-  initDocPresets(form);
+  initDocAreaHelpers(form, 'doc-area-helpers-build');
+  initDocAreaHelpers(form, 'doc-area-helpers-evolve');
   initDocFocusGrids(form);
   applyParams(form, loadParams());
-  updateDocNeedsUI(form);
+  document.getElementById('goto-build-areas')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelector('.phase-tab[data-phase="build"]')?.click();
+    document.getElementById('doc-areas-step')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   const installPreview = document.getElementById('install-script-preview');
   const adoptPreview = document.getElementById('prompt-preview');
 
@@ -1108,7 +1002,7 @@ function initSetupForm(adoptBase) {
     const n = e.target?.name;
     if (n === 'template' || n === 'customTemplate' || n === 'docRoot') {
       refreshDocFocusLabels(form);
-      updateDocNeedsUI(form);
+      updateDocAreasRecap(form);
       refreshOpenWorkflowPanels();
     }
   });
