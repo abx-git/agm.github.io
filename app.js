@@ -33,8 +33,8 @@ const REVIEW_MODES = [
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
 /** Display order for documentation area checkboxes (general categories). */
+/** IDs the human may select in Plan / Evolve (architecture content only). */
 const DOC_AREA_ORDER = [
-  'onboarding',
   'implementation',
   'interfaces',
   'persistence',
@@ -52,7 +52,7 @@ const DOC_FOCUS_HELPERS = [
   {
     id: 'starter',
     label: '+ Starter set',
-    focus: ['onboarding', 'implementation', 'interfaces', 'decisions'],
+    focus: ['implementation', 'interfaces', 'decisions'],
   },
   { id: 'full', label: 'Select all', focus: () => DOC_AREA_ORDER.slice() },
   { id: 'clear', label: 'Clear all', focus: [] },
@@ -60,22 +60,6 @@ const DOC_FOCUS_HELPERS = [
 
 /** Which architecture Markdown areas to scaffold/maintain (see prompts/reference/doc-extensions.md). */
 const DOC_EXTENSIONS = [
-  {
-    id: 'onboarding',
-    label: 'entry-point.md — graph index',
-    userLabel: 'Documentation graph index (entry-point)',
-    userHint: 'Linked map the agent traverses each session — not architecture body text',
-    docPaths: 'entry-point.md, context/always-on.md',
-    hint: 'entry-point.md is the agent’s navigation hub for the doc graph (workflows traverse from here)',
-    bootstrap: [
-      'entry-point.md: graph index — navigation table to all template sections, interfaces/, ops/, work/, and source paths; optional short overview.',
-      'always-on.md: link to entry-point.md as graph entry (with blueprint.md).',
-    ],
-    evolve: [
-      'When sections or links change: update entry-point.md navigation table so agents can traverse the full graph.',
-      'Ensure always-on.md still points to entry-point.md.',
-    ],
-  },
   {
     id: 'implementation',
     label: '<template>/ — structure & implementation',
@@ -266,7 +250,7 @@ const WORKFLOW_INPUTS = {
     {
       name: 'scope',
       label: 'Which documentation section?',
-      help: 'Pick the architecture topic to improve (runtime, APIs, structure, …). Not entry-point or always-on — those are navigation and session setup; the agent updates them when structure changes.',
+      help: 'Architecture content only (template section, interfaces/, ops/, …). entry-point, blueprint, and always-on are always agent-maintained — not listed here.',
       placeholder: 'Pick a section below',
       required: true,
     },
@@ -328,10 +312,11 @@ function normDocRoot(raw) {
 }
 
 function readDocFocus(form) {
+  const valid = new Set(DOC_AREA_ORDER);
   const seen = new Set();
   const out = [];
   form.querySelectorAll('input[name="docFocus"]:checked').forEach((cb) => {
-    if (!seen.has(cb.value)) {
+    if (!seen.has(cb.value) && valid.has(cb.value)) {
       seen.add(cb.value);
       out.push(cb.value);
     }
@@ -455,13 +440,9 @@ const TEMPLATE_SECTIONS = {
 };
 
 const FOCUS_SCOPE_PRESETS = {
-  onboarding: (root) => [
-    { value: `${root}entry-point.md`, label: 'Graph index (entry-point.md) — agent link table' },
-  ],
   implementation: (root, template) => {
     const tp = `${root}${template}/`;
     const picks = [
-      { value: `${root}context/always-on.md`, label: 'Source code map (always-on.md)' },
       { value: `${tp}`, label: `Structure & runtime (${template}/)` },
       { value: `${root}work/`, label: 'Implementation analysis / design (work/)' },
     ];
@@ -487,8 +468,7 @@ const FOCUS_SCOPE_PRESETS = {
     { value: `${root}ops/troubleshooting.md`, label: 'Troubleshooting (ops/troubleshooting.md)' },
   ],
   persistence: (root, template) => [
-    { value: `${root}${template}/`, label: `Data-related sections in ${template}/` },
-    { value: `${root}context/on-demand.md`, label: 'On-demand data stores (context/on-demand.md)' },
+    { value: `${root}${template}/`, label: `Data & storage (${template}/ data sections)` },
   ],
   interfaces: (root) => [
     { value: `${root}interfaces/`, label: 'Interfaces folder (interfaces/)' },
@@ -516,8 +496,7 @@ const FOCUS_SCOPE_PRESETS = {
     { value: `${root}interfaces/imports.md`, label: 'Partner imports (interfaces/imports.md)' },
   ],
   'domain-glossary': (root, template) => [
-    { value: `${root}context/on-demand.md`, label: 'Domain concepts (context/on-demand.md)' },
-    { value: `${root}${template}/`, label: `Glossary / terminology in ${template}/` },
+    { value: `${root}${template}/`, label: `Glossary / terminology (${template}/)` },
   ],
 };
 
@@ -550,14 +529,13 @@ function sectionFriendlyLabel(file) {
   return base.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/** Deepen content: architecture body sections only; meta files in a separate group. */
+/** Deepen content: architecture content only — never entry-point / blueprint / always-on. */
 function buildRefinementScopeOptions(params) {
   const template = resolvedTemplate(params);
   const root = normDocRoot(params.docRoot);
   const tp = `${root}${template}/`;
   const seen = new Set();
   const content = [];
-  const advanced = [];
 
   function addContent(value, label) {
     if (!value || seen.has(value)) return;
@@ -565,15 +543,9 @@ function buildRefinementScopeOptions(params) {
     content.push({ value, label });
   }
 
-  function addAdvanced(value, label) {
-    if (!value || seen.has(value)) return;
-    seen.add(value);
-    advanced.push({ value, label });
-  }
-
   addContent(
-    'Next open row in blueprint.md (agent picks target section from construction plan)',
-    'Not sure — next open task from blueprint.md'
+    'Next open row in blueprint.md (agent picks content section from construction plan)',
+    'Not sure — agent picks next content task from blueprint.md'
   );
 
   for (const file of TEMPLATE_SECTIONS[template] || []) {
@@ -594,36 +566,18 @@ function buildRefinementScopeOptions(params) {
     addContent(tp, 'Data & storage (all related template sections)');
   }
 
-  addAdvanced(
-    `${root}entry-point.md`,
-    'Graph index (entry-point) — agent link table, not section body text'
-  );
-  addAdvanced(
-    `${root}context/always-on.md`,
-    'Session setup (always-on) — app name, stack, code paths'
-  );
-  addAdvanced(
-    `${root}blueprint.md`,
-    'Progress table only (blueprint) — phase status, not architecture content'
-  );
-  addAdvanced(
-    `${root}context/on-demand.md`,
-    'Supplementary notes (on-demand) — small tables, not main sections'
-  );
-
-  return { content, advanced };
+  return { content };
 }
 
 function flattenScopeOptions(suggestions) {
   if (!suggestions) return [];
   if (Array.isArray(suggestions)) return suggestions;
-  return [...(suggestions.content || []), ...(suggestions.advanced || [])];
+  return suggestions.content || [];
 }
 
-/** Analysis / other workflows — content paths without meta files at the top. */
+/** Analysis / other workflows — same content-only scope list as refinement. */
 function buildScopeSuggestions(params) {
-  const { content, advanced } = buildRefinementScopeOptions(params);
-  return [...content, ...advanced];
+  return flattenScopeOptions(buildRefinementScopeOptions(params));
 }
 
 function templateExampleSection(templateId) {
@@ -669,6 +623,22 @@ function workflowRole(workflow) {
   return r.split('`')[0].split('(')[0].trim() || 'bootstrap';
 }
 
+/** entry-point, blueprint, always-on — never human-selected; agent maintains always. */
+function buildAgentGraphDutiesBlock(docRoot) {
+  const r = normDocRoot(docRoot);
+  return [
+    '## Agent-maintained graph (always — not in documentation areas)',
+    '',
+    'The human does not select these; you create and maintain them every session:',
+    `- ${r}entry-point.md — graph index (links to all content docs and sources)`,
+    `- ${r}blueprint.md — construction plan, phase status, session log`,
+    `- ${r}context/always-on.md — session context and source code map`,
+    '',
+    'When content areas change, update entry-point links and blueprint phases without being asked.',
+    '',
+  ].join('\n');
+}
+
 function buildDocFocusBlock(params) {
   const ids = params.docFocus || [];
   if (!ids.length) return '';
@@ -676,7 +646,7 @@ function buildDocFocusBlock(params) {
   const lines = [
     '## Architecture documentation areas (bootstrap)',
     '',
-    'Create or extend **your** Markdown under the documentation root only — not prompts/, workflows, or Blueprint Pattern procedure. Implement all selected areas (see prompts/reference/doc-extensions.md):',
+    'Create or extend **architecture content** only (template sections, interfaces/, ops/, ADRs, …) — not prompts/ or graph files (entry-point, blueprint, always-on are agent duties above). Implement all selected areas (see prompts/reference/doc-extensions.md):',
     '',
   ];
   for (const ext of DOC_EXTENSIONS) {
@@ -734,14 +704,13 @@ function buildParameterBlock(params) {
     lines.push(`- Architecture documentation areas: ${params.docFocus.join(', ')}`);
   }
   lines.push('');
+  lines.push(buildAgentGraphDutiesBlock(docRoot).trimEnd(), '');
   const focusBlock = buildDocFocusBlock(params);
   if (focusBlock) lines.push(focusBlock.trimEnd(), '');
-  lines.push('## File roles (create all three under documentation root — do not merge)');
+  lines.push('## File roles (agent creates all three at adopt — do not merge)');
   lines.push(`- ${docRoot}context/always-on.md — session context (name, stack, source map)`);
   lines.push(`- ${docRoot}blueprint.md — construction plan: phase rows → target files, status, WRK, reviews, session log`);
-  lines.push(
-    `- ${docRoot}entry-point.md — graph index for agent traversal: links to all sections and sources; optional overview; no phase status`
-  );
+  lines.push(`- ${docRoot}entry-point.md — graph index: links only; you maintain, human does not select as a documentation area`);
   lines.push('');
   lines.push(`Template folder: "${template}/" under ${docRoot}. Interview only for missing facts.`);
   lines.push('');
@@ -977,6 +946,8 @@ function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
     '- Core rules: prompts/core/system-prompt.md (installed)',
     `- Role file: ${docRoot}prompts/role-${workflowRole(workflow)}.md`,
     `- Workflow reference: prompts/workflows/${workflow.id}.md`,
+    '',
+    buildAgentGraphDutiesBlock(docRoot).trimEnd(),
     '',
   ]
     .filter(Boolean)
@@ -1215,20 +1186,8 @@ function fillScopePresetSelect(select, suggestions) {
     }
   };
 
-  if (suggestions?.content) {
-    const g1 = document.createElement('optgroup');
-    g1.label = 'Architecture content (usual choice)';
-    appendOptions(g1, suggestions.content);
-    select.appendChild(g1);
-    if (suggestions.advanced?.length) {
-      const g2 = document.createElement('optgroup');
-      g2.label = 'Navigation & progress (unusual for Deepen)';
-      appendOptions(g2, suggestions.advanced);
-      select.appendChild(g2);
-    }
-  } else {
-    appendOptions(select, suggestions);
-  }
+  const items = suggestions?.content || suggestions;
+  appendOptions(select, items);
 
   if (current && [...select.options].some((o) => o.value === current)) {
     select.value = current;
@@ -1351,7 +1310,7 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
     const guide = document.createElement('p');
     guide.className = 'workflow-field-guide';
     guide.textContent =
-      'What = outcome of this chat (e.g. add a diagram, fill gaps from code). Which section = template/ops/interfaces content. entry-point = agent graph index (links only); always-on = session context; blueprint = progress table — agent maintains those when the graph changes.';
+      'What = outcome of this chat. Which section = one architecture content area (dropdown). Graph files (entry-point, blueprint, always-on) are never chosen here — the agent maintains them automatically.';
     container.prepend(guide);
   }
 }

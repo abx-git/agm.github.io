@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=28" />
+  <link rel="stylesheet" href="app.css?v=29" />
 </head>
 <body>
   <main class="app">
@@ -137,7 +137,7 @@
               <span class="step-n">2</span>
               <div>
                 <strong>Plan — which areas to document</strong>
-                <p>Multi-select: general categories of <strong>your architecture Markdown</strong> (not Blueprint prompts). Tick none for template-only; add more later in tab <em>Improve &amp; sync</em>.</p>
+                <p>Multi-select <strong>architecture content</strong> only (runtime, APIs, ops, …). <code>entry-point.md</code>, <code>blueprint.md</code>, and <code>always-on.md</code> are always maintained by the agent — not listed here.</p>
               </div>
             </div>
             <div class="step-fields doc-areas-step-fields">
@@ -211,7 +211,7 @@
       </section>
 
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Improve &amp; sync:</strong> deepen existing docs, align with code changes, or <strong>add documentation areas</strong> you did not select during foundation. Same checkboxes as Build step 2.</p>
+        <p class="phase-intro"><strong>Improve &amp; sync:</strong> deepen <strong>content</strong> docs or sync with code. Add areas you skipped in Foundation step 2. Graph files stay under agent control.</p>
 
         <section class="doc-areas-panel doc-areas-panel--evolve">
           <h2 class="doc-areas-subtitle">Documentation areas</h2>
@@ -269,13 +269,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v28</span>
+      <span class="deploy-id">Lifecycle · v29</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=28" type="module"></script>
+  <script src="app.js?v=29" type="module"></script>
 </body>
 </html>
