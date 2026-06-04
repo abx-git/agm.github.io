@@ -104,7 +104,44 @@ function resolvedTemplate(params) {
   if (params.template === 'custom') {
     return params.customTemplate || 'custom';
   }
-  return params.template;
+  return params.template || 'arc42';
+}
+
+/** Example section path per documentation template (for placeholders and hints). */
+const TEMPLATE_HINTS = {
+  arc42: { exampleSection: 'arc42/runtime.md' },
+  'c4-light': { exampleSection: 'c4-light/components.md' },
+  'adr-first': { exampleSection: 'adr-first/views.md' },
+  'lean-service': { exampleSection: 'lean-service/runtime.md' },
+  custom: { exampleSection: 'custom/overview.md' },
+};
+
+function templateExampleSection(templateId) {
+  const t = templateId || 'arc42';
+  return (TEMPLATE_HINTS[t] || { exampleSection: `${t}/overview.md` }).exampleSection;
+}
+
+/** Replace <template> tokens and legacy arc42-only wording in prompts and labels. */
+function substituteTemplate(text, templateId) {
+  const t = templateId || 'arc42';
+  const example = templateExampleSection(t);
+  let out = String(text)
+    .replace(/<template-example-section>/g, example)
+    .replace(/<template>/g, t);
+
+  out = out
+    .replace(/\barc42\/decisions\/?/gi, `${t}/decisions/`)
+    .replace(/\barc42\//gi, `${t}/`)
+    .replace(/modules, services, or arc42 sections/gi, `modules, services, or ${t} sections`)
+    .replace(/relevant work\/ items and arc42 sections/gi, `relevant work/ items and ${t} sections`)
+    .replace(/follow imports\/exports, arc42, and ops links/gi, `follow imports/exports, ${t}/, and ops links`)
+    .replace(/specific arc42 sections/gi, `specific ${t} sections`)
+    .replace(/Resume arc42 phases/gi, 'Resume blueprint phases')
+    .replace(/After each arc42 phase/gi, 'After each blueprint phase')
+    .replace(/arc42 paths, modules, or blueprint phase numbers/gi, `paths under ${t}/, modules, or blueprint phase numbers`)
+    .replace(/e\.g\. extend arc42\/[\w.-]+[^\n]*/gi, `e.g. extend ${example} with …`);
+
+  return out;
 }
 
 function substituteDocRoot(text, docRoot) {
@@ -150,7 +187,7 @@ function buildParameterBlock(params) {
 
 function buildAdoptPrompt(base, params) {
   const block = buildParameterBlock(params);
-  let prompt = substituteDocRoot(base, params.docRoot);
+  let prompt = substituteTemplate(substituteDocRoot(base, params.docRoot), resolvedTemplate(params));
   const anchor = 'Role: bootstrap\n\n';
   if (prompt.includes(anchor)) {
     prompt = prompt.replace(anchor, `${anchor}${block}`);
@@ -243,13 +280,14 @@ function applyWorkflowInputs(prompt, workflowId, values) {
   const map = {
     'your question here': values.question,
     'e.g. payment integration resilience': values.topic,
-    'modules, services, or arc42 sections': values.scope,
+    'modules, services, or template sections': values.scope,
+    'modules, services, or <template> sections': values.scope,
     'e.g. coupling, failure modes, security, performance': values.focus,
     'e.g. add circuit breaker between order-service and payment-service': values.goal,
     'optional: latency, no new infra, etc.': values.constraints,
     'paste git diff or PR diff summary': values.gitDiff,
-    'e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing': values.goal,
-    'arc42 paths, modules, or blueprint phase numbers': values.scope,
+    goal: values.goal,
+    scope: values.scope,
     slug: values.slug,
   };
   for (const [placeholder, val] of Object.entries(map)) {
@@ -276,14 +314,47 @@ function applyWorkflowInputs(prompt, workflowId, values) {
   return out;
 }
 
+function workflowFields(workflowId, params) {
+  const base = WORKFLOW_INPUTS[workflowId];
+  if (!base) return [];
+  const t = resolvedTemplate(params || {});
+  const ex = templateExampleSection(t);
+  return base.map((field) => {
+    if (workflowId === 'refinement' && field.name === 'goal') {
+      return { ...field, placeholder: `e.g. extend ${ex} with …` };
+    }
+    if (workflowId === 'refinement' && field.name === 'scope') {
+      return {
+        ...field,
+        placeholder: `paths under ${t}/, modules, or blueprint phase numbers`,
+      };
+    }
+    if (workflowId === 'architecture-work-analysis' && field.name === 'scope') {
+      return { ...field, placeholder: `modules, services, or ${t} sections` };
+    }
+    return { ...field };
+  });
+}
+
+function personalizeWorkflowWhen(workflow, params) {
+  return substituteTemplate(
+    substituteDocRoot(workflow.when || '', params.docRoot),
+    resolvedTemplate(params)
+  );
+}
+
 function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
+  const template = resolvedTemplate(params);
   let prompt = substituteDocRoot(workflow.prompt, params.docRoot);
+  prompt = substituteTemplate(prompt, template);
   prompt = applyWorkflowInputs(prompt, workflow.id, inputValues);
   const docRoot = normDocRoot(params.docRoot);
   const header = [
     '## Session context (installed prompts)',
     '',
+    `- Documentation template: ${template}`,
     `- Documentation root: ${docRoot}`,
+    `- Template folder: ${docRoot}${template}/`,
     '- Core rules: prompts/core/system-prompt.md (installed)',
     `- Role file: ${docRoot}prompts/role-${workflowRole(workflow)}.md`,
     `- Workflow reference: prompts/workflows/${workflow.id}.md`,
@@ -354,17 +425,31 @@ function initSetupForm(adoptBase) {
     adoptPreview.textContent = buildParameterBlock(params);
   }
 
+  function refreshTemplateBadge() {
+    const badge = document.getElementById('template-active');
+    if (!badge) return;
+    const params = readForm(form);
+    const t = resolvedTemplate(params);
+    badge.hidden = false;
+    badge.textContent = `Active template for all copied prompts: ${t}/`;
+  }
+
   form.elements.namedItem('template')?.addEventListener('change', () => {
     toggleCustomField(form);
     refreshInstallPreview();
     refreshAdoptPreview();
+    refreshTemplateBadge();
+    refreshOpenWorkflowPanels();
   });
   form.addEventListener('input', () => {
     refreshInstallPreview();
     refreshAdoptPreview();
+    refreshTemplateBadge();
+    refreshOpenWorkflowPanels();
   });
   refreshInstallPreview();
   refreshAdoptPreview();
+  refreshTemplateBadge();
 
   document.getElementById('copy-install')?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -416,13 +501,13 @@ function initTabs() {
 function renderWorkflowInputs(container, workflowId, panelKey) {
   if (!container) return;
   container.innerHTML = '';
-  const fields = WORKFLOW_INPUTS[workflowId];
+  const params = loadParams() || { docRoot: 'docs/architecture/', template: 'arc42' };
+  const fields = workflowFields(workflowId, params);
   if (!fields?.length) {
     container.hidden = true;
     return;
   }
   container.hidden = false;
-  const params = loadParams() || { docRoot: 'docs/architecture/' };
   const stored = inputState[panelKey][workflowId] || {};
 
   for (const field of fields) {
@@ -501,7 +586,8 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
       panel.hidden = false;
 
       const label = document.getElementById(labelId);
-      if (label) label.textContent = w.when;
+      const sessionParams = loadParams() || { docRoot: 'docs/architecture/', template: 'arc42' };
+      if (label) label.textContent = personalizeWorkflowWhen(w, sessionParams);
 
       const note = document.getElementById(noteId);
       if (note) {
@@ -520,6 +606,18 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
       }
     });
     grid.appendChild(btn);
+  }
+}
+
+function refreshOpenWorkflowPanels() {
+  const params = loadParams() || { docRoot: 'docs/architecture/', template: 'arc42' };
+  for (const key of ['evolve', 'work', 'review']) {
+    const w = panelState[key];
+    if (!w) continue;
+    const label = document.getElementById(`${key}-label`);
+    if (label) label.textContent = personalizeWorkflowWhen(w, params);
+    renderWorkflowInputs(document.getElementById(`${key}-inputs`), w.id, key);
+    updatePromptPreview(key, w.id, params);
   }
 }
 

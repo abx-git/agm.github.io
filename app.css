@@ -233,6 +233,20 @@ body {
   border-bottom: 1px solid var(--line);
 }
 
+.template-active {
+  margin: 0 0 0.75rem;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.82rem;
+  color: var(--accent);
+  background: #f0f7ff;
+  border: 1px solid #c5daf5;
+  border-radius: 6px;
+}
+
+.template-active[hidden] {
+  display: none;
+}
+
 .workflow-inputs {
   display: flex;
   flex-direction: column;

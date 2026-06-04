@@ -21,10 +21,10 @@
     "placeholders": [
       "e.g. coupling, failure modes, security, performance",
       "e.g. payment integration resilience",
-      "modules, services, or arc42 sections",
+      "modules, services, or <template",
       "slug"
     ],
-    "prompt": "Blueprint Pattern — Architecture Work (analysis).\nWorkflow: architecture-work-analysis\nRole: architecture-work\n\nTopic: <e.g. payment integration resilience>\nScope: <modules, services, or arc42 sections>\nFocus: <e.g. coupling, failure modes, security, performance>\n\nInstructions:\n1. Read blueprint.md and traverse the graph from entry-point.md.\n2. Produce a structured analysis in docs/architecture/work/YYYY-MM-DD-<slug>.md\n   (type: analysis): Context, Findings, Recommendations, Traceability.\n3. Link to existing guardrail findings in blueprint.md if relevant.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Architecture Work (analysis).\nWorkflow: architecture-work-analysis\nRole: architecture-work\n\nTopic: <e.g. payment integration resilience>\nScope: <modules, services, or <template> sections>\nFocus: <e.g. coupling, failure modes, security, performance>\n\nInstructions:\n1. Read blueprint.md and traverse the graph from entry-point.md.\n2. Produce a structured analysis in docs/architecture/work/YYYY-MM-DD-<slug>.md\n   (type: analysis): Context, Findings, Recommendations, Traceability.\n3. Link to existing guardrail findings in blueprint.md if relevant.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-continue",
@@ -62,17 +62,18 @@
       "WORK_ITEM"
     ],
     "steps": [
-      "Read blueprint.md and relevant work/ items and arc42 sections.",
+      "Read blueprint.md and relevant work/ items and <template> sections.",
       "Write design to docs/architecture/work/YYYY-MM-DD-<slug>.md (type: design): Context, Design (with Mermaid), Alternatives, Impact, Traceability.",
-      "If the design implies a decision, draft ADR in arc42/decisions/ and cross-link.",
+      "If the design implies a decision, draft ADR in <template>/decisions/ and cross-link.",
       "Register in blueprint.md (WRK-NNN). Verify links."
     ],
     "placeholders": [
       "e.g. add circuit breaker between order-service and payment-service",
       "optional: latency, no new infra, etc.",
-      "slug"
+      "slug",
+      "template"
     ],
-    "prompt": "Blueprint Pattern — Architecture Work (design).\nWorkflow: architecture-work-design\nRole: architecture-work\n\nGoal: <e.g. add circuit breaker between order-service and payment-service>\nConstraints: <optional: latency, no new infra, etc.>\n\nInstructions:\n1. Read blueprint.md and relevant work/ items and arc42 sections.\n2. Write design to docs/architecture/work/YYYY-MM-DD-<slug>.md (type: design):\n   Context, Design (with Mermaid), Alternatives, Impact, Traceability.\n3. If the design implies a decision, draft ADR in arc42/decisions/ and cross-link.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Architecture Work (design).\nWorkflow: architecture-work-design\nRole: architecture-work\n\nGoal: <e.g. add circuit breaker between order-service and payment-service>\nConstraints: <optional: latency, no new infra, etc.>\n\nInstructions:\n1. Read blueprint.md and relevant work/ items and <template> sections.\n2. Write design to docs/architecture/work/YYYY-MM-DD-<slug>.md (type: design):\n   Context, Design (with Mermaid), Alternatives, Impact, Traceability.\n3. If the design implies a decision, draft ADR in <template>/decisions/ and cross-link.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-query",
@@ -89,7 +90,7 @@
     ],
     "steps": [
       "Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.",
-      "Traverse the Markdown link graph only; follow imports/exports, arc42, and ops links.",
+      "Traverse the Markdown link graph only; follow imports/exports, <template>/, and ops links.",
       "Do not scan raw source unless a link leads there.",
       "Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).",
       "Register the item in blueprint.md under ## Architecture work (next WRK-NNN).",
@@ -97,9 +98,10 @@
     ],
     "placeholders": [
       "slug",
+      "template",
       "your question here"
     ],
-    "prompt": "Blueprint Pattern — Architecture Work (query).\nWorkflow: architecture-work-query\nRole: architecture-work\n\nQuestion: <your question here>\n\nInstructions:\n1. Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.\n2. Traverse the Markdown link graph only; follow imports/exports, arc42, and ops links.\n3. Do not scan raw source unless a link leads there.\n4. Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).\n5. Register the item in blueprint.md under ## Architecture work (next WRK-NNN).\n6. Verify all links resolve.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Architecture Work (query).\nWorkflow: architecture-work-query\nRole: architecture-work\n\nQuestion: <your question here>\n\nInstructions:\n1. Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.\n2. Traverse the Markdown link graph only; follow imports/exports, <template>/, and ops links.\n3. Do not scan raw source unless a link leads there.\n4. Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).\n5. Register the item in blueprint.md under ## Architecture work (next WRK-NNN).\n6. Verify all links resolve.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-adopt",
@@ -132,7 +134,7 @@
     "id": "bootstrap-continue",
     "role": "bootstrap",
     "group": "Bootstrap",
-    "when": "Resume arc42 phases after Bootstrap phase 0 is `[x] done`",
+    "when": "Resume blueprint phases after Bootstrap phase 0 is `[x] done`",
     "prerequisite": "",
     "freshChat": false,
     "freshNote": "Optional",
@@ -201,7 +203,7 @@
     "id": "refinement",
     "role": "bootstrap` (same role file; scoped steps)",
     "group": "bootstrap` (same role file; scoped steps)",
-    "when": "Targeted deepening of specific arc42 sections (ongoing on large systems)",
+    "when": "Targeted deepening of specific documentation sections (ongoing on large systems)",
     "prerequisite": "",
     "freshChat": false,
     "freshNote": "Optional",
@@ -212,17 +214,17 @@
       "PHASE_STATUS"
     ],
     "steps": [
-      "Goal: <e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing>",
-      "Scope: <arc42 paths, modules, or blueprint phase numbers>",
+      "Goal: <goal>",
+      "Scope: <scope>",
       "Follow docs/architecture/prompts/role-bootstrap.md for evidence and link rules.",
       "Read always-on.md → blueprint.md. Update only the scoped sections and blueprint states.",
       "Do not restart unrelated phases."
     ],
     "placeholders": [
-      "arc42 paths, modules, or blueprint phase numbers",
-      "e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing"
+      "goal",
+      "scope"
     ],
-    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <e.g. extend arc42/runtime.md with retry and circuit-breaker behavior in payment processing>\n\nScope: <arc42 paths, modules, or blueprint phase numbers>\n\nFollow docs/architecture/prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "Blueprint Pattern — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope>\n\nFollow docs/architecture/prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",
@@ -277,7 +279,7 @@
     "id": "review-phase",
     "role": "review",
     "group": "Review",
-    "when": "After each arc42 phase; verify one phase",
+    "when": "After each blueprint phase; verify one phase",
     "prerequisite": "",
     "freshChat": true,
     "freshNote": "**Required** (no generation context)",

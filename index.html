@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Blueprint Pattern</title>
-  <link rel="stylesheet" href="app.css?v=13" />
+  <link rel="stylesheet" href="app.css?v=14" />
 </head>
 <body>
   <main class="app">
@@ -18,7 +18,7 @@
 
     <details class="glossary" open>
       <summary>Core files (read once)</summary>
-      <p class="glossary-lead">Architecture content lives in template folders (<code>arc42/</code>, …). Three files orchestrate the graph:</p>
+      <p class="glossary-lead">Architecture content lives in your chosen template folder (<code>c4-light/</code>, <code>adr-first/</code>, …). Three files orchestrate the graph:</p>
       <table class="role-table">
         <thead>
           <tr>
@@ -82,6 +82,7 @@
           <span>Project name <em>(required)</em></span>
           <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
         </label>
+        <p id="template-active" class="template-active" hidden aria-live="polite"></p>
         <label class="field">
           <span>Documentation template</span>
           <select name="template">
@@ -224,13 +225,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v13</span>
+      <span class="deploy-id">Lifecycle · v14</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=13" type="module"></script>
+  <script src="app.js?v=14" type="module"></script>
 </body>
 </html>
