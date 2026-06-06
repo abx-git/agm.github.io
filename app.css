@@ -764,6 +764,11 @@ a.btn {
   color: var(--accent);
 }
 
+.mode-btn--dialog {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  font-weight: 600;
+}
+
 .mode-panel {
   margin-top: 1.25rem;
   padding: 1rem;
@@ -785,6 +790,19 @@ a.btn {
   font-size: 0.82rem;
   color: var(--muted);
 }
+
+.dialog-hint {
+  margin-bottom: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-radius: 8px;
+}
+
+.dialog-hint[hidden] { display: none; }
 
 .foot {
   margin-top: 2.5rem;

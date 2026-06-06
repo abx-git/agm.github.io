@@ -17,7 +17,16 @@ const EVOLVE_MODES = [
   },
 ];
 
+/** Workflows that run as turn-by-turn interview (Phase 1) before writing docs (Phase 2). */
+const DIALOG_WORKFLOW_IDS = new Set(['architecture-work-interrogate']);
+
 const WORK_MODES = [
+  {
+    id: 'architecture-work-interrogate',
+    label: 'Dialog — explore solution',
+    note: 'One question per reply. Use Cursor Chat (not Agent/Composer). Documentation only after "end interview".',
+    dialog: true,
+  },
   { id: 'architecture-work-query', label: 'Answer question', note: 'Set your question in the prompt.' },
   { id: 'architecture-work-analysis', label: 'Analyze', note: 'Set topic, scope, and focus.' },
   { id: 'architecture-work-design', label: 'Design proposal', note: 'Set goal and constraints.' },
@@ -25,8 +34,16 @@ const WORK_MODES = [
 ];
 
 const REVIEW_MODES = [
-  { id: 'review-phase', label: 'Review one phase' },
-  { id: 'review-maintenance', label: 'Review all docs' },
+  {
+    id: 'review-phase',
+    label: 'Review one phase',
+    note: 'Checks the next unreviewed blueprint phase against source and links. Report-only — fixes in a follow-up session.',
+  },
+  {
+    id: 'review-maintenance',
+    label: 'Review all docs',
+    note: 'After maintenance: cross-check changed docs against the git diff. Report-only.',
+  },
 ];
 
 /** Evolve workflows that receive the architecture documentation areas block. */
@@ -223,6 +240,20 @@ const DOC_EXTENSIONS = [
 
 /** Per-workflow user fields (name → placeholder in workflow prompt). */
 const WORKFLOW_INPUTS = {
+  'architecture-work-interrogate': [
+    {
+      name: 'question',
+      label: 'Your goal / question',
+      placeholder: 'e.g. How do we make event communication with the payment service resilient to timeouts?',
+      required: true,
+    },
+    {
+      name: 'slug',
+      label: 'Work file slug',
+      placeholder: 'e.g. payment-timeout-resilience',
+      required: true,
+    },
+  ],
   'architecture-work-query': [
     { name: 'question', label: 'Your question', placeholder: 'e.g. How does order-service call payment-service?', required: true },
     { name: 'slug', label: 'Work file slug', placeholder: 'e.g. order-payment-flow', required: true },
@@ -774,17 +805,33 @@ function personalizeWorkflowWhen(workflow, params) {
   );
 }
 
+function buildDialogModeHeader() {
+  return [
+    '## Dialog mode (OVERRIDES in this chat)',
+    '',
+    '**Interview first, write later.** role-architecture-work.md steps 3–5 and OUTPUT_CONTRACT apply only in Phase 2.',
+    'Phase 1: no files, no designs, no [[ANCHOR:...]] — exactly **one question** per reply.',
+    'Use Cursor **Chat** (not Agent/Composer) — the dialog requires turn-by-turn replies.',
+    '',
+  ].join('\n');
+}
+
 function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
   const template = resolvedTemplate(params);
   let prompt = substituteDocRoot(workflow.prompt, params.docRoot);
   prompt = substituteTemplate(prompt, template);
   prompt = applyWorkflowInputs(prompt, workflow.id, inputValues);
   const docRoot = normDocRoot(params.docRoot);
+  const isDialog = DIALOG_WORKFLOW_IDS.has(workflow.id);
   const focusNote =
     params.docFocus?.length > 0
       ? `- Architecture documentation areas: ${params.docFocus.join(', ')}`
       : '';
+  const roleLine = isDialog
+    ? `- Role file: ${docRoot}prompts/role-${workflowRole(workflow)}.md (Phase 2 only — overridden in Phase 1)`
+    : `- Role file: ${docRoot}prompts/role-${workflowRole(workflow)}.md`;
   const header = [
+    ...(isDialog ? [buildDialogModeHeader()] : []),
     '## Session context (installed prompts)',
     '',
     `- Documentation template: ${template}`,
@@ -792,7 +839,7 @@ function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
     `- Template folder: ${docRoot}${template}/`,
     focusNote,
     '- Core rules: prompts/core/system-prompt.md (installed)',
-    `- Role file: ${docRoot}prompts/role-${workflowRole(workflow)}.md`,
+    roleLine,
     `- Workflow reference: prompts/workflows/${workflow.id}.md`,
     '',
     buildAgentGraphDutiesBlock(docRoot).trimEnd(),
@@ -1121,7 +1168,7 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
   for (const mode of modes) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'mode-btn';
+    btn.className = mode.dialog ? 'mode-btn mode-btn--dialog' : 'mode-btn';
     btn.textContent = mode.label;
     btn.addEventListener('click', () => {
       grid.querySelectorAll('.mode-btn').forEach((b) => b.classList.remove('active'));
@@ -1141,6 +1188,11 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
         const text = mode.note || (w.freshChat ? 'New chat required.' : '');
         note.textContent = text;
         note.hidden = !text;
+      }
+
+      const dialogHint = document.getElementById(`${key}-dialog-hint`);
+      if (dialogHint) {
+        dialogHint.hidden = !mode.dialog;
       }
 
       renderWorkflowInputs(inputsHost, w.id, key);
@@ -1211,7 +1263,7 @@ async function main() {
   initBuildPhase(workflows);
   initModeGrid(workflows, 'evolve', EVOLVE_MODES, 'evolve-grid', 'evolve-panel', 'evolve-label', 'evolve-note');
   initModeGrid(workflows, 'work', WORK_MODES, 'work-grid', 'work-panel', 'work-label', 'work-note');
-  initModeGrid(workflows, 'review', REVIEW_MODES, 'review-grid', 'review-panel', 'review-label', null);
+  initModeGrid(workflows, 'review', REVIEW_MODES, 'review-grid', 'review-panel', 'review-label', 'review-note');
   initCopyButtons();
 }
 

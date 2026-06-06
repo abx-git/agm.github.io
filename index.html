@@ -238,9 +238,13 @@
       </section>
 
       <section id="phase-work" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro">Analysis and design work items (WRK) — separate from everyday doc maintenance.</p>
+        <p class="phase-intro"><strong>Dialog — explore solution</strong> uses an interview (one question per reply) to reach a design. Other modes deliver analysis, design, or answers directly as WRK documents.</p>
         <div class="modes" id="work-grid"></div>
         <div id="work-panel" class="mode-panel" hidden>
+          <div id="work-dialog-hint" class="dialog-hint" hidden>
+            <strong>Dialog mode:</strong> paste the prompt into a <strong>new Cursor Chat</strong> (not Agent/Composer).
+            The AI asks only one question per reply — documentation in <code>work/</code> starts only after you write "end interview".
+          </div>
           <p class="mode-label" id="work-label"></p>
           <div id="work-inputs" class="workflow-inputs" hidden></div>
           <details class="prompt-preview">
@@ -257,24 +261,29 @@
 
     <details class="review-block">
       <summary>Review (verification)</summary>
-      <p class="review-intro">Separate verification from writing. Pick a review workflow:</p>
+      <p class="review-intro">
+        <strong>What it does:</strong> a separate, read-only Cursor session that <em>verifies</em> architecture docs — it does not write or fix them.
+        The AI compares documentation to source code and the link graph, writes a report to <code>work/</code>, and updates <code>blueprint.md</code> under
+        <strong>Reviews</strong> and <strong>Guardrail findings</strong>. Run in a <strong>new chat</strong> after bootstrap, maintenance, or a work session.
+      </p>
       <div class="modes review-modes" id="review-grid"></div>
       <div id="review-panel" class="mode-panel" hidden>
         <p class="mode-label" id="review-label"></p>
         <div class="cmd-row">
           <button type="button" class="btn primary mode-copy" data-panel="review">Copy prompt</button>
         </div>
+        <p class="mode-note" id="review-note" hidden></p>
       </div>
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v30</span>
+      <span class="deploy-id">Lifecycle · v33</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=30" type="module"></script>
+  <script src="app.js?v=33" type="module"></script>
 </body>
 </html>
