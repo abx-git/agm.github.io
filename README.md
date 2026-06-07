@@ -21,7 +21,7 @@ Opens `http://localhost:8765` (requires Python 3).
 |-----|-------|-----------|
 | **Build** | Install script + adopt + continue | install (generated script), adopt (form), `bootstrap-continue`, `review-milestone` |
 | **Evolve** | Deepen or sync with code | `refinement`, `maintenance` |
-| **Work** | Use compiled graph | `architecture-work-*` |
+| **Work** | Use compiled graph | `architecture-work-*` (incl. sustainable analysis) |
 | **Review** | Verify (report-only) | `review-phase`, `review-maintenance` |
 
 ## Publish

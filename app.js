@@ -1,4 +1,5 @@
 const ASSET_BASE = new URL('./', import.meta.url);
+const ASSISTANT_VERSION = new URL(import.meta.url).searchParams.get('v') || '0';
 const STORAGE_KEY = 'bp-adopt-params';
 const BP_INSTALL_URL =
   'https://raw.githubusercontent.com/abx-git/blueprint-pattern/main/scripts/bp-install.sh';
@@ -18,7 +19,10 @@ const EVOLVE_MODES = [
 ];
 
 /** Workflows that run as turn-by-turn interview (Phase 1) before writing docs (Phase 2). */
-const DIALOG_WORKFLOW_IDS = new Set(['architecture-work-interrogate']);
+const DIALOG_WORKFLOW_IDS = new Set([
+  'architecture-work-interrogate',
+  'architecture-work-sustainable-interrogate',
+]);
 
 const WORK_MODES = [
   {
@@ -29,6 +33,17 @@ const WORK_MODES = [
   },
   { id: 'architecture-work-query', label: 'Answer question', note: 'Set your question in the prompt.' },
   { id: 'architecture-work-analysis', label: 'Analyze', note: 'Set topic, scope, and focus.' },
+  {
+    id: 'architecture-work-sustainable-analysis',
+    label: 'Sustainable analysis',
+    note: 'Lilienthal-style: drift, modularity, layering, coupling, technical debt. Set scope and focus — or leave scope empty to clarify in chat.',
+  },
+  {
+    id: 'architecture-work-sustainable-interrogate',
+    label: 'Dialog — sustainable analysis',
+    note: 'One question per reply to define scope and focus, then write the analysis. Use Cursor Chat (not Agent/Composer).',
+    dialog: true,
+  },
   { id: 'architecture-work-design', label: 'Design proposal', note: 'Set goal and constraints.' },
   { id: 'architecture-work-continue', label: 'Open work items', note: 'Continues WRK entries in blueprint.md.' },
 ];
@@ -50,6 +65,31 @@ const REVIEW_MODES = [
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
 /** IDs the human may select in Plan / Evolve (architecture content only). */
+/** Lilienthal sustainable-analysis dimensions (Work phase). */
+const SUSTAINABLE_FOCUS_ORDER = [
+  'architecture-drift',
+  'modularity',
+  'layering',
+  'coupling',
+  'technical-debt',
+  'domain-model',
+  'maintainability',
+];
+
+const SUSTAINABLE_FOCUS_DIMENSIONS = [
+  {
+    id: 'architecture-drift',
+    label: 'Architecture drift',
+    hint: 'Documented vs actual structure',
+  },
+  { id: 'modularity', label: 'Modularity & boundaries', hint: 'Packages, modules, bounded contexts' },
+  { id: 'layering', label: 'Layering & dependencies', hint: 'Layer violations, dependency direction' },
+  { id: 'coupling', label: 'Coupling & cohesion', hint: 'Hotspots, inappropriate dependencies' },
+  { id: 'technical-debt', label: 'Technical debt', hint: 'Anti-patterns, duplication, complexity' },
+  { id: 'domain-model', label: 'Domain & naming', hint: 'Ubiquitous language, DDD alignment' },
+  { id: 'maintainability', label: 'Maintainability', hint: 'Changeability, test seams, extension cost' },
+];
+
 const DOC_AREA_ORDER = [
   'implementation',
   'interfaces',
@@ -269,6 +309,37 @@ const WORKFLOW_INPUTS = {
     { name: 'constraints', label: 'Constraints (optional)', placeholder: 'latency, no new infra, …', required: false },
     { name: 'slug', label: 'Work file slug', placeholder: 'e.g. payment-circuit-breaker', required: true },
   ],
+  'architecture-work-sustainable-analysis': [
+    {
+      name: 'scope',
+      label: 'Scope',
+      help: 'Leave empty to clarify scope in chat (Phase 1) before the analysis.',
+      placeholder: 'e.g. order-service, src/payment/, entire monolith',
+      required: false,
+    },
+    {
+      name: 'sourcePaths',
+      label: 'Source paths (optional)',
+      placeholder: 'e.g. src/services/order/ — defaults to always-on.md source map',
+      required: false,
+    },
+    {
+      name: 'compareDocs',
+      label: 'Compare to documented architecture',
+      type: 'checkbox',
+      defaultChecked: true,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. order-service-sustainability', required: true },
+  ],
+  'architecture-work-sustainable-interrogate': [
+    {
+      name: 'initialGoal',
+      label: 'Initial goal (optional)',
+      placeholder: 'e.g. assess technical debt before a major refactor',
+      required: false,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. payment-module-sustainability', required: true },
+  ],
   refinement: [
     {
       name: 'goal',
@@ -311,18 +382,22 @@ const panelState = { evolve: null, work: null, review: null };
 const inputState = { evolve: {}, work: {}, review: {} };
 
 async function loadWorkflows() {
-  const res = await fetch(new URL('workflows.json', ASSET_BASE));
+  const url = new URL('workflows.json', ASSET_BASE);
+  url.searchParams.set('v', ASSISTANT_VERSION);
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error('workflows.json');
   return res.json();
 }
 
-function showToast() {
+function showToast(message = 'Copied') {
   const el = document.getElementById('toast');
+  el.textContent = message;
   el.hidden = false;
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => {
     el.hidden = true;
-  }, 1400);
+    el.textContent = 'Copied';
+  }, 2800);
 }
 
 async function copy(text) {
@@ -707,7 +782,65 @@ function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocu
   ].join('\n');
 }
 
-function applyWorkflowInputs(prompt, workflowId, values) {
+function readSustainableFocus(container) {
+  if (!container) return [];
+  const valid = new Set(SUSTAINABLE_FOCUS_ORDER);
+  const out = [];
+  container.querySelectorAll('input[name="sustainableFocus"]:checked').forEach((cb) => {
+    if (valid.has(cb.value)) out.push(cb.value);
+  });
+  return out;
+}
+
+function buildSustainableFocusText(container) {
+  const ids = readSustainableFocus(container);
+  if (!ids.length) return '<unspecified>';
+  const labels = ids.map(
+    (id) => SUSTAINABLE_FOCUS_DIMENSIONS.find((d) => d.id === id)?.label || id
+  );
+  return labels.join('; ');
+}
+
+function appendSustainableFocusFieldset(container) {
+  const fieldset = document.createElement('fieldset');
+  fieldset.className = 'doc-focus-unified sustainable-focus-fieldset';
+  const legend = document.createElement('legend');
+  legend.textContent = 'Focus dimensions (Lilienthal)';
+  fieldset.appendChild(legend);
+
+  const hint = document.createElement('p');
+  hint.className = 'field-hint doc-focus-unified-hint';
+  hint.textContent =
+    'Optional — leave all unchecked to analyze all dimensions or clarify in chat.';
+  fieldset.appendChild(hint);
+
+  const grid = document.createElement('div');
+  grid.className = 'focus-grid focus-grid--open';
+  for (const dim of SUSTAINABLE_FOCUS_ORDER.map(
+    (id) => SUSTAINABLE_FOCUS_DIMENSIONS.find((d) => d.id === id)
+  ).filter(Boolean)) {
+    const label = document.createElement('label');
+    label.className = 'focus-option';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.name = 'sustainableFocus';
+    cb.value = dim.id;
+    const text = document.createElement('span');
+    const strong = document.createElement('strong');
+    strong.textContent = dim.label;
+    text.append(strong);
+    const small = document.createElement('small');
+    small.className = 'focus-hint';
+    small.textContent = dim.hint;
+    text.append(small);
+    label.append(cb, text);
+    grid.append(label);
+  }
+  fieldset.appendChild(grid);
+  container.appendChild(fieldset);
+}
+
+function applyWorkflowInputs(prompt, workflowId, values, inputsContainer) {
   let out = prompt;
   const map = {
     'your question here': values.question,
@@ -723,6 +856,11 @@ function applyWorkflowInputs(prompt, workflowId, values) {
     slug: values.slug,
     'diff-from': values.diffFrom,
     'diff-to': values.diffTo || 'HEAD',
+    'focus-dimensions': values.focusDimensions,
+    'source-paths': values.sourcePaths,
+    'compare-documentation': values.compareDocumentation,
+    'initial-goal': values.initialGoal,
+    'clarify-with-user': values.scope === '<clarify-with-user>' ? values.scope : undefined,
   };
   for (const [placeholder, val] of Object.entries(map)) {
     if (val == null || val === '') continue;
@@ -759,6 +897,27 @@ function applyWorkflowInputs(prompt, workflowId, values) {
     out = out.replace(/<diff-to>/g, to);
     out = out.replace(/\$\{DIFF_FROM\}/g, values.diffFrom);
     out = out.replace(/\$\{DIFF_TO\}/g, to);
+  }
+  if (workflowId === 'architecture-work-sustainable-analysis') {
+    const scope = values.scope?.trim() || '<clarify-with-user>';
+    out = out.replace(/Scope: <modules, services, packages, or repository paths>/, `Scope: ${scope}`);
+    out = out.replace(
+      /Focus dimensions: <focus-dimensions>/,
+      `Focus dimensions: ${values.focusDimensions || '<unspecified>'}`
+    );
+    const src = values.sourcePaths?.trim() || '<from always-on.md source map>';
+    out = out.replace(/Source paths \(optional\): <source-paths>/, `Source paths (optional): ${src}`);
+    out = out.replace(
+      /Compare to documented architecture: <compare-documentation>/,
+      `Compare to documented architecture: ${values.compareDocumentation || 'yes'}`
+    );
+  }
+  if (workflowId === 'architecture-work-sustainable-interrogate' && values.initialGoal) {
+    out = out.replace(
+      /Initial goal \(optional\): <initial-goal>/,
+      `Initial goal (optional): ${values.initialGoal}`
+    );
+    out = out.replace(/<initial-goal>/g, values.initialGoal);
   }
   return out;
 }
@@ -816,11 +975,27 @@ function buildDialogModeHeader() {
   ].join('\n');
 }
 
-function personalizeWorkflowPrompt(workflow, params, inputValues = {}) {
+function buildWorkflowInputValues(workflowId, stored, inputsContainer) {
+  const values = { ...stored };
+  if (workflowId === 'architecture-work-sustainable-analysis') {
+    values.focusDimensions = buildSustainableFocusText(inputsContainer);
+    values.compareDocumentation = stored.compareDocs === false ? 'no' : 'yes';
+    values.sourcePaths = stored.sourcePaths;
+    values.scope = stored.scope?.trim() || '<clarify-with-user>';
+  }
+  return values;
+}
+
+function personalizeWorkflowPrompt(workflow, params, inputValues = {}, inputsContainer = null) {
   const template = resolvedTemplate(params);
   let prompt = substituteDocRoot(workflow.prompt, params.docRoot);
   prompt = substituteTemplate(prompt, template);
-  prompt = applyWorkflowInputs(prompt, workflow.id, inputValues);
+  prompt = applyWorkflowInputs(
+    prompt,
+    workflow.id,
+    buildWorkflowInputValues(workflow.id, inputValues, inputsContainer),
+    inputsContainer
+  );
   const docRoot = normDocRoot(params.docRoot);
   const isDialog = DIALOG_WORKFLOW_IDS.has(workflow.id);
   const focusNote =
@@ -1062,13 +1237,31 @@ function initTabs() {
   });
 }
 
-function syncWorkflowFieldState(panelKey, workflowId, fieldName, value, params) {
+function syncWorkflowFieldState(panelKey, workflowId, fieldName, value, params, inputsHost) {
   inputState[panelKey][workflowId] = inputState[panelKey][workflowId] || {};
   inputState[panelKey][workflowId][fieldName] = value;
-  updatePromptPreview(panelKey, workflowId, params);
+  updatePromptPreview(panelKey, workflowId, params, inputsHost);
 }
 
-function renderWorkflowField(container, field, panelKey, workflowId, stored, params, form) {
+function renderWorkflowField(container, field, panelKey, workflowId, stored, params, form, inputsHost) {
+  if (field.type === 'checkbox') {
+    const label = document.createElement('label');
+    label.className = 'field field--checkbox';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.dataset.field = field.name;
+    input.name = `${panelKey}-${workflowId}-${field.name}`;
+    input.checked = stored[field.name] ?? field.defaultChecked ?? false;
+    input.addEventListener('change', () => {
+      syncWorkflowFieldState(panelKey, workflowId, field.name, input.checked, params, inputsHost);
+    });
+    const span = document.createElement('span');
+    span.textContent = field.label;
+    label.append(input, span);
+    container.appendChild(label);
+    return;
+  }
+
   const label = document.createElement('label');
   label.className = 'field';
   const span = document.createElement('span');
@@ -1091,8 +1284,8 @@ function renderWorkflowField(container, field, panelKey, workflowId, stored, par
   label.appendChild(input);
 
   input.addEventListener('input', () => {
-    syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params);
-    if (workflowId === 'refinement') updatePromptPreview(panelKey, workflowId, readForm(form));
+    syncWorkflowFieldState(panelKey, workflowId, field.name, input.value, params, inputsHost);
+    if (workflowId === 'refinement') updatePromptPreview(panelKey, workflowId, readForm(form), inputsHost);
   });
   if (field.help) {
     const help = document.createElement('p');
@@ -1116,6 +1309,7 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
   container.hidden = false;
 
   if (container.dataset.workflowId === workflowId && container.querySelector('[data-field]')) {
+    container.hidden = false;
     return;
   }
 
@@ -1127,19 +1321,31 @@ function renderWorkflowInputs(container, workflowId, panelKey) {
     appendDocFocusUnified(container, form, 'session');
   }
 
+  if (workflowId === 'architecture-work-sustainable-analysis') {
+    appendSustainableFocusFieldset(container);
+    container.querySelectorAll('input[name="sustainableFocus"]').forEach((cb) => {
+      cb.addEventListener('change', () => {
+        updatePromptPreview(panelKey, workflowId, params, container);
+      });
+    });
+  }
+
   for (const field of fields) {
-    renderWorkflowField(container, field, panelKey, workflowId, stored, params, form);
+    renderWorkflowField(container, field, panelKey, workflowId, stored, params, form, container);
   }
 }
 
-function updatePromptPreview(panelKey, workflowId, params) {
+function updatePromptPreview(panelKey, workflowId, params, inputsHost) {
   const pre = document.getElementById(`${panelKey}-prompt-preview`);
   const w = panelState[panelKey];
+  const container =
+    inputsHost || document.getElementById(`${panelKey}-inputs`);
   if (!pre || !w || w.id !== workflowId) return;
   pre.textContent = personalizeWorkflowPrompt(
     w,
     params || loadParams() || { docRoot: 'docs/architecture/' },
-    inputState[panelKey][workflowId] || {}
+    inputState[panelKey][workflowId] || {},
+    container
   );
 }
 
@@ -1170,12 +1376,19 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
     btn.type = 'button';
     btn.className = mode.dialog ? 'mode-btn mode-btn--dialog' : 'mode-btn';
     btn.textContent = mode.label;
+    if (!byId(workflows, mode.id)) {
+      btn.disabled = true;
+      btn.title = 'Workflow data missing — hard-refresh the page (Ctrl+Shift+R).';
+    }
     btn.addEventListener('click', () => {
       grid.querySelectorAll('.mode-btn').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
 
       const w = byId(workflows, mode.id);
-      if (!w) return;
+      if (!w) {
+        showToast(`Workflow "${mode.id}" not loaded — hard-refresh (Ctrl+Shift+R).`);
+        return;
+      }
       panelState[key] = w;
       panel.hidden = false;
 
@@ -1200,7 +1413,8 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
         previewHost.textContent = personalizeWorkflowPrompt(
           w,
           loadParams() || { docRoot: 'docs/architecture/' },
-          inputState[key][w.id] || {}
+          inputState[key][w.id] || {},
+          inputsHost
         );
       }
     });
@@ -1230,7 +1444,8 @@ function initCopyButtons() {
         personalizeWorkflowPrompt(
           w,
           loadParams() || { docRoot: 'docs/architecture/' },
-          inputState[key][w.id] || {}
+          inputState[key][w.id] || {},
+          document.getElementById(`${key}-inputs`)
         )
       );
     });
@@ -1238,7 +1453,9 @@ function initCopyButtons() {
 }
 
 async function loadAdoptPrompt() {
-  const res = await fetch(new URL('adopt-prompt.txt', ASSET_BASE));
+  const url = new URL('adopt-prompt.txt', ASSET_BASE);
+  url.searchParams.set('v', ASSISTANT_VERSION);
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error('adopt-prompt.txt');
   return res.text();
 }
