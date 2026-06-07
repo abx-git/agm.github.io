@@ -1,6 +1,6 @@
 # AGM Assistant
 
-Three-phase lifecycle UI: **Build** · **Evolve** · **Work**, plus cross-cutting **Review**.
+Three-phase lifecycle UI: **Build** · **Evolve** · **Work (Architecture)** · **Work (Domain / DDD)**, plus cross-cutting **Review**.
 
 Live: https://abx-git.github.io/blueprint-pattern.github.io/
 
@@ -21,7 +21,8 @@ Opens `http://localhost:8765` (requires Python 3).
 |-----|-------|-----------|
 | **Build** | Install script + adopt + continue | install (generated script), adopt (form), `bootstrap-continue`, `review-milestone` |
 | **Evolve** | Deepen or sync with code | `refinement`, `maintenance` |
-| **Work** | Use compiled graph | `architecture-work-*` (incl. sustainable analysis) |
+| **Work** | Architecture on compiled graph | `architecture-work-*` (incl. sustainable analysis) |
+| **Domain (DDD)** | Strategic & tactical domain model | `domain-work-*` (incl. event storm dialog) |
 | **Review** | Verify (report-only) | `review-phase`, `review-maintenance` |
 
 ## Publish

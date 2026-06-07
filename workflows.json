@@ -40,12 +40,12 @@
       "WORK_ITEM"
     ],
     "steps": [
-      "Read docs/architecture/blueprint.md ## Architecture work.",
-      "Pick the next item with status draft, or start a new query/analysis/design if requested.",
+      "Read docs/architecture/blueprint.md ## Work register (or ## Architecture work).",
+      "Pick the next item with Track: architecture (or untagged legacy row) and status draft, or start a new query/analysis/design if requested.",
       "Update the work file and blueprint before stopping."
     ],
     "placeholders": [],
-    "prompt": "AGM — continue Architecture Work.\nWorkflow: architecture-work-continue\nRole: architecture-work\n\nRead docs/architecture/blueprint.md ## Architecture work.\nPick the next item with status draft, or start a new query/analysis/design if requested.\nUpdate the work file and blueprint before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — continue Architecture Work.\nWorkflow: architecture-work-continue\nRole: architecture-work\n\nRead docs/architecture/blueprint.md ## Work register (or ## Architecture work).\nPick the next item with Track: architecture (or untagged legacy row) and status draft, or start a new query/analysis/design if requested.\nUpdate the work file and blueprint before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-design",
@@ -323,6 +323,301 @@
     ],
     "placeholders": [],
     "prompt": "AGM — Bootstrap (initialize).\nWorkflow: bootstrap-init\nRole: bootstrap\n\nBootstrap AGM documentation for this application.\n\nFollow docs/architecture/prompts/role-bootstrap.md (copy from docs/templates/architecture/prompts/ if missing).\nRead prompts/core/system-prompt.md rules. Create docs/architecture/ structure from the chosen template.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-context-map",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Identify bounded contexts and strategic relationships",
+    "prerequisite": "Bootstrap phase 0 `[x] done`; `domain/context-map.md` exists",
+    "freshChat": false,
+    "freshNote": "",
+    "anchors": [
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Read blueprint.md, domain/, interfaces/, entry-point.md; traverse graph before scanning source.",
+      "Identify bounded contexts (business capability + ubiquitous language boundary).",
+      "Update <doc-root>domain/context-map.md (contexts table + Mermaid map + integration patterns).",
+      "Map each context to implementation paths and interfaces/ contracts.",
+      "Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-analysis) with findings and recommendations.",
+      "Record matching ddd-guardrails.md IDs in recommendations; propose blueprint guardrail rows.",
+      "Register WRK (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "doc-root",
+      "optional: greenfield | legacy extraction | integration cleanup",
+      "slug",
+      "systems, modules, services, or repository paths"
+    ],
+    "prompt": "AGM — Domain Work (context map).\nWorkflow: domain-work-context-map\nRole: domain-work\n\nScope: <systems, modules, services, or repository paths>\nFocus: <optional: greenfield | legacy extraction | integration cleanup>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Context map\n\nInstructions:\n1. Read blueprint.md, domain/, interfaces/, entry-point.md; traverse graph before scanning source.\n2. Identify bounded contexts (business capability + ubiquitous language boundary).\n3. Update <doc-root>domain/context-map.md (contexts table + Mermaid map + integration patterns).\n4. Map each context to implementation paths and interfaces/ contracts.\n5. Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-analysis) with findings and recommendations.\n6. Record matching ddd-guardrails.md IDs in recommendations; propose blueprint guardrail rows.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-continue",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Resume open domain WRK items",
+    "prerequisite": "",
+    "freshChat": false,
+    "freshNote": "Optional",
+    "anchors": [
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Read <doc-root>blueprint.md ## Work register.",
+      "Pick the next item with Track: domain and status draft, or continue the domain task the human names.",
+      "Update domain/ graph files and work item before stopping."
+    ],
+    "placeholders": [
+      "doc-root"
+    ],
+    "prompt": "AGM — continue Domain Work.\nWorkflow: domain-work-continue\nRole: domain-work\n\nRead <doc-root>blueprint.md ## Work register.\nPick the next item with Track: domain and status draft, or continue the domain task the human names.\nUpdate domain/ graph files and work item before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-design",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Domain model or boundary design (aggregates, ACL, context split)",
+    "prerequisite": "Bootstrap phase 0 `[x] done`; context map recommended for cross-context designs",
+    "freshChat": false,
+    "freshNote": "",
+    "anchors": [
+      "ADR_IMPACT",
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Read domain/, relevant work/ items, interfaces/, template decisions/.",
+      "Write design to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-design): model, aggregates, events, integration impact.",
+      "Draft updates to domain/contexts/<context>/model.md (link from work item).",
+      "Strategic boundary change → draft ADR in <template>/decisions/ and update context-map.md.",
+      "Register WRK (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "context",
+      "context name or cross-cutting",
+      "doc-root",
+      "e.g. split Order aggregate, introduce ACL to payment context, model refund policy",
+      "optional",
+      "slug",
+      "template"
+    ],
+    "prompt": "AGM — Domain Work (design).\nWorkflow: domain-work-design\nRole: domain-work\n\nGoal: <e.g. split Order aggregate, introduce ACL to payment context, model refund policy>\nBounded context: <context name or cross-cutting>\nConstraints: <optional>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Domain design\n\nInstructions:\n1. Read domain/, relevant work/ items, interfaces/, template decisions/.\n2. Write design to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-design): model, aggregates, events, integration impact.\n3. Draft updates to domain/contexts/<context>/model.md (link from work item).\n4. Strategic boundary change → draft ADR in <template>/decisions/ and update context-map.md.\n5. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-event-storm",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Domain discovery via Event Storming (dialog)",
+    "prerequisite": "Bootstrap phase 0 `[x] done`; `domain/` scaffold installed",
+    "freshChat": true,
+    "freshNote": "Required — Cursor **Chat** (not Agent/Composer)",
+    "anchors": [
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Process / bounded context (optional): <process-or-context>",
+      "Initial goal (optional): <initial-goal>",
+      "Report format: prompts/reference/ddd-work-report-formats.md § Event storm",
+      "═══════════════════════════════════════════════════════",
+      "PHASE 1 — EVENT STORM INTERVIEW",
+      "═══════════════════════════════════════════════════════",
+      "Dialog to build a shared domain timeline. OVERRIDES role-domain-work.md (steps 3–7 and OUTPUT_CONTRACT) until Phase 2.",
+      "- Do not create or modify files",
+      "- No aggregate diagrams, context maps, or design proposals",
+      "- No [[ANCHOR:...]] output",
+      "- No more than ONE question per reply",
+      "- First reply: storm plan (domain events → commands → aggregates → policies) + question 1",
+      "- Follow-ups: progress + one question about the next event, command, policy, or hotspot",
+      "- Use orange/purple/pink/yellow stickies metaphor in prose (events, commands, aggregates, policies)",
+      "1) Domain events in chronological order (past tense: \"OrderPlaced\")",
+      "2) Commands that trigger events",
+      "3) Aggregate candidates that accept commands",
+      "4) Policies / reactions (when X then Y)",
+      "5) Read models and external systems",
+      "6) Hot spots (uncertainty, contention, legacy)",
+      "---",
+      "**Progress:** Step X of Y — [topic]",
+      "**Brief:** [optional, max. 2 sentences]",
+      "**Question:** [exactly one question]",
+      "---",
+      "═══════════════════════════════════════════════════════",
+      "PHASE 2 — WRITE",
+      "═══════════════════════════════════════════════════════",
+      "Start when human writes \"end interview\", \"done\", or \"write it up\".",
+      "1. Read <doc-root>blueprint.md, domain/, entry-point.md (background only).",
+      "2. Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-discovery) per report format.",
+      "3. Add candidate events to <doc-root>domain/events.md (draft rows) if agreed.",
+      "4. Optionally create <doc-root>domain/contexts/<slug>/model.md draft if one context emerged.",
+      "5. Register WRK in blueprint (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "doc-root",
+      "initial-goal",
+      "process-or-context",
+      "slug"
+    ],
+    "prompt": "AGM — Domain Work (event storm / dialog).\nWorkflow: domain-work-event-storm\nRole: domain-work\n\nProcess / bounded context (optional): <process-or-context>\nInitial goal (optional): <initial-goal>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Event storm\n\n═══════════════════════════════════════════════════════\nPHASE 1 — EVENT STORM INTERVIEW\n═══════════════════════════════════════════════════════\n\nDialog to build a shared domain timeline. OVERRIDES role-domain-work.md (steps 3–7 and OUTPUT_CONTRACT) until Phase 2.\n\nFORBIDDEN in Phase 1:\n- Do not create or modify files\n- No aggregate diagrams, context maps, or design proposals\n- No [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- First reply: storm plan (domain events → commands → aggregates → policies) + question 1\n- Follow-ups: progress + one question about the next event, command, policy, or hotspot\n- Use orange/purple/pink/yellow stickies metaphor in prose (events, commands, aggregates, policies)\n\nClarify in order (adjust if human steers):\n1) Domain events in chronological order (past tense: \"OrderPlaced\")\n2) Commands that trigger events\n3) Aggregate candidates that accept commands\n4) Policies / reactions (when X then Y)\n5) Read models and external systems\n6) Hot spots (uncertainty, contention, legacy)\n\nReply format Phase 1:\n---\n**Progress:** Step X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\n═══════════════════════════════════════════════════════\nPHASE 2 — WRITE\n═══════════════════════════════════════════════════════\n\nStart when human writes \"end interview\", \"done\", or \"write it up\".\n\n1. Read <doc-root>blueprint.md, domain/, entry-point.md (background only).\n2. Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-discovery) per report format.\n3. Add candidate events to <doc-root>domain/events.md (draft rows) if agreed.\n4. Optionally create <doc-root>domain/contexts/<slug>/model.md draft if one context emerged.\n5. Register WRK in blueprint (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-integration-review",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Review cross-context integration against DDD patterns",
+    "prerequisite": "`interfaces/` and preferably `domain/context-map.md` populated",
+    "freshChat": false,
+    "freshNote": "",
+    "anchors": [
+      "ADR_IMPACT",
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Read domain/context-map.md, interfaces/exports.md, interfaces/imports.md, ecosystem-index if present.",
+      "For each integration, classify pattern: ACL, OHS, conformist, partnership, shared kernel, separate ways.",
+      "Contrast documented context map relationships with actual contracts.",
+      "Flag ddd-guardrails.md strategic smells (DDD-S01–S06).",
+      "Update context-map.md relationship table if corrections are evidence-based.",
+      "Write work report (type: domain-analysis) with prioritized recommendations.",
+      "Register WRK (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "cross-service integrations, API surface, or named context pair"
+    ],
+    "prompt": "AGM — Domain Work (integration review).\nWorkflow: domain-work-integration-review\nRole: domain-work\n\nScope: <cross-service integrations, API surface, or named context pair>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Integration review\n\nInstructions:\n1. Read domain/context-map.md, interfaces/exports.md, interfaces/imports.md, ecosystem-index if present.\n2. For each integration, classify pattern: ACL, OHS, conformist, partnership, shared kernel, separate ways.\n3. Contrast documented context map relationships with actual contracts.\n4. Flag ddd-guardrails.md strategic smells (DDD-S01–S06).\n5. Update context-map.md relationship table if corrections are evidence-based.\n6. Write work report (type: domain-analysis) with prioritized recommendations.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-language-audit",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Ubiquitous language audit (docs vs code vs APIs)",
+    "prerequisite": "Glossary or domain/contexts/*/language.md partially populated",
+    "freshChat": false,
+    "freshNote": "",
+    "anchors": [
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Collect term inventory from domain language docs and template glossary.",
+      "Collect names from Scope source (types, modules, REST/event names) — follow graph links first.",
+      "Build mismatch matrix: synonym clusters, deprecated terms, technical leaks.",
+      "Recommend one canonical term per concept per context.",
+      "Apply agreed renames to language.md / glossary / on-demand.md only where human confirms in session; otherwise list in report.",
+      "Write work report (type: domain-analysis); flag DDD-T05, DDD-T06.",
+      "Register WRK (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "bounded context, service, or module paths"
+    ],
+    "prompt": "AGM — Domain Work (language audit).\nWorkflow: domain-work-language-audit\nRole: domain-work\n\nScope: <bounded context, service, or module paths>\nSources to compare: glossary, on-demand.md, domain/contexts/*/language.md, public API, type names in code\n\nReport format: prompts/reference/ddd-work-report-formats.md § Language audit\n\nInstructions:\n1. Collect term inventory from domain language docs and template glossary.\n2. Collect names from Scope source (types, modules, REST/event names) — follow graph links first.\n3. Build mismatch matrix: synonym clusters, deprecated terms, technical leaks.\n4. Recommend one canonical term per concept per context.\n5. Apply agreed renames to language.md / glossary / on-demand.md only where human confirms in session; otherwise list in report.\n6. Write work report (type: domain-analysis); flag DDD-T05, DDD-T06.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-query",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Answer a domain / DDD question using the graph",
+    "prerequisite": "Bootstrap phase 0 `[x] done`",
+    "freshChat": false,
+    "freshNote": "",
+    "anchors": [
+      "LINK_CHECK",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Read blueprint.md, domain/, entry-point.md, prompts/role-domain-work.md.",
+      "Traverse Markdown graph; prefer domain/, glossary, interfaces/, contexts/ over raw source.",
+      "Write answer to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-question) using _template-domain.md.",
+      "Register WRK (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "doc-root",
+      "slug",
+      "your domain question here"
+    ],
+    "prompt": "AGM — Domain Work (query).\nWorkflow: domain-work-query\nRole: domain-work\n\nQuestion: <your domain question here>\n\nInstructions:\n1. Read blueprint.md, domain/, entry-point.md, prompts/role-domain-work.md.\n2. Traverse Markdown graph; prefer domain/, glossary, interfaces/, contexts/ over raw source.\n3. Write answer to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-question) using _template-domain.md.\n4. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-subdomain-classification",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Classify subdomains (core / supporting / generic) for investment",
+    "prerequisite": "Bootstrap phase 0 `[x] done`",
+    "freshChat": false,
+    "freshNote": "",
+    "anchors": [
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Read domain/, blueprint.md, entry-point.md; link to business goals in template docs.",
+      "Inventory subdomains (finer-grained than bounded contexts where helpful).",
+      "Classify each: core | supporting | generic with explicit rationale.",
+      "Update <doc-root>domain/subdomains.md.",
+      "Write work report (type: domain-analysis) with investment implications.",
+      "Register WRK (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "doc-root",
+      "product line, platform, or enterprise area"
+    ],
+    "prompt": "AGM — Domain Work (subdomain classification).\nWorkflow: domain-work-subdomain-classification\nRole: domain-work\n\nBusiness scope: <product line, platform, or enterprise area>\nEvidence: <doc-root>domain/context-map.md, subdomains.md, arc42 introduction/strategy if present>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Subdomain classification\n\nInstructions:\n1. Read domain/, blueprint.md, entry-point.md; link to business goals in template docs.\n2. Inventory subdomains (finer-grained than bounded contexts where helpful).\n3. Classify each: core | supporting | generic with explicit rationale.\n4. Update <doc-root>domain/subdomains.md.\n5. Write work report (type: domain-analysis) with investment implications.\n6. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "domain-work-tactical-review",
+    "role": "domain-work",
+    "group": "Domain work (DDD)",
+    "when": "Tactical DDD review (aggregates, invariants, events, repositories)",
+    "prerequisite": "Bounded context identified; `domain/contexts/<context>/model.md` recommended",
+    "freshChat": false,
+    "freshNote": "",
+    "anchors": [
+      "DDD_GRAPH_UPDATED",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS",
+      "TRACEABILITY_COVERAGE",
+      "WORK_ITEM"
+    ],
+    "steps": [
+      "Read domain/contexts/<context>/model.md and language.md if present; traverse from entry-point.md.",
+      "Inspect source under Scope for aggregate roots, entities, VOs, repositories, domain services, events.",
+      "Check: consistency boundaries, anemic model, repository scope, domain vs integration events.",
+      "Map findings to ddd-guardrails.md tactical IDs (DDD-T01–T08).",
+      "Propose updates to model.md and events.md where evidence supports.",
+      "Write work report (type: domain-analysis).",
+      "Register WRK (Track: domain). Verify links."
+    ],
+    "placeholders": [
+      "context",
+      "context name",
+      "source paths for this context",
+      "yes | no"
+    ],
+    "prompt": "AGM — Domain Work (tactical review).\nWorkflow: domain-work-tactical-review\nRole: domain-work\n\nBounded context: <context name>\nScope: <source paths for this context>\nCompare to model doc: <yes | no>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Tactical review\n\nInstructions:\n1. Read domain/contexts/<context>/model.md and language.md if present; traverse from entry-point.md.\n2. Inspect source under Scope for aggregate roots, entities, VOs, repositories, domain services, events.\n3. Check: consistency boundaries, anemic model, repository scope, domain vs integration events.\n4. Map findings to ddd-guardrails.md tactical IDs (DDD-T01–T08).\n5. Propose updates to model.md and events.md where evidence supports.\n6. Write work report (type: domain-analysis).\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "maintenance-diff-range",

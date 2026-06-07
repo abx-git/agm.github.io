@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Architecture Graph Method (AGM)</title>
-  <link rel="stylesheet" href="app.css?v=34" />
+  <link rel="stylesheet" href="app.css?v=36" />
 </head>
 <body>
   <main class="app">
@@ -52,7 +52,8 @@
       <nav class="phase-nav" role="tablist" aria-label="Lifecycle">
         <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Foundation</button>
         <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Improve &amp; sync</button>
-        <button type="button" class="phase-tab" data-phase="work" role="tab">3 · Work</button>
+        <button type="button" class="phase-tab" data-phase="work" role="tab">3 · Architecture</button>
+        <button type="button" class="phase-tab" data-phase="domain" role="tab">4 · Domain (DDD)</button>
       </nav>
 
       <section id="phase-build" class="phase active" role="tabpanel">
@@ -238,7 +239,7 @@
       </section>
 
       <section id="phase-work" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Dialog — explore solution</strong> and <strong>Dialog — sustainable analysis</strong> use an interview (one question per reply). <strong>Sustainable analysis</strong> evaluates drift, modularity, layering, coupling, and technical debt — with form inputs or scope clarification in chat. Other modes deliver analysis, design, or answers directly as WRK documents.</p>
+        <p class="phase-intro"><strong>Architecture work</strong> — technical questions, analysis, design, and sustainable structure reviews on the compiled graph. Dialog modes use one question per reply (Cursor Chat).</p>
         <div class="modes" id="work-grid"></div>
         <div id="work-panel" class="mode-panel" hidden>
           <div id="work-dialog-hint" class="dialog-hint" hidden>
@@ -255,6 +256,26 @@
             <button type="button" class="btn primary mode-copy" data-panel="work">Copy prompt</button>
           </div>
           <p class="mode-note" id="work-note" hidden></p>
+        </div>
+      </section>
+
+      <section id="phase-domain" class="phase" role="tabpanel" hidden>
+        <p class="phase-intro"><strong>Domain work (DDD)</strong> — strategic design (context map, subdomains, integration patterns) and tactical design (aggregates, ubiquitous language, domain events). Updates <code>domain/</code> and <code>work/</code> with Track: domain. Event storm uses dialog mode (Cursor Chat).</p>
+        <div class="modes" id="domain-grid"></div>
+        <div id="domain-panel" class="mode-panel" hidden>
+          <div id="domain-dialog-hint" class="dialog-hint" hidden>
+            <strong>Event storm:</strong> paste into a <strong>new Cursor Chat</strong>. One question per reply until "end interview".
+          </div>
+          <p class="mode-label" id="domain-label"></p>
+          <div id="domain-inputs" class="workflow-inputs" hidden></div>
+          <details class="prompt-preview">
+            <summary>Preview prompt</summary>
+            <pre id="domain-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
+          </details>
+          <div class="cmd-row">
+            <button type="button" class="btn primary mode-copy" data-panel="domain">Copy prompt</button>
+          </div>
+          <p class="mode-note" id="domain-note" hidden></p>
         </div>
       </section>
     </form>
@@ -277,13 +298,13 @@
     </details>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v35</span>
+      <span class="deploy-id">Lifecycle · v36</span>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=35" type="module"></script>
+  <script src="app.js?v=36" type="module"></script>
 </body>
 </html>

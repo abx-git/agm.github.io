@@ -22,9 +22,10 @@ const EVOLVE_MODES = [
 const DIALOG_WORKFLOW_IDS = new Set([
   'architecture-work-interrogate',
   'architecture-work-sustainable-interrogate',
+  'domain-work-event-storm',
 ]);
 
-const WORK_MODES = [
+const ARCHITECTURE_WORK_MODES = [
   {
     id: 'architecture-work-interrogate',
     label: 'Dialog — explore solution',
@@ -45,8 +46,31 @@ const WORK_MODES = [
     dialog: true,
   },
   { id: 'architecture-work-design', label: 'Design proposal', note: 'Set goal and constraints.' },
-  { id: 'architecture-work-continue', label: 'Open work items', note: 'Continues WRK entries in blueprint.md.' },
+  { id: 'architecture-work-continue', label: 'Open work items', note: 'Continues WRK entries (Track: architecture) in blueprint.md.' },
 ];
+
+const DOMAIN_WORK_MODES = [
+  {
+    id: 'domain-work-event-storm',
+    label: 'Event storm (dialog)',
+    note: 'Domain discovery — one question per reply. Use Cursor Chat. Write after "end interview".',
+    dialog: true,
+  },
+  { id: 'domain-work-context-map', label: 'Context map', note: 'Bounded contexts and strategic relationships.' },
+  {
+    id: 'domain-work-subdomain-classification',
+    label: 'Subdomain classification',
+    note: 'Core / supporting / generic subdomains.',
+  },
+  { id: 'domain-work-integration-review', label: 'Integration review', note: 'ACL, OHS, conformist patterns vs interfaces/.' },
+  { id: 'domain-work-tactical-review', label: 'Tactical review', note: 'Aggregates, invariants, repositories, events.' },
+  { id: 'domain-work-language-audit', label: 'Language audit', note: 'Ubiquitous language vs code and APIs.' },
+  { id: 'domain-work-query', label: 'Domain question', note: 'Answer a DDD question from the graph.' },
+  { id: 'domain-work-design', label: 'Domain design', note: 'Aggregates, boundaries, ACL, context split.' },
+  { id: 'domain-work-continue', label: 'Open domain WRK', note: 'Continues WRK entries (Track: domain).' },
+];
+
+const WORK_MODES = ARCHITECTURE_WORK_MODES;
 
 const REVIEW_MODES = [
   {
@@ -100,6 +124,7 @@ const DOC_AREA_ORDER = [
   'operations',
   'decisions',
   'domain-glossary',
+  'domain-model',
   'ecosystem',
 ];
 
@@ -276,6 +301,24 @@ const DOC_EXTENSIONS = [
       'Maintenance/refinement: update glossary, on-demand concepts, and ubiquitous language when domain terms change in code or APIs.',
     ],
   },
+  {
+    id: 'domain-model',
+    label: 'Domain model (DDD)',
+    userLabel: 'DDD context map & models',
+    userHint: 'Bounded contexts, aggregates, domain events',
+    docPaths: 'domain/context-map.md, domain/contexts/, domain/events.md',
+    hint: 'Strategic and tactical domain documentation — use Domain Work workflows (phase 4)',
+    bootstrap: [
+      'domain/context-map.md: bounded contexts and relationships.',
+      'domain/subdomains.md, domain/events.md: classification and event catalog.',
+      'blueprint.md: phases 14–17 for domain/.',
+      'entry-point.md: link domain/ section.',
+    ],
+    evolve: [
+      'Refinement / Domain Work: update context models when boundaries or language change.',
+      'Maintenance: sync domain/events.md when integration events change in interfaces/.',
+    ],
+  },
 ];
 
 /** Per-workflow user fields (name → placeholder in workflow prompt). */
@@ -340,6 +383,94 @@ const WORKFLOW_INPUTS = {
     },
     { name: 'slug', label: 'Work file slug', placeholder: 'e.g. payment-module-sustainability', required: true },
   ],
+  'domain-work-event-storm': [
+    {
+      name: 'processOrContext',
+      label: 'Process / bounded context (optional)',
+      placeholder: 'e.g. checkout flow, order fulfillment',
+      required: false,
+    },
+    {
+      name: 'initialGoal',
+      label: 'Initial goal (optional)',
+      placeholder: 'e.g. discover events for refund process',
+      required: false,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. checkout-event-storm', required: true },
+  ],
+  'domain-work-context-map': [
+    {
+      name: 'scope',
+      label: 'Scope',
+      placeholder: 'modules, services, or repository paths',
+      required: true,
+    },
+    {
+      name: 'focus',
+      label: 'Focus (optional)',
+      placeholder: 'greenfield | legacy extraction | integration cleanup',
+      required: false,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. ecosystem-context-map', required: true },
+  ],
+  'domain-work-subdomain-classification': [
+    {
+      name: 'businessScope',
+      label: 'Business scope',
+      placeholder: 'product line, platform, or enterprise area',
+      required: true,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. platform-subdomains', required: true },
+  ],
+  'domain-work-integration-review': [
+    {
+      name: 'scope',
+      label: 'Scope',
+      placeholder: 'cross-service integrations or context pair',
+      required: true,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. payment-integration-ddd', required: true },
+  ],
+  'domain-work-tactical-review': [
+    {
+      name: 'boundedContext',
+      label: 'Bounded context',
+      placeholder: 'e.g. order, billing',
+      required: true,
+    },
+    { name: 'scope', label: 'Source paths', placeholder: 'e.g. src/order/', required: true },
+    {
+      name: 'compareModel',
+      label: 'Compare to model doc',
+      type: 'checkbox',
+      defaultChecked: true,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. order-tactical-review', required: true },
+  ],
+  'domain-work-language-audit': [
+    { name: 'scope', label: 'Scope', placeholder: 'bounded context or module paths', required: true },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. order-language-audit', required: true },
+  ],
+  'domain-work-query': [
+    { name: 'question', label: 'Domain question', placeholder: 'e.g. Where is Order aggregate boundary?', required: true },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. order-aggregate-boundary', required: true },
+  ],
+  'domain-work-design': [
+    {
+      name: 'goal',
+      label: 'Goal',
+      placeholder: 'e.g. split Order aggregate, add ACL to payment',
+      required: true,
+    },
+    {
+      name: 'boundedContext',
+      label: 'Bounded context',
+      placeholder: 'context name or cross-cutting',
+      required: true,
+    },
+    { name: 'constraints', label: 'Constraints (optional)', placeholder: '…', required: false },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. order-aggregate-split', required: true },
+  ],
   refinement: [
     {
       name: 'goal',
@@ -378,8 +509,8 @@ const WORKFLOW_INPUTS = {
   ],
 };
 
-const panelState = { evolve: null, work: null, review: null };
-const inputState = { evolve: {}, work: {}, review: {} };
+const panelState = { evolve: null, work: null, domain: null, review: null };
+const inputState = { evolve: {}, work: {}, domain: {}, review: {} };
 
 async function loadWorkflows() {
   const url = new URL('workflows.json', ASSET_BASE);
@@ -919,6 +1050,41 @@ function applyWorkflowInputs(prompt, workflowId, values, inputsContainer) {
     );
     out = out.replace(/<initial-goal>/g, values.initialGoal);
   }
+  if (workflowId === 'domain-work-event-storm') {
+    const proc = values.processOrContext?.trim() || '<to be clarified in dialog>';
+    out = out.replace(/Process \/ bounded context \(optional\): <process-or-context>/, `Process / bounded context (optional): ${proc}`);
+    out = out.replace(/<process-or-context>/g, proc);
+    if (values.initialGoal) {
+      out = out.replace(/Initial goal \(optional\): <initial-goal>/, `Initial goal (optional): ${values.initialGoal}`);
+      out = out.replace(/<initial-goal>/g, values.initialGoal);
+    }
+  }
+  if (workflowId === 'domain-work-context-map') {
+    out = out.replace(/Scope: <systems, modules, services, or repository paths>/, `Scope: ${values.scope || ''}`);
+    out = out.replace(/Focus: <optional: greenfield \| legacy extraction \| integration cleanup>/, `Focus: ${values.focus || 'unspecified'}`);
+  }
+  if (workflowId === 'domain-work-subdomain-classification') {
+    out = out.replace(/Business scope: <product line, platform, or enterprise area>/, `Business scope: ${values.businessScope || ''}`);
+  }
+  if (workflowId === 'domain-work-integration-review') {
+    out = out.replace(/Scope: <cross-service integrations, API surface, or named context pair>/, `Scope: ${values.scope || ''}`);
+  }
+  if (workflowId === 'domain-work-tactical-review') {
+    out = out.replace(/Bounded context: <context name>/, `Bounded context: ${values.boundedContext || ''}`);
+    out = out.replace(/Scope: <source paths for this context>/, `Scope: ${values.scope || ''}`);
+    out = out.replace(/Compare to model doc: <yes \| no>/, `Compare to model doc: ${values.compareModel ? 'yes' : 'no'}`);
+  }
+  if (workflowId === 'domain-work-language-audit') {
+    out = out.replace(/Scope: <bounded context, service, or module paths>/, `Scope: ${values.scope || ''}`);
+  }
+  if (workflowId === 'domain-work-query' && values.question) {
+    out = out.replace(/Question: <your domain question here>/, `Question: ${values.question}`);
+  }
+  if (workflowId === 'domain-work-design') {
+    out = out.replace(/Goal: <e.g. split Order aggregate, introduce ACL to payment context, model refund policy>/, `Goal: ${values.goal || ''}`);
+    out = out.replace(/Bounded context: <context name or cross-cutting>/, `Bounded context: ${values.boundedContext || ''}`);
+    out = out.replace(/Constraints: <optional>/, `Constraints: ${values.constraints || 'none'}`);
+  }
   return out;
 }
 
@@ -1219,6 +1385,7 @@ function initTabs() {
     build: document.getElementById('phase-build'),
     evolve: document.getElementById('phase-evolve'),
     work: document.getElementById('phase-work'),
+    domain: document.getElementById('phase-domain'),
   };
 
   tabs.forEach((tab) => {
@@ -1424,7 +1591,7 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
 
 function refreshOpenWorkflowPanels() {
   const params = loadParams() || { docRoot: 'docs/architecture/', template: 'arc42' };
-  for (const key of ['evolve', 'work', 'review']) {
+  for (const key of ['evolve', 'work', 'domain', 'review']) {
     const w = panelState[key];
     if (!w) continue;
     const label = document.getElementById(`${key}-label`);
@@ -1479,7 +1646,8 @@ async function main() {
   initSetupForm(adoptBase);
   initBuildPhase(workflows);
   initModeGrid(workflows, 'evolve', EVOLVE_MODES, 'evolve-grid', 'evolve-panel', 'evolve-label', 'evolve-note');
-  initModeGrid(workflows, 'work', WORK_MODES, 'work-grid', 'work-panel', 'work-label', 'work-note');
+  initModeGrid(workflows, 'work', ARCHITECTURE_WORK_MODES, 'work-grid', 'work-panel', 'work-label', 'work-note');
+  initModeGrid(workflows, 'domain', DOMAIN_WORK_MODES, 'domain-grid', 'domain-panel', 'domain-label', 'domain-note');
   initModeGrid(workflows, 'review', REVIEW_MODES, 'review-grid', 'review-panel', 'review-label', 'review-note');
   initCopyButtons();
 }
