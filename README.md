@@ -1,4 +1,4 @@
-# Blueprint Pattern Assistant
+# AGM Assistant
 
 Three-phase lifecycle UI: **Build** · **Evolve** · **Work**, plus cross-cutting **Review**.
 

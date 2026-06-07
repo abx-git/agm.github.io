@@ -714,7 +714,7 @@ function buildInstallScript(params) {
 
   const lines = [
     '#!/usr/bin/env bash',
-    '# Blueprint Pattern - generated install script',
+    '# AGM - generated install script',
     '# Run from your application repository root. No git clone required.',
     '# Save as bp-install-run.sh then: chmod +x bp-install-run.sh && ./bp-install-run.sh',
     'set -euo pipefail',
@@ -747,7 +747,7 @@ function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocu
   const q = (s) => `"${String(s).replace(/"/g, '""')}"`;
   const focus = (docFocus || []).join(',');
   return [
-    '# Blueprint Pattern — generated install script (Windows)',
+    '# AGM — generated install script (Windows)',
     '# Run in PowerShell from your application repository root.',
     '# Requires: curl.exe (Windows 10+) or run under Git Bash with the bash script instead.',
     '$ErrorActionPreference = "Stop"',
