@@ -36,7 +36,7 @@ const WORK_MODES = [
   {
     id: 'architecture-work-sustainable-analysis',
     label: 'Sustainable analysis',
-    note: 'Lilienthal-style: drift, modularity, layering, coupling, technical debt. Set scope and focus — or leave scope empty to clarify in chat.',
+    note: 'Drift, modularity, layering, coupling, technical debt. Set scope and focus — or leave scope empty to clarify in chat.',
   },
   {
     id: 'architecture-work-sustainable-interrogate',
@@ -65,7 +65,7 @@ const REVIEW_MODES = [
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
 /** IDs the human may select in Plan / Evolve (architecture content only). */
-/** Lilienthal sustainable-analysis dimensions (Work phase). */
+/** Sustainable-analysis focus dimensions (Work phase). */
 const SUSTAINABLE_FOCUS_ORDER = [
   'architecture-drift',
   'modularity',
@@ -805,7 +805,7 @@ function appendSustainableFocusFieldset(container) {
   const fieldset = document.createElement('fieldset');
   fieldset.className = 'doc-focus-unified sustainable-focus-fieldset';
   const legend = document.createElement('legend');
-  legend.textContent = 'Focus dimensions (Lilienthal)';
+  legend.textContent = 'Focus dimensions';
   fieldset.appendChild(legend);
 
   const hint = document.createElement('p');
