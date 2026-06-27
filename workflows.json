@@ -1,8 +1,11 @@
 [
   {
     "id": "architecture-work-analysis",
+    "track": "Architect",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "architecture-work",
-    "group": "Architecture work",
+    "group": "Architect",
     "when": "Structured analysis (risks, coupling, quality)",
     "prerequisite": "Bootstrap phase 0 `[x] done`",
     "freshChat": false,
@@ -24,12 +27,15 @@
       "modules, services, or <template",
       "slug"
     ],
-    "prompt": "AGM — Architecture Work (analysis).\nWorkflow: architecture-work-analysis\nRole: architecture-work\n\nTopic: <e.g. payment integration resilience>\nScope: <modules, services, or <template> sections>\nFocus: <e.g. coupling, failure modes, security, performance>\n\nInstructions:\n1. Read blueprint.md and traverse the graph from entry-point.md.\n2. Produce a structured analysis in docs/architecture/work/YYYY-MM-DD-<slug>.md\n   (type: analysis): Context, Findings, Recommendations, Traceability.\n3. Link to existing guardrail findings in blueprint.md if relevant.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Architect · Evaluate\nWorkflow: architecture-work-analysis\nRole: architecture-work\n\nTopic: <e.g. payment integration resilience>\nScope: <modules, services, or <template> sections>\nFocus: <e.g. coupling, failure modes, security, performance>\n\nInstructions:\n1. Read blueprint.md and traverse the graph from entry-point.md.\n2. Produce a structured analysis in docs/architecture/work/YYYY-MM-DD-<slug>.md\n   (type: analysis): Context, Findings, Recommendations, Traceability.\n3. Link to existing guardrail findings in blueprint.md if relevant.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-continue",
+    "track": "Architect",
+    "activity": "Continue",
+    "mode": "Direct",
     "role": "architecture-work",
-    "group": "Architecture work",
+    "group": "Architect",
     "when": "Resume open WRK items in blueprint.md",
     "prerequisite": "",
     "freshChat": false,
@@ -45,12 +51,15 @@
       "Update the work file and blueprint before stopping."
     ],
     "placeholders": [],
-    "prompt": "AGM — continue Architecture Work.\nWorkflow: architecture-work-continue\nRole: architecture-work\n\nRead docs/architecture/blueprint.md ## Work register (or ## Architecture work).\nPick the next item with Track: architecture (or untagged legacy row) and status draft, or start a new query/analysis/design if requested.\nUpdate the work file and blueprint before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Architect · Continue\nWorkflow: architecture-work-continue\nRole: architecture-work\n\nRead docs/architecture/blueprint.md ## Work register (or ## Architecture work).\nPick the next item with Track: architecture (or untagged legacy row) and status draft, or start a new query/analysis/design if requested.\nUpdate the work file and blueprint before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-design",
+    "track": "Architect",
+    "activity": "Design",
+    "mode": "Direct",
     "role": "architecture-work",
-    "group": "Architecture work",
+    "group": "Architect",
     "when": "Architecture design proposal",
     "prerequisite": "Bootstrap phase 0 `[x] done`",
     "freshChat": false,
@@ -73,12 +82,15 @@
       "slug",
       "template"
     ],
-    "prompt": "AGM — Architecture Work (design).\nWorkflow: architecture-work-design\nRole: architecture-work\n\nGoal: <e.g. add circuit breaker between order-service and payment-service>\nConstraints: <optional: latency, no new infra, etc.>\n\nInstructions:\n1. Read blueprint.md and relevant work/ items and <template> sections.\n2. Write design to docs/architecture/work/YYYY-MM-DD-<slug>.md (type: design):\n   Context, Design (with Mermaid), Alternatives, Impact, Traceability.\n3. If the design implies a decision, draft ADR in <template>/decisions/ and cross-link.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Architect · Design\nWorkflow: architecture-work-design\nRole: architecture-work\n\nGoal: <e.g. add circuit breaker between order-service and payment-service>\nConstraints: <optional: latency, no new infra, etc.>\n\nInstructions:\n1. Read blueprint.md and relevant work/ items and <template> sections.\n2. Write design to docs/architecture/work/YYYY-MM-DD-<slug>.md (type: design):\n   Context, Design (with Mermaid), Alternatives, Impact, Traceability.\n3. If the design implies a decision, draft ADR in <template>/decisions/ and cross-link.\n4. Register in blueprint.md (WRK-NNN). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-interrogate",
+    "track": "Architect",
+    "activity": "Clarify",
+    "mode": "Dialog",
     "role": "architecture-work",
-    "group": "Architecture work",
+    "group": "Architect",
     "when": "Dialog to explore a solution (one question per reply)",
     "prerequisite": "Bootstrap phase 0 `[x] done`; `entry-point.md` exists",
     "freshChat": false,
@@ -126,12 +138,15 @@
       "slug",
       "your question here"
     ],
-    "prompt": "AGM — Architecture Work (interrogate / dialog mode).\nWorkflow: architecture-work-interrogate\nRole: architecture-work\n\nGoal / question: <your question here>\n\n═══════════════════════════════════════════════════════\nPHASE 1 — INTERVIEW (active until explicit end)\n═══════════════════════════════════════════════════════\n\nThis workflow is a **dialog to explore the solution step by step**.\nIt OVERRIDES role-architecture-work.md (steps 3–5 and OUTPUT_CONTRACT) until Phase 2 begins.\n\nFORBIDDEN in Phase 1 — in every reply until the human writes \"end interview\" or all plan items are clarified:\n- Do not create, modify, or propose creating files\n- No Mermaid diagrams, architecture sketches, or design proposals\n- No recommendation lists, trade-offs, or solution drafts\n- No [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- In the FIRST reply: short interview plan (3–5 bullets) + exactly question 1\n- In follow-up replies: optionally max. 2 sentences of context/progress + exactly ONE question\n- Adjust the plan when the human revises earlier answers\n\nReply format Phase 1 (strict):\n---\n**Progress:** Point X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\n═══════════════════════════════════════════════════════\nPHASE 2 — WRITE (only after explicit signal)\n═══════════════════════════════════════════════════════\n\nStart Phase 2 only when:\n- the human writes \"end interview\", \"done\", or \"write it up\", OR\n- all plan items are clarified and the human agrees.\n\nThen apply role-architecture-work.md, write file under <doc-root>work/YYYY-MM-DD-<slug>.md (type: design), WRK entry in <doc-root>blueprint.md, output [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]].\n\nPhase 1 procedure:\n1. Read <doc-root>blueprint.md and traverse from <doc-root>entry-point.md (silently in the background — do not dump as a wall of text).\n2. First reply: brief understanding (1 sentence) + interview plan (3–5 bullets) + question 1.\n3. Each further reply: progress + optional brief + exactly one question. Always wait for the human.\n4. On revision: adjust plan, re-clarify affected points.\n\nIn your FIRST reply, confirm dialog mode, show the plan, and ask question 1. Do not invent a solution upfront."
+    "prompt": "AGM — Architect · Clarify (dialog)\nWorkflow: architecture-work-interrogate\nRole: architecture-work\n\nGoal / question: <your question here>\n\n═══════════════════════════════════════════════════════\nPHASE 1 — INTERVIEW (active until explicit end)\n═══════════════════════════════════════════════════════\n\nThis workflow is a **dialog to explore the solution step by step**.\nIt OVERRIDES role-architecture-work.md (steps 3–5 and OUTPUT_CONTRACT) until Phase 2 begins.\n\nFORBIDDEN in Phase 1 — in every reply until the human writes \"end interview\" or all plan items are clarified:\n- Do not create, modify, or propose creating files\n- No Mermaid diagrams, architecture sketches, or design proposals\n- No recommendation lists, trade-offs, or solution drafts\n- No [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- In the FIRST reply: short interview plan (3–5 bullets) + exactly question 1\n- In follow-up replies: optionally max. 2 sentences of context/progress + exactly ONE question\n- Adjust the plan when the human revises earlier answers\n\nReply format Phase 1 (strict):\n---\n**Progress:** Point X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\n═══════════════════════════════════════════════════════\nPHASE 2 — WRITE (only after explicit signal)\n═══════════════════════════════════════════════════════\n\nStart Phase 2 only when:\n- the human writes \"end interview\", \"done\", or \"write it up\", OR\n- all plan items are clarified and the human agrees.\n\nThen apply role-architecture-work.md, write file under <doc-root>work/YYYY-MM-DD-<slug>.md (type: design), WRK entry in <doc-root>blueprint.md, output [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]].\n\nPhase 1 procedure:\n1. Read <doc-root>blueprint.md and traverse from <doc-root>entry-point.md (silently in the background — do not dump as a wall of text).\n2. First reply: brief understanding (1 sentence) + interview plan (3–5 bullets) + question 1.\n3. Each further reply: progress + optional brief + exactly one question. Always wait for the human.\n4. On revision: adjust plan, re-clarify affected points.\n\nIn your FIRST reply, confirm dialog mode, show the plan, and ask question 1. Do not invent a solution upfront."
   },
   {
     "id": "architecture-work-query",
+    "track": "Architect",
+    "activity": "Clarify",
+    "mode": "Direct",
     "role": "architecture-work",
-    "group": "Architecture work",
+    "group": "Architect",
     "when": "Answer a specific architecture question using the graph",
     "prerequisite": "Bootstrap phase 0 `[x] done`; `entry-point.md` exists",
     "freshChat": false,
@@ -146,7 +161,7 @@
       "Traverse the Markdown link graph only; follow imports/exports, <template>/, and ops links.",
       "Do not scan raw source unless a link leads there.",
       "Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).",
-      "Register the item in blueprint.md under ## Architecture work (next WRK-NNN).",
+      "Register the item in blueprint.md ## Work register (next WRK-NNN, Track: architecture).",
       "Verify all links resolve."
     ],
     "placeholders": [
@@ -154,12 +169,15 @@
       "template",
       "your question here"
     ],
-    "prompt": "AGM — Architecture Work (query).\nWorkflow: architecture-work-query\nRole: architecture-work\n\nQuestion: <your question here>\n\nInstructions:\n1. Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.\n2. Traverse the Markdown link graph only; follow imports/exports, <template>/, and ops links.\n3. Do not scan raw source unless a link leads there.\n4. Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).\n5. Register the item in blueprint.md under ## Architecture work (next WRK-NNN).\n6. Verify all links resolve.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Architect · Clarify\nWorkflow: architecture-work-query\nRole: architecture-work\n\nQuestion: <your question here>\n\nInstructions:\n1. Read docs/architecture/blueprint.md, entry-point.md, and prompts/role-architecture-work.md.\n2. Traverse the Markdown link graph only; follow imports/exports, <template>/, and ops links.\n3. Do not scan raw source unless a link leads there.\n4. Write the answer to docs/architecture/work/YYYY-MM-DD-<slug>.md using work/_template.md (type: question).\n5. Register the item in blueprint.md ## Work register (next WRK-NNN, Track: architecture).\n6. Verify all links resolve.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-sustainable-analysis",
+    "track": "Architect",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "architecture-work",
-    "group": "Architecture work",
+    "group": "Architect",
     "when": "Sustainable software analysis — structure, drift, technical debt",
     "prerequisite": "Bootstrap phase 0 `[x] done`; `entry-point.md` and source map in `always-on.md`",
     "freshChat": false,
@@ -190,12 +208,15 @@
       "template",
       "unspecified"
     ],
-    "prompt": "AGM — Architecture Work (sustainable analysis).\nWorkflow: architecture-work-sustainable-analysis\nRole: architecture-work\n\nMethod: sustainable software architecture\n(architecture drift, modularity, layering, coupling, technical debt, domain alignment, maintainability)\n\nScope: <modules, services, packages, or repository paths>\nFocus dimensions: <focus-dimensions>\nSource paths (optional): <source-paths>\nCompare to documented architecture: <compare-documentation>\n\n═══════════════════════════════════════════════════════\nPHASE 1 — CLARIFICATION (only if parameters are incomplete)\n═══════════════════════════════════════════════════════\n\nStart Phase 1 when Scope is `<clarify-with-user>`, or you cannot determine analysis\nboundaries from the graph and inputs alone.\n\nPhase 1 OVERRIDES role-architecture-work.md (steps 3–5 and OUTPUT_CONTRACT) until Phase 2 begins.\n\nFORBIDDEN in Phase 1:\n- Do not create or modify files\n- No full analysis, recommendations, or [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- First reply: short clarification plan (3–5 bullets) + exactly question 1\n- Follow-ups: max. 2 sentences context + exactly ONE question\n- Adjust plan when the human revises earlier answers\n\nReply format Phase 1:\n---\n**Progress:** Point X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\nSkip Phase 1 when Scope and Focus dimensions are concrete — proceed directly to Phase 2.\n\n═══════════════════════════════════════════════════════\nPHASE 2 — ANALYSIS (write)\n═══════════════════════════════════════════════════════\n\nStart Phase 2 when parameters are clear, or when the human writes \"end interview\", \"done\", or \"write it up\".\n\nInstructions:\n1. Read <doc-root>blueprint.md, traverse from <doc-root>entry-point.md, and read <doc-root>context/always-on.md (source map).\n2. Inspect source under Scope and Source paths — follow links from the graph first; extend to code only where evidence is needed.\n3. If Compare to documented architecture is yes: contrast intended structure (<template> sections, building blocks, interfaces) with observed code structure; record drift explicitly.\n4. Produce docs/architecture/work/YYYY-MM-DD-<slug>.md (type: analysis) using this structure:\n   - Context & scope\n   - Intended vs actual architecture (drift) — skip subsection if compare=no and no docs exist\n   - Structural quality (modularity, boundaries, package/module layout)\n   - Layering & dependencies (violations, cycles, wrong-direction deps)\n   - Coupling & cohesion (hotspots, god modules, inappropriate cross-cutting)\n   - Technical debt (categorized findings with severity: critical / major / minor)\n   - Domain & naming (ubiquitous language, bounded contexts if applicable)\n   - Maintainability & changeability (extension points, test seams, change cost)\n   - Recommendations (prioritized, sized: quick win / medium / strategic)\n   - Traceability (every major claim → doc link or source path)\n5. Limit analysis to Focus dimensions when not `<unspecified>`; mention omitted dimensions briefly in Context.\n6. Link to existing guardrail findings in blueprint.md; add new guardrail candidates in Recommendations.\n7. Register in <doc-root>blueprint.md (WRK-NNN). Verify relative links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Architect · Evaluate (sustainable)\nWorkflow: architecture-work-sustainable-analysis\nRole: architecture-work\n\nMethod: sustainable software architecture\n(architecture drift, modularity, layering, coupling, technical debt, domain alignment, maintainability)\n\nScope: <modules, services, packages, or repository paths>\nFocus dimensions: <focus-dimensions>\nSource paths (optional): <source-paths>\nCompare to documented architecture: <compare-documentation>\n\n═══════════════════════════════════════════════════════\nPHASE 1 — CLARIFICATION (only if parameters are incomplete)\n═══════════════════════════════════════════════════════\n\nStart Phase 1 when Scope is `<clarify-with-user>`, or you cannot determine analysis\nboundaries from the graph and inputs alone.\n\nPhase 1 OVERRIDES role-architecture-work.md (steps 3–5 and OUTPUT_CONTRACT) until Phase 2 begins.\n\nFORBIDDEN in Phase 1:\n- Do not create or modify files\n- No full analysis, recommendations, or [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- First reply: short clarification plan (3–5 bullets) + exactly question 1\n- Follow-ups: max. 2 sentences context + exactly ONE question\n- Adjust plan when the human revises earlier answers\n\nReply format Phase 1:\n---\n**Progress:** Point X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\nSkip Phase 1 when Scope and Focus dimensions are concrete — proceed directly to Phase 2.\n\n═══════════════════════════════════════════════════════\nPHASE 2 — ANALYSIS (write)\n═══════════════════════════════════════════════════════\n\nStart Phase 2 when parameters are clear, or when the human writes \"end interview\", \"done\", or \"write it up\".\n\nInstructions:\n1. Read <doc-root>blueprint.md, traverse from <doc-root>entry-point.md, and read <doc-root>context/always-on.md (source map).\n2. Inspect source under Scope and Source paths — follow links from the graph first; extend to code only where evidence is needed.\n3. If Compare to documented architecture is yes: contrast intended structure (<template> sections, building blocks, interfaces) with observed code structure; record drift explicitly.\n4. Produce docs/architecture/work/YYYY-MM-DD-<slug>.md (type: analysis) using this structure:\n   - Context & scope\n   - Intended vs actual architecture (drift) — skip subsection if compare=no and no docs exist\n   - Structural quality (modularity, boundaries, package/module layout)\n   - Layering & dependencies (violations, cycles, wrong-direction deps)\n   - Coupling & cohesion (hotspots, god modules, inappropriate cross-cutting)\n   - Technical debt (categorized findings with severity: critical / major / minor)\n   - Domain & naming (ubiquitous language, bounded contexts if applicable)\n   - Maintainability & changeability (extension points, test seams, change cost)\n   - Recommendations (prioritized, sized: quick win / medium / strategic)\n   - Traceability (every major claim → doc link or source path)\n5. Limit analysis to Focus dimensions when not `<unspecified>`; mention omitted dimensions briefly in Context.\n6. Link to existing guardrail findings in blueprint.md; add new guardrail candidates in Recommendations.\n7. Register in <doc-root>blueprint.md (WRK-NNN). Verify relative links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "architecture-work-sustainable-interrogate",
+    "track": "Architect",
+    "activity": "Evaluate",
+    "mode": "Dialog",
     "role": "architecture-work",
-    "group": "Architecture work",
+    "group": "Architect",
     "when": "Dialog — define scope and focus, then sustainable software analysis",
     "prerequisite": "Bootstrap phase 0 `[x] done`; `entry-point.md` exists",
     "freshChat": false,
@@ -250,12 +271,15 @@
       "initial-goal",
       "slug"
     ],
-    "prompt": "AGM — Architecture Work (sustainable analysis / dialog mode).\nWorkflow: architecture-work-sustainable-interrogate\nRole: architecture-work\n\nMethod: sustainable software architecture\n\nInitial goal (optional): <initial-goal>\n\n═══════════════════════════════════════════════════════\nPHASE 1 — INTERVIEW (active until explicit end)\n═══════════════════════════════════════════════════════\n\nThis workflow is a **dialog to scope and focus a sustainable architecture analysis** before writing.\nIt OVERRIDES role-architecture-work.md (steps 3–5 and OUTPUT_CONTRACT) until Phase 2 begins.\n\nClarify at minimum:\n- Analysis scope (modules, services, packages, or paths)\n- Focus dimensions (architecture drift, modularity, layering, coupling, technical debt, domain model, maintainability)\n- Whether to compare documented vs actual architecture\n- Optional source paths beyond always-on.md source map\n- Work file slug for the final report\n\nFORBIDDEN in Phase 1 — until the human writes \"end interview\" or all plan items are clarified:\n- Do not create, modify, or propose creating files\n- No analysis findings, recommendations, or Mermaid diagrams\n- No [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- First reply: short interview plan (3–5 bullets) + exactly question 1\n- Follow-ups: max. 2 sentences context + exactly ONE question\n- Adjust plan when the human revises earlier answers\n\nReply format Phase 1 (strict):\n---\n**Progress:** Point X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\n═══════════════════════════════════════════════════════\nPHASE 2 — ANALYSIS (write)\n═══════════════════════════════════════════════════════\n\nStart Phase 2 when:\n- the human writes \"end interview\", \"done\", or \"write it up\", OR\n- scope, focus, compare flag, and slug are all agreed.\n\nThen apply role-architecture-work.md and write <doc-root>work/YYYY-MM-DD-<slug>.md (type: analysis).\n\nPhase 2 procedure:\n1. Read <doc-root>blueprint.md, traverse from <doc-root>entry-point.md, read <doc-root>context/always-on.md.\n2. Inspect source under agreed scope; follow graph links first.\n3. Write analysis with sections: Context & scope | Intended vs actual (drift) | Structural quality |\n   Layering & dependencies | Coupling & cohesion | Technical debt | Domain & naming |\n   Maintainability & changeability | Recommendations | Traceability.\n4. Register WRK-NNN in <doc-root>blueprint.md. Link guardrail findings where relevant.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop.\n\nIn your FIRST reply, confirm dialog mode, show the plan, and ask question 1. Do not start the analysis upfront."
+    "prompt": "AGM — Architect · Evaluate (dialog)\nWorkflow: architecture-work-sustainable-interrogate\nRole: architecture-work\n\nMethod: sustainable software architecture\n\nInitial goal (optional): <initial-goal>\n\n═══════════════════════════════════════════════════════\nPHASE 1 — INTERVIEW (active until explicit end)\n═══════════════════════════════════════════════════════\n\nThis workflow is a **dialog to scope and focus a sustainable architecture analysis** before writing.\nIt OVERRIDES role-architecture-work.md (steps 3–5 and OUTPUT_CONTRACT) until Phase 2 begins.\n\nClarify at minimum:\n- Analysis scope (modules, services, packages, or paths)\n- Focus dimensions (architecture drift, modularity, layering, coupling, technical debt, domain model, maintainability)\n- Whether to compare documented vs actual architecture\n- Optional source paths beyond always-on.md source map\n- Work file slug for the final report\n\nFORBIDDEN in Phase 1 — until the human writes \"end interview\" or all plan items are clarified:\n- Do not create, modify, or propose creating files\n- No analysis findings, recommendations, or Mermaid diagrams\n- No [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- First reply: short interview plan (3–5 bullets) + exactly question 1\n- Follow-ups: max. 2 sentences context + exactly ONE question\n- Adjust plan when the human revises earlier answers\n\nReply format Phase 1 (strict):\n---\n**Progress:** Point X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\n═══════════════════════════════════════════════════════\nPHASE 2 — ANALYSIS (write)\n═══════════════════════════════════════════════════════\n\nStart Phase 2 when:\n- the human writes \"end interview\", \"done\", or \"write it up\", OR\n- scope, focus, compare flag, and slug are all agreed.\n\nThen apply role-architecture-work.md and write <doc-root>work/YYYY-MM-DD-<slug>.md (type: analysis).\n\nPhase 2 procedure:\n1. Read <doc-root>blueprint.md, traverse from <doc-root>entry-point.md, read <doc-root>context/always-on.md.\n2. Inspect source under agreed scope; follow graph links first.\n3. Write analysis with sections: Context & scope | Intended vs actual (drift) | Structural quality |\n   Layering & dependencies | Coupling & cohesion | Technical debt | Domain & naming |\n   Maintainability & changeability | Recommendations | Traceability.\n4. Register WRK-NNN in <doc-root>blueprint.md. Link guardrail findings where relevant.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop.\n\nIn your FIRST reply, confirm dialog mode, show the plan, and ask question 1. Do not start the analysis upfront."
   },
   {
     "id": "bootstrap-adopt",
+    "track": "Build",
+    "activity": "Communicate",
+    "mode": "Direct",
     "role": "bootstrap",
-    "group": "Bootstrap",
+    "group": "Build",
     "when": "First-time adoption; no `docs/architecture/blueprint.md` yet",
     "prerequisite": "",
     "freshChat": true,
@@ -278,12 +302,15 @@
     "placeholders": [
       "doc-root"
     ],
-    "prompt": "AGM — Adopt (standalone session).\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Architecture Graph Method (AGM) into this application repository. The human has already run `bp-install.sh` (Assistant UI → Build → Install). Execute Phase B–C in prompts/reference/adopt-procedure.md only.\n\nPrerequisites: application repository open in the IDE; install script completed; human available for a short interview.\n\nInstructions:\n1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Verify Phase A in prompts/reference/adopt-procedure.md: role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script (no git clone).\n3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.\n4. If **Architecture documentation areas (bootstrap)** is present, add blueprint phases and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).\n5. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Build · Adopt\nWorkflow: bootstrap-adopt\nRole: bootstrap\n\nAdopt the Architecture Graph Method (AGM) into this application repository. The human has already run `bp-install.sh` (Assistant UI → Build → Install). Execute Phase B–C in prompts/reference/adopt-procedure.md only.\n\nPrerequisites: application repository open in the IDE; install script completed; human available for a short interview.\n\nInstructions:\n1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.\n2. Verify Phase A in prompts/reference/adopt-procedure.md: role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script (no git clone).\n3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.\n4. If **Architecture documentation areas (bootstrap)** is present, add blueprint phases and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).\n5. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.\n6. Verify relative links. Append a session log entry to blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",
+    "track": "Build",
+    "activity": "Communicate",
+    "mode": "Direct",
     "role": "bootstrap",
-    "group": "Bootstrap",
+    "group": "Build",
     "when": "Resume blueprint phases after Bootstrap phase 0 is `[x] done`",
     "prerequisite": "",
     "freshChat": false,
@@ -299,12 +326,15 @@
       "Resume the next [~] or [ ] phase."
     ],
     "placeholders": [],
-    "prompt": "AGM — Bootstrap (continue).\nWorkflow: bootstrap-continue\nRole: bootstrap\n\nFollow the AGM core prompt and docs/architecture/prompts/role-bootstrap.md.\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md.\nResume the next [~] or [ ] phase.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Build · Continue\nWorkflow: bootstrap-continue\nRole: bootstrap\n\nFollow the AGM core prompt and docs/architecture/prompts/role-bootstrap.md.\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md.\nResume the next [~] or [ ] phase.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-init",
+    "track": "Build",
+    "activity": "Communicate",
+    "mode": "Direct",
     "role": "bootstrap",
-    "group": "Bootstrap",
+    "group": "Build",
     "when": "First-time setup; no `docs/architecture/blueprint.md` yet",
     "prerequisite": "",
     "freshChat": false,
@@ -322,12 +352,15 @@
       "Read prompts/core/system-prompt.md rules. Create docs/architecture/ structure from the chosen template."
     ],
     "placeholders": [],
-    "prompt": "AGM — Bootstrap (initialize).\nWorkflow: bootstrap-init\nRole: bootstrap\n\nBootstrap AGM documentation for this application.\n\nFollow docs/architecture/prompts/role-bootstrap.md (copy from docs/templates/architecture/prompts/ if missing).\nRead prompts/core/system-prompt.md rules. Create docs/architecture/ structure from the chosen template.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Build · Init\nWorkflow: bootstrap-init\nRole: bootstrap\n\nBootstrap AGM documentation for this application.\n\nFollow docs/architecture/prompts/role-bootstrap.md (copy from docs/templates/architecture/prompts/ if missing).\nRead prompts/core/system-prompt.md rules. Create docs/architecture/ structure from the chosen template.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-context-map",
+    "track": "Domain",
+    "activity": "Design",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Identify bounded contexts and strategic relationships",
     "prerequisite": "Bootstrap phase 0 `[x] done`; `domain/context-map.md` exists",
     "freshChat": false,
@@ -354,12 +387,15 @@
       "slug",
       "systems, modules, services, or repository paths"
     ],
-    "prompt": "AGM — Domain Work (context map).\nWorkflow: domain-work-context-map\nRole: domain-work\n\nScope: <systems, modules, services, or repository paths>\nFocus: <optional: greenfield | legacy extraction | integration cleanup>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Context map\n\nInstructions:\n1. Read blueprint.md, domain/, interfaces/, entry-point.md; traverse graph before scanning source.\n2. Identify bounded contexts (business capability + ubiquitous language boundary).\n3. Update <doc-root>domain/context-map.md (contexts table + Mermaid map + integration patterns).\n4. Map each context to implementation paths and interfaces/ contracts.\n5. Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-analysis) with findings and recommendations.\n6. Record matching ddd-guardrails.md IDs in recommendations; propose blueprint guardrail rows.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Design\nWorkflow: domain-work-context-map\nRole: domain-work\n\nScope: <systems, modules, services, or repository paths>\nFocus: <optional: greenfield | legacy extraction | integration cleanup>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Context map\n\nInstructions:\n1. Read blueprint.md, domain/, interfaces/, entry-point.md; traverse graph before scanning source.\n2. Identify bounded contexts (business capability + ubiquitous language boundary).\n3. Update <doc-root>domain/context-map.md (contexts table + Mermaid map + integration patterns).\n4. Map each context to implementation paths and interfaces/ contracts.\n5. Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-analysis) with findings and recommendations.\n6. Record matching ddd-guardrails.md IDs in recommendations; propose blueprint guardrail rows.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-continue",
+    "track": "Domain",
+    "activity": "Continue",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Resume open domain WRK items",
     "prerequisite": "",
     "freshChat": false,
@@ -378,12 +414,15 @@
     "placeholders": [
       "doc-root"
     ],
-    "prompt": "AGM — continue Domain Work.\nWorkflow: domain-work-continue\nRole: domain-work\n\nRead <doc-root>blueprint.md ## Work register.\nPick the next item with Track: domain and status draft, or continue the domain task the human names.\nUpdate domain/ graph files and work item before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Continue\nWorkflow: domain-work-continue\nRole: domain-work\n\nRead <doc-root>blueprint.md ## Work register.\nPick the next item with Track: domain and status draft, or continue the domain task the human names.\nUpdate domain/ graph files and work item before stopping.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-design",
+    "track": "Domain",
+    "activity": "Design",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Domain model or boundary design (aggregates, ACL, context split)",
     "prerequisite": "Bootstrap phase 0 `[x] done`; context map recommended for cross-context designs",
     "freshChat": false,
@@ -412,12 +451,15 @@
       "slug",
       "template"
     ],
-    "prompt": "AGM — Domain Work (design).\nWorkflow: domain-work-design\nRole: domain-work\n\nGoal: <e.g. split Order aggregate, introduce ACL to payment context, model refund policy>\nBounded context: <context name or cross-cutting>\nConstraints: <optional>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Domain design\n\nInstructions:\n1. Read domain/, relevant work/ items, interfaces/, template decisions/.\n2. Write design to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-design): model, aggregates, events, integration impact.\n3. Draft updates to domain/contexts/<context>/model.md (link from work item).\n4. Strategic boundary change → draft ADR in <template>/decisions/ and update context-map.md.\n5. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Design\nWorkflow: domain-work-design\nRole: domain-work\n\nGoal: <e.g. split Order aggregate, introduce ACL to payment context, model refund policy>\nBounded context: <context name or cross-cutting>\nConstraints: <optional>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Domain design\n\nInstructions:\n1. Read domain/, relevant work/ items, interfaces/, template decisions/.\n2. Write design to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-design): model, aggregates, events, integration impact.\n3. Draft updates to domain/contexts/<context>/model.md (link from work item).\n4. Strategic boundary change → draft ADR in <template>/decisions/ and update context-map.md.\n5. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-event-storm",
+    "track": "Domain",
+    "activity": "Clarify",
+    "mode": "Dialog",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Domain discovery via Event Storming (dialog)",
     "prerequisite": "Bootstrap phase 0 `[x] done`; `domain/` scaffold installed",
     "freshChat": true,
@@ -471,12 +513,15 @@
       "process-or-context",
       "slug"
     ],
-    "prompt": "AGM — Domain Work (event storm / dialog).\nWorkflow: domain-work-event-storm\nRole: domain-work\n\nProcess / bounded context (optional): <process-or-context>\nInitial goal (optional): <initial-goal>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Event storm\n\n═══════════════════════════════════════════════════════\nPHASE 1 — EVENT STORM INTERVIEW\n═══════════════════════════════════════════════════════\n\nDialog to build a shared domain timeline. OVERRIDES role-domain-work.md (steps 3–7 and OUTPUT_CONTRACT) until Phase 2.\n\nFORBIDDEN in Phase 1:\n- Do not create or modify files\n- No aggregate diagrams, context maps, or design proposals\n- No [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- First reply: storm plan (domain events → commands → aggregates → policies) + question 1\n- Follow-ups: progress + one question about the next event, command, policy, or hotspot\n- Use orange/purple/pink/yellow stickies metaphor in prose (events, commands, aggregates, policies)\n\nClarify in order (adjust if human steers):\n1) Domain events in chronological order (past tense: \"OrderPlaced\")\n2) Commands that trigger events\n3) Aggregate candidates that accept commands\n4) Policies / reactions (when X then Y)\n5) Read models and external systems\n6) Hot spots (uncertainty, contention, legacy)\n\nReply format Phase 1:\n---\n**Progress:** Step X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\n═══════════════════════════════════════════════════════\nPHASE 2 — WRITE\n═══════════════════════════════════════════════════════\n\nStart when human writes \"end interview\", \"done\", or \"write it up\".\n\n1. Read <doc-root>blueprint.md, domain/, entry-point.md (background only).\n2. Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-discovery) per report format.\n3. Add candidate events to <doc-root>domain/events.md (draft rows) if agreed.\n4. Optionally create <doc-root>domain/contexts/<slug>/model.md draft if one context emerged.\n5. Register WRK in blueprint (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Clarify (dialog)\nWorkflow: domain-work-event-storm\nRole: domain-work\n\nProcess / bounded context (optional): <process-or-context>\nInitial goal (optional): <initial-goal>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Event storm\n\n═══════════════════════════════════════════════════════\nPHASE 1 — EVENT STORM INTERVIEW\n═══════════════════════════════════════════════════════\n\nDialog to build a shared domain timeline. OVERRIDES role-domain-work.md (steps 3–7 and OUTPUT_CONTRACT) until Phase 2.\n\nFORBIDDEN in Phase 1:\n- Do not create or modify files\n- No aggregate diagrams, context maps, or design proposals\n- No [[ANCHOR:...]] output\n- No more than ONE question per reply\n\nALLOWED in Phase 1:\n- First reply: storm plan (domain events → commands → aggregates → policies) + question 1\n- Follow-ups: progress + one question about the next event, command, policy, or hotspot\n- Use orange/purple/pink/yellow stickies metaphor in prose (events, commands, aggregates, policies)\n\nClarify in order (adjust if human steers):\n1) Domain events in chronological order (past tense: \"OrderPlaced\")\n2) Commands that trigger events\n3) Aggregate candidates that accept commands\n4) Policies / reactions (when X then Y)\n5) Read models and external systems\n6) Hot spots (uncertainty, contention, legacy)\n\nReply format Phase 1:\n---\n**Progress:** Step X of Y — [topic]\n**Brief:** [optional, max. 2 sentences]\n**Question:** [exactly one question]\n---\n\n═══════════════════════════════════════════════════════\nPHASE 2 — WRITE\n═══════════════════════════════════════════════════════\n\nStart when human writes \"end interview\", \"done\", or \"write it up\".\n\n1. Read <doc-root>blueprint.md, domain/, entry-point.md (background only).\n2. Write <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-discovery) per report format.\n3. Add candidate events to <doc-root>domain/events.md (draft rows) if agreed.\n4. Optionally create <doc-root>domain/contexts/<slug>/model.md draft if one context emerged.\n5. Register WRK in blueprint (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-integration-review",
+    "track": "Domain",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Review cross-context integration against DDD patterns",
     "prerequisite": "`interfaces/` and preferably `domain/context-map.md` populated",
     "freshChat": false,
@@ -501,12 +546,15 @@
     "placeholders": [
       "cross-service integrations, API surface, or named context pair"
     ],
-    "prompt": "AGM — Domain Work (integration review).\nWorkflow: domain-work-integration-review\nRole: domain-work\n\nScope: <cross-service integrations, API surface, or named context pair>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Integration review\n\nInstructions:\n1. Read domain/context-map.md, interfaces/exports.md, interfaces/imports.md, ecosystem-index if present.\n2. For each integration, classify pattern: ACL, OHS, conformist, partnership, shared kernel, separate ways.\n3. Contrast documented context map relationships with actual contracts.\n4. Flag ddd-guardrails.md strategic smells (DDD-S01–S06).\n5. Update context-map.md relationship table if corrections are evidence-based.\n6. Write work report (type: domain-analysis) with prioritized recommendations.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Evaluate\nWorkflow: domain-work-integration-review\nRole: domain-work\n\nScope: <cross-service integrations, API surface, or named context pair>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Integration review\n\nInstructions:\n1. Read domain/context-map.md, interfaces/exports.md, interfaces/imports.md, ecosystem-index if present.\n2. For each integration, classify pattern: ACL, OHS, conformist, partnership, shared kernel, separate ways.\n3. Contrast documented context map relationships with actual contracts.\n4. Flag ddd-guardrails.md strategic smells (DDD-S01–S06).\n5. Update context-map.md relationship table if corrections are evidence-based.\n6. Write work report (type: domain-analysis) with prioritized recommendations.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:ADR_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-language-audit",
+    "track": "Domain",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Ubiquitous language audit (docs vs code vs APIs)",
     "prerequisite": "Glossary or domain/contexts/*/language.md partially populated",
     "freshChat": false,
@@ -530,12 +578,15 @@
     "placeholders": [
       "bounded context, service, or module paths"
     ],
-    "prompt": "AGM — Domain Work (language audit).\nWorkflow: domain-work-language-audit\nRole: domain-work\n\nScope: <bounded context, service, or module paths>\nSources to compare: glossary, on-demand.md, domain/contexts/*/language.md, public API, type names in code\n\nReport format: prompts/reference/ddd-work-report-formats.md § Language audit\n\nInstructions:\n1. Collect term inventory from domain language docs and template glossary.\n2. Collect names from Scope source (types, modules, REST/event names) — follow graph links first.\n3. Build mismatch matrix: synonym clusters, deprecated terms, technical leaks.\n4. Recommend one canonical term per concept per context.\n5. Apply agreed renames to language.md / glossary / on-demand.md only where human confirms in session; otherwise list in report.\n6. Write work report (type: domain-analysis); flag DDD-T05, DDD-T06.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Evaluate\nWorkflow: domain-work-language-audit\nRole: domain-work\n\nScope: <bounded context, service, or module paths>\nSources to compare: glossary, on-demand.md, domain/contexts/*/language.md, public API, type names in code\n\nReport format: prompts/reference/ddd-work-report-formats.md § Language audit\n\nInstructions:\n1. Collect term inventory from domain language docs and template glossary.\n2. Collect names from Scope source (types, modules, REST/event names) — follow graph links first.\n3. Build mismatch matrix: synonym clusters, deprecated terms, technical leaks.\n4. Recommend one canonical term per concept per context.\n5. Apply agreed renames to language.md / glossary / on-demand.md only where human confirms in session; otherwise list in report.\n6. Write work report (type: domain-analysis); flag DDD-T05, DDD-T06.\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-query",
+    "track": "Domain",
+    "activity": "Clarify",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Answer a domain / DDD question using the graph",
     "prerequisite": "Bootstrap phase 0 `[x] done`",
     "freshChat": false,
@@ -556,12 +607,15 @@
       "slug",
       "your domain question here"
     ],
-    "prompt": "AGM — Domain Work (query).\nWorkflow: domain-work-query\nRole: domain-work\n\nQuestion: <your domain question here>\n\nInstructions:\n1. Read blueprint.md, domain/, entry-point.md, prompts/role-domain-work.md.\n2. Traverse Markdown graph; prefer domain/, glossary, interfaces/, contexts/ over raw source.\n3. Write answer to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-question) using _template-domain.md.\n4. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Clarify\nWorkflow: domain-work-query\nRole: domain-work\n\nQuestion: <your domain question here>\n\nInstructions:\n1. Read blueprint.md, domain/, entry-point.md, prompts/role-domain-work.md.\n2. Traverse Markdown graph; prefer domain/, glossary, interfaces/, contexts/ over raw source.\n3. Write answer to <doc-root>work/YYYY-MM-DD-<slug>.md (type: domain-question) using _template-domain.md.\n4. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-subdomain-classification",
+    "track": "Domain",
+    "activity": "Clarify",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Classify subdomains (core / supporting / generic) for investment",
     "prerequisite": "Bootstrap phase 0 `[x] done`",
     "freshChat": false,
@@ -585,12 +639,15 @@
       "doc-root",
       "product line, platform, or enterprise area"
     ],
-    "prompt": "AGM — Domain Work (subdomain classification).\nWorkflow: domain-work-subdomain-classification\nRole: domain-work\n\nBusiness scope: <product line, platform, or enterprise area>\nEvidence: <doc-root>domain/context-map.md, subdomains.md, arc42 introduction/strategy if present>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Subdomain classification\n\nInstructions:\n1. Read domain/, blueprint.md, entry-point.md; link to business goals in template docs.\n2. Inventory subdomains (finer-grained than bounded contexts where helpful).\n3. Classify each: core | supporting | generic with explicit rationale.\n4. Update <doc-root>domain/subdomains.md.\n5. Write work report (type: domain-analysis) with investment implications.\n6. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Clarify\nWorkflow: domain-work-subdomain-classification\nRole: domain-work\n\nBusiness scope: <product line, platform, or enterprise area>\nEvidence: <doc-root>domain/context-map.md, subdomains.md, arc42 introduction/strategy if present>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Subdomain classification\n\nInstructions:\n1. Read domain/, blueprint.md, entry-point.md; link to business goals in template docs.\n2. Inventory subdomains (finer-grained than bounded contexts where helpful).\n3. Classify each: core | supporting | generic with explicit rationale.\n4. Update <doc-root>domain/subdomains.md.\n5. Write work report (type: domain-analysis) with investment implications.\n6. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-tactical-review",
+    "track": "Domain",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "domain-work",
-    "group": "Domain work (DDD)",
+    "group": "Domain",
     "when": "Tactical DDD review (aggregates, invariants, events, repositories)",
     "prerequisite": "Bounded context identified; `domain/contexts/<context>/model.md` recommended",
     "freshChat": false,
@@ -617,12 +674,15 @@
       "source paths for this context",
       "yes | no"
     ],
-    "prompt": "AGM — Domain Work (tactical review).\nWorkflow: domain-work-tactical-review\nRole: domain-work\n\nBounded context: <context name>\nScope: <source paths for this context>\nCompare to model doc: <yes | no>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Tactical review\n\nInstructions:\n1. Read domain/contexts/<context>/model.md and language.md if present; traverse from entry-point.md.\n2. Inspect source under Scope for aggregate roots, entities, VOs, repositories, domain services, events.\n3. Check: consistency boundaries, anemic model, repository scope, domain vs integration events.\n4. Map findings to ddd-guardrails.md tactical IDs (DDD-T01–T08).\n5. Propose updates to model.md and events.md where evidence supports.\n6. Write work report (type: domain-analysis).\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Evaluate\nWorkflow: domain-work-tactical-review\nRole: domain-work\n\nBounded context: <context name>\nScope: <source paths for this context>\nCompare to model doc: <yes | no>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Tactical review\n\nInstructions:\n1. Read domain/contexts/<context>/model.md and language.md if present; traverse from entry-point.md.\n2. Inspect source under Scope for aggregate roots, entities, VOs, repositories, domain services, events.\n3. Check: consistency boundaries, anemic model, repository scope, domain vs integration events.\n4. Map findings to ddd-guardrails.md tactical IDs (DDD-T01–T08).\n5. Propose updates to model.md and events.md where evidence supports.\n6. Write work report (type: domain-analysis).\n7. Register WRK (Track: domain). Verify links.\n\nOutput [[ANCHOR:WORK_ITEM]], [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "maintenance-diff-range",
+    "track": "Evolve",
+    "activity": "Sync",
+    "mode": "Direct",
     "role": "maintenance",
-    "group": "Maintenance",
+    "group": "Evolve",
     "when": "After code changes; agent fetches `git diff` between two refs (CI-friendly)",
     "prerequisite": "",
     "freshChat": false,
@@ -646,12 +706,15 @@
       "diff-to",
       "doc-root"
     ],
-    "prompt": "AGM — Maintenance (git diff range).\nWorkflow: maintenance-diff-range\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n5. If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Sync (git range)\nWorkflow: maintenance-diff-range\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n5. If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "maintenance",
+    "track": "Evolve",
+    "activity": "Sync",
+    "mode": "Direct",
     "role": "maintenance",
-    "group": "Maintenance",
+    "group": "Evolve",
     "when": "After code changes; same PR or follow-up session",
     "prerequisite": "",
     "freshChat": false,
@@ -672,12 +735,15 @@
     "placeholders": [
       "paste git diff or PR diff summary"
     ],
-    "prompt": "AGM — Maintenance.\nWorkflow: maintenance\nRole: maintenance\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\nIf **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Sync\nWorkflow: maintenance\nRole: maintenance\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\nIf **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "refinement",
-    "role": "bootstrap` (same role file; scoped steps)",
-    "group": "bootstrap` (same role file; scoped steps)",
+    "track": "Evolve",
+    "activity": "Communicate",
+    "mode": "Direct",
+    "role": "bootstrap",
+    "group": "Evolve",
     "when": "Targeted deepening of specific documentation sections (ongoing on large systems)",
     "prerequisite": "",
     "freshChat": false,
@@ -701,12 +767,15 @@
       "goal",
       "scope"
     ],
-    "prompt": "AGM — Refinement.\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md)\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Refine\nWorkflow: refinement\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md)\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",
+    "track": "Verify",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "review",
-    "group": "Review",
+    "group": "Verify",
     "when": "After a maintenance run",
     "prerequisite": "",
     "freshChat": true,
@@ -724,12 +793,15 @@
       "Do not fix issues — report only."
     ],
     "placeholders": [],
-    "prompt": "AGM — Review (maintenance).\nWorkflow: review-maintenance\nRole: review\n\nReview AGM documentation for this application.\nReview type: maintenance\n\nCross-check only files changed in the last maintenance run against the git diff.\nDo not fix issues — report only.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Verify · Evaluate (post-sync)\nWorkflow: review-maintenance\nRole: review\n\nReview AGM documentation for this application.\nReview type: maintenance\n\nCross-check only files changed in the last maintenance run against the git diff.\nDo not fix issues — report only.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-milestone",
+    "track": "Verify",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "review",
-    "group": "Review",
+    "group": "Verify",
     "when": "After Bootstrap milestone — close creation",
     "prerequisite": "",
     "freshChat": true,
@@ -750,12 +822,15 @@
       "Report-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews."
     ],
     "placeholders": [],
-    "prompt": "AGM — Review (milestone).\nWorkflow: review-milestone\nRole: review\n\nReview AGM documentation for this application.\nReview type: milestone (bootstrap close)\n\nFocus:\n1. Validate docs/architecture/blueprint.md — phase states, WRK registry, session log, and open items match the actual documentation graph.\n2. Cross-check the full docs/architecture/ graph for consistency, stale content, and broken relative links.\n3. From bootstrap follow-up sessions: find insights still only in work/ files or the session log that belong in template sections (arc42, c4-light, etc.). Recommend where to link or summarize them — report-only; do not rewrite architecture docs in this session.\n\nReport-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Verify · Evaluate (milestone)\nWorkflow: review-milestone\nRole: review\n\nReview AGM documentation for this application.\nReview type: milestone (bootstrap close)\n\nFocus:\n1. Validate docs/architecture/blueprint.md — phase states, WRK registry, session log, and open items match the actual documentation graph.\n2. Cross-check the full docs/architecture/ graph for consistency, stale content, and broken relative links.\n3. From bootstrap follow-up sessions: find insights still only in work/ files or the session log that belong in template sections (arc42, c4-light, etc.). Recommend where to link or summarize them — report-only; do not rewrite architecture docs in this session.\n\nReport-only. Write report to docs/architecture/work/. Update blueprint.md ## Reviews.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-phase",
+    "track": "Verify",
+    "activity": "Evaluate",
+    "mode": "Direct",
     "role": "review",
-    "group": "Review",
+    "group": "Verify",
     "when": "After each blueprint phase; verify one phase",
     "prerequisite": "",
     "freshChat": true,
@@ -775,6 +850,6 @@
     "placeholders": [
       "slug"
     ],
-    "prompt": "AGM — Review (phase).\nWorkflow: review-phase\nRole: review\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-review.md.\nSelect next unreviewed phase in ## Reviews. Report-only — do not fix files.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop.\nWrite work/YYYY-MM-DD-review-<slug>.md. Update ## Reviews and ## Guardrail findings in blueprint.md."
+    "prompt": "AGM — Verify · Evaluate\nWorkflow: review-phase\nRole: review\n\nRead docs/architecture/context/always-on.md → docs/architecture/blueprint.md → docs/architecture/prompts/role-review.md.\nSelect next unreviewed phase in ## Reviews. Report-only — do not fix files.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop.\nWrite work/YYYY-MM-DD-review-<slug>.md. Update ## Reviews and ## Guardrail findings in blueprint.md."
   }
 ]

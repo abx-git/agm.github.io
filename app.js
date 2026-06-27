@@ -7,13 +7,13 @@ const BP_INSTALL_URL =
 const EVOLVE_MODES = [
   {
     id: 'refinement',
-    label: 'Deepen content',
-    note: 'Check documentation focus (or type text), then what should improve.',
+    label: 'Refine · Communicate',
+    note: 'Deepen a section for an audience — documentation focus checkboxes or text.',
   },
-  { id: 'maintenance', label: 'Sync with pasted diff', note: 'After code changes — paste git diff or PR summary.' },
+  { id: 'maintenance', label: 'Sync · paste diff', note: 'After code changes — paste git diff or PR summary.' },
   {
     id: 'maintenance-diff-range',
-    label: 'Sync with git range',
+    label: 'Sync · git range',
     note: 'Agent loads diff between two refs (CI / MCP friendly).',
   },
 ];
@@ -28,46 +28,46 @@ const DIALOG_WORKFLOW_IDS = new Set([
 const ARCHITECTURE_WORK_MODES = [
   {
     id: 'architecture-work-interrogate',
-    label: 'Dialog — explore solution',
+    label: 'Clarify · dialog',
     note: 'One question per reply. Use Cursor Chat (not Agent/Composer). Documentation only after "end interview".',
     dialog: true,
   },
-  { id: 'architecture-work-query', label: 'Answer question', note: 'Set your question in the prompt.' },
-  { id: 'architecture-work-analysis', label: 'Analyze', note: 'Set topic, scope, and focus.' },
+  { id: 'architecture-work-query', label: 'Clarify · query', note: 'Answer a question from the graph.' },
+  { id: 'architecture-work-analysis', label: 'Evaluate · analysis', note: 'Risks, coupling, quality — set topic, scope, and focus.' },
   {
     id: 'architecture-work-sustainable-analysis',
-    label: 'Sustainable analysis',
+    label: 'Evaluate · sustainable',
     note: 'Drift, modularity, layering, coupling, technical debt. Set scope and focus — or leave scope empty to clarify in chat.',
   },
   {
     id: 'architecture-work-sustainable-interrogate',
-    label: 'Dialog — sustainable analysis',
+    label: 'Evaluate · dialog',
     note: 'One question per reply to define scope and focus, then write the analysis. Use Cursor Chat (not Agent/Composer).',
     dialog: true,
   },
-  { id: 'architecture-work-design', label: 'Design proposal', note: 'Set goal and constraints.' },
-  { id: 'architecture-work-continue', label: 'Open work items', note: 'Continues WRK entries (Track: architecture) in blueprint.md.' },
+  { id: 'architecture-work-design', label: 'Design', note: 'Structure or cross-cutting proposal — set goal and constraints.' },
+  { id: 'architecture-work-continue', label: 'Continue WRK', note: 'Resume open WRK entries (Track: architecture) in blueprint.md.' },
 ];
 
 const DOMAIN_WORK_MODES = [
   {
     id: 'domain-work-event-storm',
-    label: 'Event storm (dialog)',
+    label: 'Clarify · event storm',
     note: 'Domain discovery — one question per reply. Use Cursor Chat. Write after "end interview".',
     dialog: true,
   },
-  { id: 'domain-work-context-map', label: 'Context map', note: 'Bounded contexts and strategic relationships.' },
+  { id: 'domain-work-context-map', label: 'Design · context map', note: 'Bounded contexts and strategic relationships.' },
   {
     id: 'domain-work-subdomain-classification',
-    label: 'Subdomain classification',
+    label: 'Clarify · subdomains',
     note: 'Core / supporting / generic subdomains.',
   },
-  { id: 'domain-work-integration-review', label: 'Integration review', note: 'ACL, OHS, conformist patterns vs interfaces/.' },
-  { id: 'domain-work-tactical-review', label: 'Tactical review', note: 'Aggregates, invariants, repositories, events.' },
-  { id: 'domain-work-language-audit', label: 'Language audit', note: 'Ubiquitous language vs code and APIs.' },
-  { id: 'domain-work-query', label: 'Domain question', note: 'Answer a DDD question from the graph.' },
-  { id: 'domain-work-design', label: 'Domain design', note: 'Aggregates, boundaries, ACL, context split.' },
-  { id: 'domain-work-continue', label: 'Open domain WRK', note: 'Continues WRK entries (Track: domain).' },
+  { id: 'domain-work-integration-review', label: 'Evaluate · integration', note: 'ACL, OHS, conformist patterns vs interfaces/.' },
+  { id: 'domain-work-tactical-review', label: 'Evaluate · tactical', note: 'Aggregates, invariants, repositories, events.' },
+  { id: 'domain-work-language-audit', label: 'Evaluate · language', note: 'Ubiquitous language vs code and APIs.' },
+  { id: 'domain-work-query', label: 'Clarify · query', note: 'Answer a DDD question from the graph.' },
+  { id: 'domain-work-design', label: 'Design', note: 'Aggregates, boundaries, ACL, context split.' },
+  { id: 'domain-work-continue', label: 'Continue WRK', note: 'Resume open WRK entries (Track: domain).' },
 ];
 
 const WORK_MODES = ARCHITECTURE_WORK_MODES;
@@ -75,12 +75,12 @@ const WORK_MODES = ARCHITECTURE_WORK_MODES;
 const REVIEW_MODES = [
   {
     id: 'review-phase',
-    label: 'Review one phase',
+    label: 'Evaluate · phase',
     note: 'Checks the next unreviewed blueprint phase against source and links. Report-only — fixes in a follow-up session.',
   },
   {
     id: 'review-maintenance',
-    label: 'Review all docs',
+    label: 'Evaluate · post-sync',
     note: 'After maintenance: cross-check changed docs against the git diff. Report-only.',
   },
 ];
