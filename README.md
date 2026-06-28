@@ -2,9 +2,9 @@
 
 Lifecycle UI: **Build** · **Evolve** · **Architect** · **Domain**, plus cross-cutting **Verify** (`review-*`). Workflows use **Track · Activity · Mode** vocabulary — see [Guide](../guide.md).
 
-Live: https://abx-git.github.io/blueprint-pattern.github.io/
+Live: https://abx-git.github.io/agm.github.io/
 
-**Pages repo:** [abx-git/blueprint-pattern.github.io](https://github.com/abx-git/blueprint-pattern.github.io)  
+**Pages repo:** [abx-git/agm.github.io](https://github.com/abx-git/agm.github.io)  
 **Setup (once):** [GITHUB-PAGES-SETUP.md](./GITHUB-PAGES-SETUP.md)
 
 ## Run locally
