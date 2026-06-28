@@ -372,10 +372,20 @@ body {
   margin-top: 0.35rem;
 }
 
-.evolve-workflows-title {
-  margin: 0 0 0.65rem;
+.evolve-workflows-title,
+.advanced-track-title {
   font-size: 0.95rem;
   font-weight: 600;
+  margin: 1.25rem 0 0.65rem;
+}
+
+.phase-intro--compact {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.phase-tab--advanced {
+  margin-left: auto;
 }
 
 .doc-needs-recap {

@@ -4,17 +4,24 @@ const STORAGE_KEY = 'bp-adopt-params';
 const BP_INSTALL_URL =
   'https://raw.githubusercontent.com/abx-git/blueprint-pattern/main/scripts/bp-install.sh';
 
-const EVOLVE_MODES = [
-  {
-    id: 'refinement',
-    label: 'Refine · Communicate',
-    note: 'Deepen a section for an audience — documentation focus checkboxes or text.',
-  },
-  { id: 'maintenance', label: 'Sync · paste diff', note: 'After code changes — paste git diff or PR summary.' },
+const EVOLVE_MODES_GOLDEN = [
   {
     id: 'maintenance-diff-range',
-    label: 'Sync · git range',
-    note: 'Agent loads diff between two refs (CI / MCP friendly).',
+    intent: 'Sync docs with code',
+    note: 'After a merge or PR — agent loads git diff range (CI / MCP friendly).',
+  },
+  {
+    id: 'refinement',
+    intent: 'Deepen one section',
+    note: 'Improve one section for an audience — documentation focus checkboxes or text.',
+  },
+];
+
+const EVOLVE_MODES_ADVANCED = [
+  {
+    id: 'maintenance',
+    intent: 'Sync docs (paste diff)',
+    note: 'Fallback when git range is unavailable — paste git diff or PR summary.',
   },
 ];
 
@@ -25,67 +32,81 @@ const DIALOG_WORKFLOW_IDS = new Set([
   'domain-work-event-storm',
 ]);
 
-const ARCHITECTURE_WORK_MODES = [
+const ARCHITECTURE_WORK_MODES_GOLDEN = [
+  { id: 'architecture-work-query', intent: 'Answer a question', note: 'Traverse the graph; write a work report.' },
+  { id: 'architecture-work-design', intent: 'Propose a design', note: 'Structure or cross-cutting change — set goal and constraints.' },
+];
+
+const ARCHITECTURE_WORK_MODES_ADVANCED = [
   {
     id: 'architecture-work-interrogate',
-    label: 'Clarify · dialog',
-    note: 'One question per reply. Use Cursor Chat (not Agent/Composer). Documentation only after "end interview".',
+    intent: 'Explore (dialog)',
+    note: 'One question per reply. Use Cursor Chat (not Agent/Composer). Write after "end interview".',
     dialog: true,
   },
-  { id: 'architecture-work-query', label: 'Clarify · query', note: 'Answer a question from the graph.' },
-  { id: 'architecture-work-analysis', label: 'Evaluate · analysis', note: 'Risks, coupling, quality — set topic, scope, and focus.' },
+  { id: 'architecture-work-analysis', intent: 'Analyze risks & quality', note: 'Risks, coupling, quality — set topic, scope, and focus.' },
   {
     id: 'architecture-work-sustainable-analysis',
-    label: 'Evaluate · sustainable',
-    note: 'Drift, modularity, layering, coupling, technical debt. Set scope and focus — or leave scope empty to clarify in chat.',
+    intent: 'Sustainable analysis',
+    note: 'Drift, modularity, layering, coupling, technical debt.',
   },
   {
     id: 'architecture-work-sustainable-interrogate',
-    label: 'Evaluate · dialog',
-    note: 'One question per reply to define scope and focus, then write the analysis. Use Cursor Chat (not Agent/Composer).',
+    intent: 'Scope analysis (dialog)',
+    note: 'One question per reply to define scope, then write analysis. Cursor Chat.',
     dialog: true,
   },
-  { id: 'architecture-work-design', label: 'Design', note: 'Structure or cross-cutting proposal — set goal and constraints.' },
-  { id: 'architecture-work-continue', label: 'Continue WRK', note: 'Resume open WRK entries (Track: architecture) in blueprint.md.' },
+  { id: 'architecture-work-continue', intent: 'Resume open work', note: 'Continue WRK entries in blueprint.md (architecture track).' },
 ];
+
+const ARCHITECTURE_WORK_MODES = [...ARCHITECTURE_WORK_MODES_GOLDEN, ...ARCHITECTURE_WORK_MODES_ADVANCED];
 
 const DOMAIN_WORK_MODES = [
   {
     id: 'domain-work-event-storm',
-    label: 'Clarify · event storm',
-    note: 'Domain discovery — one question per reply. Use Cursor Chat. Write after "end interview".',
+    intent: 'Domain discovery (dialog)',
+    note: 'Event storm — one question per reply. Cursor Chat. Write after "end interview".',
     dialog: true,
   },
-  { id: 'domain-work-context-map', label: 'Design · context map', note: 'Bounded contexts and strategic relationships.' },
-  {
-    id: 'domain-work-subdomain-classification',
-    label: 'Clarify · subdomains',
-    note: 'Core / supporting / generic subdomains.',
-  },
-  { id: 'domain-work-integration-review', label: 'Evaluate · integration', note: 'ACL, OHS, conformist patterns vs interfaces/.' },
-  { id: 'domain-work-tactical-review', label: 'Evaluate · tactical', note: 'Aggregates, invariants, repositories, events.' },
-  { id: 'domain-work-language-audit', label: 'Evaluate · language', note: 'Ubiquitous language vs code and APIs.' },
-  { id: 'domain-work-query', label: 'Clarify · query', note: 'Answer a DDD question from the graph.' },
-  { id: 'domain-work-design', label: 'Design', note: 'Aggregates, boundaries, ACL, context split.' },
-  { id: 'domain-work-continue', label: 'Continue WRK', note: 'Resume open WRK entries (Track: domain).' },
+  { id: 'domain-work-context-map', intent: 'Context map', note: 'Bounded contexts and strategic relationships.' },
+  { id: 'domain-work-subdomain-classification', intent: 'Classify subdomains', note: 'Core / supporting / generic subdomains.' },
+  { id: 'domain-work-integration-review', intent: 'Review integrations', note: 'ACL, OHS, conformist patterns vs interfaces/.' },
+  { id: 'domain-work-tactical-review', intent: 'Tactical review', note: 'Aggregates, invariants, repositories, events.' },
+  { id: 'domain-work-language-audit', intent: 'Language audit', note: 'Ubiquitous language vs code and APIs.' },
+  { id: 'domain-work-query', intent: 'Domain question', note: 'Answer a DDD question from the graph.' },
+  { id: 'domain-work-design', intent: 'Domain design', note: 'Aggregates, boundaries, ACL, context split.' },
+  { id: 'domain-work-continue', intent: 'Resume domain work', note: 'Continue WRK entries (domain track).' },
 ];
 
 const WORK_MODES = ARCHITECTURE_WORK_MODES;
 
-const REVIEW_MODES = [
-  {
-    id: 'review-phase',
-    label: 'Evaluate · phase',
-    note: 'Checks the next unreviewed blueprint phase against source and links. Report-only — fixes in a follow-up session.',
-  },
+const REVIEW_MODES_GOLDEN = [
   {
     id: 'review-maintenance',
-    label: 'Evaluate · post-sync',
-    note: 'After maintenance: cross-check changed docs against the git diff. Report-only.',
+    intent: 'After code sync',
+    note: 'Cross-check docs touched by last maintenance against the git diff. Report-only — fresh chat.',
+  },
+  {
+    id: 'review-phase',
+    intent: 'After completing a phase',
+    note: 'Verify one blueprint phase against source and links. Report-only — fresh chat.',
   },
 ];
 
-/** Evolve workflows that receive the architecture documentation areas block. */
+const REVIEW_MODES_ADVANCED = [
+  {
+    id: 'review-milestone',
+    intent: 'Close Build stage',
+    note: 'Full graph milestone review. Report-only — fresh chat.',
+  },
+];
+
+const REVIEW_MODES = [...REVIEW_MODES_GOLDEN, ...REVIEW_MODES_ADVANCED];
+
+/** User-facing label — intent first; workflow id stays internal. */
+function modeButtonLabel(mode) {
+  return mode.intent || mode.label || mode.id;
+}
 const EVOLVE_WORKFLOW_IDS = new Set(['refinement', 'maintenance', 'maintenance-diff-range']);
 
 /** IDs the human may select in Plan / Evolve (architecture content only). */
@@ -1384,8 +1405,8 @@ function initTabs() {
   const panels = {
     build: document.getElementById('phase-build'),
     evolve: document.getElementById('phase-evolve'),
-    work: document.getElementById('phase-work'),
-    domain: document.getElementById('phase-domain'),
+    verify: document.getElementById('phase-verify'),
+    advanced: document.getElementById('phase-advanced'),
   };
 
   tabs.forEach((tab) => {
@@ -1542,7 +1563,7 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = mode.dialog ? 'mode-btn mode-btn--dialog' : 'mode-btn';
-    btn.textContent = mode.label;
+    btn.textContent = modeButtonLabel(mode);
     if (!byId(workflows, mode.id)) {
       btn.disabled = true;
       btn.title = 'Workflow data missing — hard-refresh the page (Ctrl+Shift+R).';
@@ -1645,10 +1666,37 @@ async function main() {
 
   initSetupForm(adoptBase);
   initBuildPhase(workflows);
-  initModeGrid(workflows, 'evolve', EVOLVE_MODES, 'evolve-grid', 'evolve-panel', 'evolve-label', 'evolve-note');
-  initModeGrid(workflows, 'work', ARCHITECTURE_WORK_MODES, 'work-grid', 'work-panel', 'work-label', 'work-note');
+  initModeGrid(workflows, 'evolve', EVOLVE_MODES_GOLDEN, 'evolve-grid', 'evolve-panel', 'evolve-label', 'evolve-note');
+  initModeGrid(
+    workflows,
+    'evolve',
+    EVOLVE_MODES_ADVANCED,
+    'evolve-advanced-grid',
+    'evolve-panel',
+    'evolve-label',
+    'evolve-note'
+  );
+  initModeGrid(workflows, 'work', ARCHITECTURE_WORK_MODES_GOLDEN, 'work-grid', 'work-panel', 'work-label', 'work-note');
+  initModeGrid(
+    workflows,
+    'work',
+    ARCHITECTURE_WORK_MODES_ADVANCED,
+    'work-advanced-grid',
+    'work-panel',
+    'work-label',
+    'work-note'
+  );
   initModeGrid(workflows, 'domain', DOMAIN_WORK_MODES, 'domain-grid', 'domain-panel', 'domain-label', 'domain-note');
-  initModeGrid(workflows, 'review', REVIEW_MODES, 'review-grid', 'review-panel', 'review-label', 'review-note');
+  initModeGrid(workflows, 'review', REVIEW_MODES_GOLDEN, 'review-grid', 'review-panel', 'review-label', 'review-note');
+  initModeGrid(
+    workflows,
+    'review',
+    REVIEW_MODES_ADVANCED,
+    'review-advanced-grid',
+    'review-panel',
+    'review-label',
+    'review-note'
+  );
   initCopyButtons();
 }
 

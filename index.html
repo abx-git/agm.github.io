@@ -7,13 +7,13 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Architecture Graph Method (AGM)</title>
-  <link rel="stylesheet" href="app.css?v=36" />
+  <link rel="stylesheet" href="app.css?v=38" />
 </head>
 <body>
   <main class="app">
     <header class="head">
       <h1>Architecture Graph Method (AGM)</h1>
-      <p class="tagline">Living architecture graph in your repo — orchestrated via <code>blueprint.md</code>.</p>
+      <p class="tagline">Living architecture graph in your repo — orchestrated via <code>blueprint.md</code>. <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/quickstart.md">Quickstart</a> (~10 min).</p>
     </header>
 
     <details class="glossary" open>
@@ -50,14 +50,14 @@
 
     <form id="setup-form" class="setup-form">
       <nav class="phase-nav" role="tablist" aria-label="Lifecycle">
-        <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">1 · Foundation</button>
-        <button type="button" class="phase-tab" data-phase="evolve" role="tab">2 · Improve &amp; sync</button>
-        <button type="button" class="phase-tab" data-phase="work" role="tab">3 · Architecture</button>
-        <button type="button" class="phase-tab" data-phase="domain" role="tab">4 · Domain (DDD)</button>
+        <button type="button" class="phase-tab active" data-phase="build" role="tab" aria-selected="true">Build</button>
+        <button type="button" class="phase-tab" data-phase="evolve" role="tab">Evolve</button>
+        <button type="button" class="phase-tab" data-phase="verify" role="tab">Verify</button>
+        <button type="button" class="phase-tab phase-tab--advanced" data-phase="advanced" role="tab">Advanced</button>
       </nav>
 
       <section id="phase-build" class="phase active" role="tabpanel">
-        <p class="phase-intro"><strong>Foundation:</strong> install the scaffold, choose which parts of your architecture to document (multi-select), then adopt. <strong>Improve &amp; sync</strong> (next tab) is for deepening content or aligning docs with code later.</p>
+        <p class="phase-intro"><strong>Build:</strong> install once, adopt in one chat, continue chapter by chapter. See <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/quickstart.md">quickstart</a>.</p>
 
         <div class="setup-shared">
           <label class="field">
@@ -68,11 +68,13 @@
           <label class="field">
             <span>Documentation template</span>
             <select name="template">
-              <option value="arc42">arc42 (default)</option>
-              <option value="c4-light">c4-light</option>
-              <option value="adr-first">adr-first</option>
-              <option value="lean-service">lean-service</option>
-              <option value="custom">custom</option>
+              <option value="arc42">arc42 (default — multi-module)</option>
+              <option value="lean-service">lean-service (single service)</option>
+              <optgroup label="Advanced templates">
+                <option value="c4-light">c4-light</option>
+                <option value="adr-first">adr-first</option>
+                <option value="custom">custom</option>
+              </optgroup>
             </select>
           </label>
           <label class="field field-custom" hidden>
@@ -160,7 +162,7 @@
             <div class="step-head">
               <span class="step-n">3</span>
               <div>
-                <strong>Adopt — start the construction plan</strong>
+                <strong>Adopt — first-time setup</strong>
                 <p>Uses step 2 selections. Agent creates <code>blueprint.md</code>, <code>entry-point.md</code>, <code>always-on.md</code>, and plans phases for selected areas.</p>
               </div>
             </div>
@@ -196,20 +198,8 @@
             <div class="step-head">
               <span class="step-n">4</span>
               <div>
-                <strong>Continue building</strong>
+                <strong>Continue — next chapter</strong>
                 <p>Next open row in <code>blueprint.md</code> → copy prompt → new chat. Sync <code>entry-point.md</code> when sections appear.</p>
-              </div>
-            </div>
-            <div class="cmd-row">
-              <button type="button" class="btn primary btn-prompt">Copy prompt</button>
-            </div>
-          </li>
-          <li class="step" data-workflow="review-milestone">
-            <div class="step-head">
-              <span class="step-n">5</span>
-              <div>
-                <strong>Close foundation phase</strong>
-                <p>Report-only: validate construction plan vs. graph, links, redistribute follow-up insights into template sections.</p>
               </div>
             </div>
             <div class="cmd-row">
@@ -220,10 +210,14 @@
       </section>
 
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Improve &amp; sync:</strong> use <strong>Deepen content</strong> with the same documentation focus as Foundation step 2 (checkboxes or text). Maintenance workflows sync with code only.</p>
+        <p class="phase-intro"><strong>Evolve:</strong> sync docs after code changes or deepen one section. Always start a <strong>new chat</strong>.</p>
 
-        <h2 class="evolve-workflows-title">How to improve</h2>
+        <h2 class="evolve-workflows-title">Choose intent</h2>
         <div class="modes" id="evolve-grid"></div>
+        <details class="advanced-workflows">
+          <summary>More sync options</summary>
+          <div class="modes" id="evolve-advanced-grid"></div>
+        </details>
         <div id="evolve-panel" class="mode-panel" hidden>
           <p class="mode-label" id="evolve-label"></p>
           <div id="evolve-inputs" class="workflow-inputs" hidden></div>
@@ -238,9 +232,36 @@
         </div>
       </section>
 
-      <section id="phase-work" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Architect</strong> track — Clarify, Design, and Evaluate on the compiled graph (<code>architecture-work-*</code>). Dialog mode: one question per reply (Cursor Chat).</p>
+      <section id="phase-verify" class="phase" role="tabpanel" hidden>
+        <p class="phase-intro"><strong>Verify:</strong> report-only — never the same chat as write or sync. Pick intent, copy prompt, <strong>new chat</strong>.</p>
+        <div class="modes" id="review-grid"></div>
+        <details class="advanced-workflows">
+          <summary>More verify options</summary>
+          <div class="modes" id="review-advanced-grid"></div>
+        </details>
+        <div id="review-panel" class="mode-panel" hidden>
+          <p class="mode-label" id="review-label"></p>
+          <div id="review-inputs" class="workflow-inputs" hidden></div>
+          <details class="prompt-preview">
+            <summary>Preview prompt</summary>
+            <pre id="review-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
+          </details>
+          <div class="cmd-row">
+            <button type="button" class="btn primary mode-copy" data-panel="review">Copy prompt</button>
+          </div>
+          <p class="mode-note" id="review-note" hidden></p>
+        </div>
+      </section>
+
+      <section id="phase-advanced" class="phase" role="tabpanel" hidden>
+        <p class="phase-intro"><strong>Advanced:</strong> architecture and domain (DDD) work on an established graph — not part of the golden path.</p>
+
+        <h2 class="advanced-track-title">Architecture</h2>
         <div class="modes" id="work-grid"></div>
+        <details class="advanced-workflows">
+          <summary>More architecture options</summary>
+          <div class="modes" id="work-advanced-grid"></div>
+        </details>
         <div id="work-panel" class="mode-panel" hidden>
           <div id="work-dialog-hint" class="dialog-hint" hidden>
             <strong>Dialog mode:</strong> paste the prompt into a <strong>new Cursor Chat</strong> (not Agent/Composer).
@@ -257,10 +278,9 @@
           </div>
           <p class="mode-note" id="work-note" hidden></p>
         </div>
-      </section>
 
-      <section id="phase-domain" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Domain</strong> track — Clarify, Design, and Evaluate for DDD (<code>domain-work-*</code>). Updates <code>domain/</code> and <code>work/</code> (WRK Track: domain). Event storm uses dialog mode (Cursor Chat).</p>
+        <h2 class="advanced-track-title">Domain (DDD)</h2>
+        <p class="phase-intro phase-intro--compact">Strategic and tactical domain modeling — updates <code>domain/</code> and <code>work/</code>.</p>
         <div class="modes" id="domain-grid"></div>
         <div id="domain-panel" class="mode-panel" hidden>
           <div id="domain-dialog-hint" class="dialog-hint" hidden>
@@ -280,31 +300,15 @@
       </section>
     </form>
 
-    <details class="review-block">
-      <summary>Review (verification)</summary>
-      <p class="review-intro">
-        <strong>What it does:</strong> a separate, read-only Cursor session that <em>verifies</em> architecture docs — it does not write or fix them.
-        The AI compares documentation to source code and the link graph, writes a report to <code>work/</code>, and updates <code>blueprint.md</code> under
-        <strong>Reviews</strong> and <strong>Guardrail findings</strong>. Run in a <strong>new chat</strong> after bootstrap, maintenance, or a work session.
-      </p>
-      <div class="modes review-modes" id="review-grid"></div>
-      <div id="review-panel" class="mode-panel" hidden>
-        <p class="mode-label" id="review-label"></p>
-        <div class="cmd-row">
-          <button type="button" class="btn primary mode-copy" data-panel="review">Copy prompt</button>
-        </div>
-        <p class="mode-note" id="review-note" hidden></p>
-      </div>
-    </details>
-
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v36</span>
+      <span class="deploy-id">Lifecycle · v38</span>
+      · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/quickstart.md">Quickstart</a>
       · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=36" type="module"></script>
+  <script src="app.js?v=38" type="module"></script>
 </body>
 </html>
