@@ -1,6 +1,8 @@
 # AGM Assistant
 
-Lifecycle UI: **Build** · **Evolve** · **Architect** · **Domain**, plus cross-cutting **Verify** (`review-*`). Workflows use **Track · Activity · Mode** vocabulary — see [Guide](../guide.md).
+Lifecycle UI: **Build** · **Evolve** · **Verify**, plus collapsed **Advanced** (Architect + Domain).
+
+Day-1 = golden path only (6 workflows). Advanced intents stay available but are not required to start.
 
 Live: https://abx-git.github.io/agm.github.io/
 
@@ -15,15 +17,20 @@ Live: https://abx-git.github.io/agm.github.io/
 
 Opens `http://localhost:8765` (requires Python 3).
 
-## Lifecycle tabs
+## Guided UX (v40+)
 
-| Tab | Phase | Workflows |
-|-----|-------|-----------|
-| **Build** | Install script + adopt + continue | install (generated script), adopt (form), `bootstrap-continue`, `review-milestone` |
-| **Evolve** | Deepen or sync with code | `refinement`, `maintenance` |
-| **Architect** | Clarify · Design · Evaluate on graph | `architecture-work-*` |
-| **Domain** | DDD on graph | `domain-work-*` |
-| **Verify** | Evaluate (report-only, new chat) | `review-phase`, `review-maintenance` |
+- **Start here** strip — 5-step golden path with contextual banner (no prior AGM knowledge required).
+- **Session mode** — **Copy prompt** (default) or **MCP in IDE** (`agm_trigger_workflow`).
+- **MCP panel** — IDE-specific config path, copyable `mcp.json`, verify steps, MCP install/adopt/session requests.
+
+## Tabs
+
+| Tab | What | Workflows |
+|-----|------|-----------|
+| **Build** | Install + adopt + continue | `agm-install.sh` (default golden; optional `--full`), `bootstrap-adopt`, `bootstrap-continue` |
+| **Evolve** | Sync or deepen | `maintenance-diff-range`, `refinement` (+ paste-diff under More) |
+| **Verify** | Report-only, fresh chat | `review-maintenance`, `review-phase` (+ milestone under More) |
+| **Advanced** | After a graph exists | `architecture-work-*`, Domain pack under collapsed details |
 
 ## Publish
 

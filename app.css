@@ -35,6 +35,260 @@ body {
   font-size: 0.95rem;
 }
 
+.start-here {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid #c5daf5;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+}
+
+.start-here-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.45rem;
+}
+
+.start-here-lead {
+  margin: 0 0 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.journey-strip {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.35rem;
+}
+
+@media (max-width: 520px) {
+  .journey-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+  .journey-strip li:nth-child(5) {
+    grid-column: span 2;
+  }
+}
+
+.journey-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.5rem 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.journey-step:hover {
+  border-color: var(--accent);
+}
+
+.journey-step--active {
+  border-color: var(--accent);
+  background: #f0f7ff;
+}
+
+.journey-n {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 50%;
+  background: var(--text);
+  color: #fff;
+}
+
+.journey-step--active .journey-n {
+  background: var(--accent);
+}
+
+.journey-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.journey-hint {
+  font-size: 0.68rem;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.journey-banner {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--accent);
+  background: #fff;
+  border: 1px solid #c5daf5;
+  border-radius: 6px;
+}
+
+.session-mode-fieldset {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.session-mode-fieldset legend {
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0 0.25rem;
+}
+
+.session-mode-hint {
+  margin: 0 0 0.65rem;
+}
+
+.session-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 520px) {
+  .session-mode-options {
+    flex-direction: row;
+  }
+}
+
+.session-mode-option {
+  flex: 1;
+  cursor: pointer;
+}
+
+.session-mode-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.session-mode-card {
+  display: block;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  height: 100%;
+}
+
+.session-mode-option input:checked + .session-mode-card {
+  border-color: var(--accent);
+  background: #f0f7ff;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.session-mode-card strong {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 0.2rem;
+}
+
+.session-mode-card small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.mcp-setup-panel {
+  margin: 0 0 1rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid #e8d48a;
+  border-radius: 8px;
+  background: #fffbeb;
+}
+
+.mcp-setup-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+}
+
+.mcp-setup-lead {
+  margin: 0 0 0.65rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.mcp-config-path {
+  margin: 0 0 0.65rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.mcp-config-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.mcp-setup-actions {
+  margin: 0.5rem 0 0.65rem;
+}
+
+.mcp-verify-steps {
+  margin: 0 0 0.5rem 1.1rem;
+  padding: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.mcp-setup-foot {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.mcp-setup-foot a {
+  color: var(--accent);
+}
+
+.step-action-hint {
+  margin: 0 0 0.65rem;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  background: #f0f7ff;
+  border: 1px solid #c5daf5;
+  border-radius: 6px;
+}
+
+.step-action-hint[hidden] {
+  display: none;
+}
+
+.mode-actions {
+  gap: 0.5rem;
+}
+
+.btn-install-mcp,
+.btn-adopt-mcp,
+.btn-prompt-mcp,
+.mode-copy-mcp {
+  margin-top: 0.35rem;
+}
+
+@media (min-width: 480px) {
+  .cmd-row .btn-install-mcp,
+  .cmd-row .btn-adopt-mcp,
+  .cmd-row .btn-prompt-mcp {
+    margin-top: 0;
+  }
+}
+
 .glossary {
   margin-bottom: 1rem;
   padding: 0.75rem 1rem;

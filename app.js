@@ -1,8 +1,272 @@
 const ASSET_BASE = new URL('./', import.meta.url);
 const ASSISTANT_VERSION = new URL(import.meta.url).searchParams.get('v') || '0';
-const STORAGE_KEY = 'bp-adopt-params';
-const BP_INSTALL_URL =
-  'https://raw.githubusercontent.com/abx-git/blueprint-pattern/main/scripts/bp-install.sh';
+const STORAGE_KEY = 'agm-adopt-params';
+const AGM_INSTALL_URL =
+  'https://raw.githubusercontent.com/abx-git/agm/main/scripts/agm-install.sh';
+
+/** Where to merge MCP config — varies by IDE. */
+const MCP_CONFIG_PATHS = {
+  cursor: {
+    path: '.cursor/mcp.json (project root) or Cursor Settings → MCP',
+    note: 'Project-level config is recommended — commit .cursor/mcp.json for your team.',
+  },
+  claude: {
+    path: 'macOS: ~/Library/Application Support/Claude/claude_desktop_config.json · Windows: %APPDATA%\\Claude\\claude_desktop_config.json',
+    note: 'Merge the agm block into mcpServers, then fully quit and reopen Claude Desktop.',
+  },
+  copilot: {
+    path: 'VS Code: .vscode/mcp.json (project) or user settings MCP section',
+    note: 'Requires MCP support in your Copilot / VS Code build.',
+  },
+  generic: {
+    path: 'Your agent tool MCP config file (see tool documentation)',
+    note: 'Any stdio MCP client that supports npx commands works.',
+  },
+};
+
+const JOURNEY_BANNERS = {
+  install:
+    'Step 1 — Install: run the script (or MCP agm_scaffold) in your application repo root. Then proceed to Adopt.',
+  adopt:
+    'Step 2 — Adopt: new chat in your app repo. Agent creates blueprint.md, entry-point.md, and the first doc section.',
+  continue:
+    'Step 3 — Continue: new chat. Agent picks the next open row in blueprint.md and writes that chapter.',
+  evolve:
+    'Step 4 — Evolve: new chat after code changes (sync) or when one section needs depth (refine).',
+  verify:
+    'Step 5 — Verify: always a fresh chat — report only, no doc edits in this session.',
+};
+
+function buildMcpServerConfig() {
+  return JSON.stringify(
+    {
+      mcpServers: {
+        agm: {
+          command: 'npx',
+          args: ['-y', '@abx-hh/agm-cli', 'agm-mcp'],
+        },
+      },
+    },
+    null,
+    2
+  );
+}
+
+function readSessionMode(form) {
+  const el = form?.elements?.namedItem('sessionMode');
+  if (!el) return 'copy';
+  const checked = form.querySelector('input[name="sessionMode"]:checked');
+  return checked?.value === 'mcp' ? 'mcp' : 'copy';
+}
+
+function mcpToolJson(tool, args) {
+  return JSON.stringify({ tool, arguments: args }, null, 2);
+}
+
+function buildMcpScaffoldRequest(params) {
+  const template = resolvedTemplate(params);
+  const args = {
+    project: params.appName || 'My Application',
+    template,
+    docRoot: normDocRoot(params.docRoot),
+    aiTool: params.aiTool || 'cursor',
+  };
+  if (params.installPack === 'full') args.full = true;
+  else if (params.installPack === 'domain') args.domain = true;
+
+  return [
+    'AGM — install scaffold via MCP (run in your application repo)',
+    '',
+    'In a new chat with AGM MCP connected, ask your agent to call:',
+    '',
+    mcpToolJson('agm_scaffold', args),
+    '',
+    'Or say in natural language:',
+    `"Call agm_scaffold for project ${args.project}, template ${args.template}, docRoot ${args.docRoot}."`,
+    '',
+    'After success, run Step 2 (Adopt) — agm_trigger_workflow bootstrap-adopt.',
+  ].join('\n');
+}
+
+function buildMcpAdoptGoal(params) {
+  const lines = [];
+  if (params.purpose) lines.push(`Purpose: ${params.purpose}`);
+  if (params.stack) lines.push(`Stack: ${params.stack}`);
+  if (params.sourceRoot) lines.push(`Primary source: ${params.sourceRoot}`);
+  if (params.externalSystems) lines.push(`External systems: ${params.externalSystems}`);
+  if (params.docFocus?.length) lines.push(`Documentation areas: ${params.docFocus.join(', ')}`);
+  if (params.docFocusDetail) lines.push(`Focus detail: ${params.docFocusDetail}`);
+  return lines.join('\n');
+}
+
+function buildMcpWorkflowRequest(workflowId, params, inputValues = {}) {
+  const args = { workflowId };
+  const goalParts = [];
+  if (params?.appName) goalParts.push(`Application: ${params.appName}`);
+  if (params?.template) goalParts.push(`Template: ${resolvedTemplate(params)}`);
+  if (params?.docRoot) goalParts.push(`Doc root: ${normDocRoot(params.docRoot)}`);
+
+  const adoptGoal = buildMcpAdoptGoal(params || {});
+  if (workflowId === 'bootstrap-adopt' && adoptGoal) {
+    args.goal = adoptGoal;
+  } else if (inputValues.goal) {
+    args.goal = inputValues.goal;
+  }
+
+  const parameters = {};
+  for (const [key, val] of Object.entries(inputValues)) {
+    if (val == null || val === '') continue;
+    if (key === 'goal' && args.goal) continue;
+    if (typeof val === 'boolean') parameters[key] = val;
+    else parameters[key] = String(val);
+  }
+  if (Object.keys(parameters).length) args.parameters = parameters;
+
+  if (workflowId === 'maintenance-diff-range') {
+    if (inputValues.diffFrom) args.diffFrom = inputValues.diffFrom;
+    if (inputValues.diffTo) args.diffTo = inputValues.diffTo || 'HEAD';
+  }
+
+  const freshNote =
+    workflowId.startsWith('review-') || workflowId === 'review-maintenance' || workflowId === 'review-phase'
+      ? 'Use a FRESH chat — report only, no doc edits.'
+      : 'Use a NEW chat in your application repo.';
+
+  return [
+    `AGM session — ${workflowId}`,
+    '',
+    freshNote,
+    '',
+    'Ask your agent to call MCP tool agm_trigger_workflow:',
+    '',
+    mcpToolJson('agm_trigger_workflow', args),
+    '',
+    'The agent receives the compressed workflow instruction automatically — do not paste the full prompt.',
+  ].join('\n');
+}
+
+function updateSessionModeUI(form) {
+  const mode = readSessionMode(form);
+  const isMcp = mode === 'mcp';
+
+  document.getElementById('mcp-setup-panel')?.toggleAttribute('hidden', !isMcp);
+
+  for (const id of [
+    'copy-install-mcp',
+    'copy-adopt-mcp',
+    'copy-continue-mcp',
+  ]) {
+    document.getElementById(id)?.toggleAttribute('hidden', !isMcp);
+  }
+  document.querySelectorAll('.mode-copy-mcp').forEach((el) => {
+    el.toggleAttribute('hidden', !isMcp);
+  });
+
+  const primaryInstall = document.getElementById('copy-install');
+  const primaryAdopt = document.getElementById('copy-adopt');
+  const primaryContinue = document.getElementById('copy-continue');
+  if (primaryInstall) primaryInstall.classList.toggle('primary', !isMcp);
+  if (primaryAdopt) primaryAdopt.classList.toggle('primary', !isMcp);
+  if (primaryContinue) primaryContinue.classList.toggle('primary', !isMcp);
+  document.querySelectorAll('.mode-copy').forEach((el) => {
+    el.classList.toggle('primary', !isMcp);
+  });
+
+  const aiTool = String(form.elements.namedItem('aiTool')?.value || 'cursor');
+  const pathInfo = MCP_CONFIG_PATHS[aiTool] || MCP_CONFIG_PATHS.generic;
+  const pathEl = document.getElementById('mcp-config-path');
+  if (pathEl) {
+    pathEl.innerHTML = `<strong>Config file:</strong> ${pathInfo.path}<br><span class="mcp-config-note">${pathInfo.note}</span>`;
+  }
+  const mcpPre = document.getElementById('mcp-config-preview');
+  if (mcpPre) mcpPre.textContent = buildMcpServerConfig();
+
+  refreshMcpStepHints(form);
+}
+
+function refreshMcpStepHints(form) {
+  const isMcp = readSessionMode(form) === 'mcp';
+  const params = readForm(form);
+
+  const setHint = (id, html) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!isMcp || !html) {
+      el.hidden = true;
+      el.replaceChildren();
+      return;
+    }
+    el.hidden = false;
+    el.innerHTML = html;
+  };
+
+  setHint(
+    'install-mcp-hint',
+    isMcp
+      ? '<strong>MCP path:</strong> copy the MCP install request below, or use the install script if MCP is not configured yet.'
+      : ''
+  );
+  setHint(
+    'adopt-mcp-hint',
+    isMcp
+      ? '<strong>MCP path:</strong> after install, copy the MCP adopt request → paste into a <em>new chat</em> in your app repo.'
+      : ''
+  );
+  setHint(
+    'continue-mcp-hint',
+    isMcp
+      ? '<strong>MCP path:</strong> copy MCP request → new chat → agent calls <code>agm_trigger_workflow</code> with <code>bootstrap-continue</code>.'
+      : ''
+  );
+}
+
+function setJourneyHighlight(step) {
+  document.querySelectorAll('.journey-step').forEach((el) => {
+    el.classList.toggle('journey-step--active', el.dataset.journey === step);
+  });
+  const banner = document.getElementById('journey-banner');
+  if (banner && JOURNEY_BANNERS[step]) banner.textContent = JOURNEY_BANNERS[step];
+}
+
+function initJourneyNav() {
+  document.querySelectorAll('.journey-step').forEach((stepEl) => {
+    stepEl.addEventListener('click', () => {
+      const key = stepEl.dataset.journey;
+      setJourneyHighlight(key);
+      const tabs = document.querySelectorAll('.phase-tab');
+      const panels = {
+        build: document.getElementById('phase-build'),
+        evolve: document.getElementById('phase-evolve'),
+        verify: document.getElementById('phase-verify'),
+      };
+      const tabMap = {
+        install: 'build',
+        adopt: 'build',
+        continue: 'build',
+        evolve: 'evolve',
+        verify: 'verify',
+      };
+      const phase = tabMap[key] || 'build';
+      tabs.forEach((t) => {
+        const on = t.dataset.phase === phase;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      Object.entries(panels).forEach(([k, panel]) => {
+        if (!panel) return;
+        const on = k === phase;
+        panel.hidden = !on;
+        panel.classList.toggle('active', on);
+      });
+      if (key === 'adopt') {
+        document.getElementById('copy-adopt')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (key === 'install') {
+        document.getElementById('copy-install')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+  setJourneyHighlight('install');
+}
 
 const EVOLVE_MODES_GOLDEN = [
   {
@@ -32,12 +296,18 @@ const DIALOG_WORKFLOW_IDS = new Set([
   'domain-work-event-storm',
 ]);
 
-const ARCHITECTURE_WORK_MODES_GOLDEN = [
-  { id: 'architecture-work-query', intent: 'Answer a question', note: 'Traverse the graph; write a work report.' },
-  { id: 'architecture-work-design', intent: 'Propose a design', note: 'Structure or cross-cutting change — set goal and constraints.' },
-];
-
-const ARCHITECTURE_WORK_MODES_ADVANCED = [
+/** All Architect workflows live under Advanced (not public starter / Day-1). */
+const ARCHITECTURE_WORK_MODES = [
+  {
+    id: 'architecture-work-query',
+    intent: 'Answer a question',
+    note: 'Traverse the graph; write a work report. Needs graph + install --full/--domain for role files.',
+  },
+  {
+    id: 'architecture-work-design',
+    intent: 'Propose a design',
+    note: 'Structure or cross-cutting change — set goal and constraints.',
+  },
   {
     id: 'architecture-work-interrogate',
     intent: 'Explore (dialog)',
@@ -58,8 +328,6 @@ const ARCHITECTURE_WORK_MODES_ADVANCED = [
   },
   { id: 'architecture-work-continue', intent: 'Resume open work', note: 'Continue WRK entries in blueprint.md (architecture track).' },
 ];
-
-const ARCHITECTURE_WORK_MODES = [...ARCHITECTURE_WORK_MODES_GOLDEN, ...ARCHITECTURE_WORK_MODES_ADVANCED];
 
 const DOMAIN_WORK_MODES = [
   {
@@ -590,6 +858,8 @@ function setDocFocusChecked(form, value, checked) {
 function readForm(form) {
   const data = new FormData(form);
   const template = String(data.get('template') || 'arc42');
+  const packEl = form.elements.namedItem('installPack');
+  const installPack = packEl && packEl.checked ? 'full' : 'golden';
   return {
     os: String(data.get('os') || 'macos'),
     aiTool: String(data.get('aiTool') || 'cursor'),
@@ -603,6 +873,8 @@ function readForm(form) {
     externalSystems: String(data.get('externalSystems') || '').trim(),
     docFocus: readDocFocus(form),
     docFocusDetail: String(data.get('docFocusDetail') || '').trim(),
+    installPack,
+    sessionMode: readSessionMode(form),
   };
 }
 
@@ -802,7 +1074,7 @@ function buildParameterBlock(params) {
     `- Application: ${params.appName}`,
     `- Documentation template: ${template}`,
     `- Documentation root: ${docRoot}`,
-    `- Install: bp-install.sh completed (prompts + scaffold present)`,
+    `- Install: agm-install.sh completed (prompts + scaffold present)`,
   ];
   if (params.purpose) lines.push(`- Purpose / domain: ${params.purpose}`);
   if (params.stack) lines.push(`- Stack: ${params.stack}`);
@@ -853,6 +1125,7 @@ function buildInstallScript(params) {
   const project = params.appName || 'My Application';
   const aiTool = params.aiTool;
   const os = params.os;
+  const installPack = params.installPack || 'golden';
 
   if (os === 'windows') {
     return buildInstallScriptWindows({
@@ -861,14 +1134,18 @@ function buildInstallScript(params) {
       project,
       aiTool,
       docFocus: params.docFocus || [],
+      installPack,
     });
   }
 
+  const packFlag =
+    installPack === 'full' ? ' \\\n  --full' : installPack === 'domain' ? ' \\\n  --domain' : '';
+
   const lines = [
     '#!/usr/bin/env bash',
-    '# AGM - generated install script',
+    '# AGM - generated install script (golden path by default)',
     '# Run from your application repository root. No git clone required.',
-    '# Save as bp-install-run.sh then: chmod +x bp-install-run.sh && ./bp-install-run.sh',
+    '# Save as agm-install-run.sh then: chmod +x agm-install-run.sh && ./agm-install-run.sh',
     'set -euo pipefail',
     '',
     bashAssign('PROJECT', project),
@@ -877,17 +1154,17 @@ function buildInstallScript(params) {
     bashAssign('AI_TOOL', aiTool),
     bashAssign('DOC_FOCUS', (params.docFocus || []).join(',')),
     '',
-    'INSTALLER="$(mktemp -t bp-install.XXXXXX.sh)"',
+    'INSTALLER="$(mktemp -t agm-install.XXXXXX.sh)"',
     'cleanup_installer() { rm -f -- "${INSTALLER:-}"; }',
     'trap cleanup_installer EXIT',
-    `curl -fsSL "${BP_INSTALL_URL}" -o "$INSTALLER"`,
+    `curl -fsSL "${AGM_INSTALL_URL}" -o "$INSTALLER"`,
     'chmod +x "$INSTALLER"',
     '"$INSTALLER" \\',
     '  --project "$PROJECT" \\',
     '  --doc-root "$DOC_ROOT" \\',
     '  --template "$TEMPLATE" \\',
     '  --ai-tool "$AI_TOOL" \\',
-    '  --focus "$DOC_FOCUS"',
+    `  --focus "$DOC_FOCUS"${packFlag}`,
     '',
     'echo "Install finished. Open Assistant UI -> Build -> Adopt."',
     '',
@@ -895,9 +1172,11 @@ function buildInstallScript(params) {
   return lines.join('\n');
 }
 
-function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocus }) {
+function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocus, installPack }) {
   const q = (s) => `"${String(s).replace(/"/g, '""')}"`;
   const focus = (docFocus || []).join(',');
+  const packArgs =
+    installPack === 'full' ? ' `\n  --full' : installPack === 'domain' ? ' `\n  --domain' : '';
   return [
     '# AGM — generated install script (Windows)',
     '# Run in PowerShell from your application repository root.',
@@ -910,8 +1189,8 @@ function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocu
     `$AiTool = ${q(aiTool)}`,
     `$DocFocus = ${q(focus)}`,
     '',
-    '$Installer = Join-Path $env:TEMP ("bp-install-" + [guid]::NewGuid().ToString("n") + ".sh")',
-    `curl.exe -fsSL ${q(BP_INSTALL_URL)} -o $Installer`,
+    '$Installer = Join-Path $env:TEMP ("agm-install-" + [guid]::NewGuid().ToString("n") + ".sh")',
+    `curl.exe -fsSL ${q(AGM_INSTALL_URL)} -o $Installer`,
     'if (-not $?) { throw "Download failed. Use Git Bash and the macOS/Linux script from the Assistant UI." }',
     '',
     '# Git Bash (adjust path if needed)',
@@ -926,7 +1205,7 @@ function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocu
     '  --doc-root $DocRoot `',
     '  --template $Template `',
     '  --ai-tool $AiTool `',
-    '  --focus $DocFocus',
+    `  --focus $DocFocus${packArgs}`,
     'Remove-Item -Force $Installer -ErrorAction SilentlyContinue',
     '',
     'Write-Host "Install finished. Open Assistant UI → Build → Adopt."',
@@ -1243,6 +1522,13 @@ function applyParams(form, params) {
   form.querySelectorAll('input[name="docFocus"]').forEach((cb) => {
     cb.checked = focus.has(cb.value);
   });
+  const packEl = form.elements.namedItem('installPack');
+  if (packEl) packEl.checked = params.installPack === 'full';
+  const mode = params.sessionMode === 'mcp' ? 'mcp' : 'copy';
+  form.querySelectorAll('input[name="sessionMode"]').forEach((rb) => {
+    rb.checked = rb.value === mode;
+  });
+  updateSessionModeUI(form);
   const detailEl = form.elements.namedItem('docFocusDetail');
   if (detailEl && params.docFocusDetail != null) detailEl.value = params.docFocusDetail;
   toggleCustomField(form);
@@ -1260,6 +1546,7 @@ function toggleCustomField(form) {
 function onDocFocusChange(form) {
   saveParams(readForm(form));
   updateDocAreasRecap(form);
+  refreshMcpStepHints(form);
   const pre = document.getElementById('install-script-preview');
   if (pre) pre.textContent = buildInstallScript(readForm(form));
   const params = readForm(form);
@@ -1318,6 +1605,14 @@ function initSetupForm(adoptBase) {
   initDocAreaHelpers(form, 'doc-area-helpers-build');
   initDocFocusGrids(form);
   applyParams(form, loadParams());
+  form.querySelectorAll('input[name="sessionMode"]').forEach((rb) => {
+    rb.addEventListener('change', () => {
+      saveParams(readForm(form));
+      updateSessionModeUI(form);
+    });
+  });
+  form.elements.namedItem('aiTool')?.addEventListener('change', () => updateSessionModeUI(form));
+  updateSessionModeUI(form);
   form.elements.namedItem('docFocusDetail')?.addEventListener('input', () => {
     saveParams(readForm(form));
     updateDocAreasRecap(form);
@@ -1382,6 +1677,32 @@ function initSetupForm(adoptBase) {
     const params = readForm(form);
     saveParams(params);
     copy(buildInstallScript(params));
+    setJourneyHighlight('install');
+  });
+
+  document.getElementById('copy-install-mcp')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const params = readForm(form);
+    saveParams(params);
+    copy(buildMcpScaffoldRequest(params));
+    setJourneyHighlight('install');
+  });
+
+  document.getElementById('copy-mcp-config')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    copy(buildMcpServerConfig());
+  });
+
+  document.getElementById('copy-adopt-mcp')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const params = readForm(form);
+    if (!params.appName) {
+      form.elements.namedItem('appName')?.focus();
+      return;
+    }
+    saveParams(params);
+    copy(buildMcpWorkflowRequest('bootstrap-adopt', params));
+    setJourneyHighlight('adopt');
   });
 
   form.addEventListener('submit', (e) => {
@@ -1396,7 +1717,12 @@ function initSetupForm(adoptBase) {
       return;
     }
     saveParams(params);
-    copy(buildAdoptPrompt(adoptBase, params));
+    if (readSessionMode(form) === 'mcp') {
+      copy(buildMcpWorkflowRequest('bootstrap-adopt', params));
+    } else {
+      copy(buildAdoptPrompt(adoptBase, params));
+    }
+    setJourneyHighlight('adopt');
   });
 }
 
@@ -1538,9 +1864,16 @@ function updatePromptPreview(panelKey, workflowId, params, inputsHost) {
 }
 
 function bindStep(stepEl, workflow) {
-  stepEl.querySelector('.btn-prompt')?.addEventListener('click', () => {
+  const copyBtn = stepEl.querySelector('.btn-prompt') || stepEl.querySelector('#copy-continue');
+  copyBtn?.addEventListener('click', () => {
     const params = loadParams() || { docRoot: 'docs/architecture/' };
     copy(personalizeWorkflowPrompt(workflow, params, {}));
+    setJourneyHighlight('continue');
+  });
+  stepEl.querySelector('.btn-prompt-mcp')?.addEventListener('click', () => {
+    const params = loadParams() || { docRoot: 'docs/architecture/' };
+    copy(buildMcpWorkflowRequest(workflow.id, params));
+    setJourneyHighlight('continue');
   });
 }
 
@@ -1597,6 +1930,7 @@ function initModeGrid(workflows, key, modes, gridId, panelId, labelId, noteId) {
       }
 
       renderWorkflowInputs(inputsHost, w.id, key);
+      refreshPanelMcpHint(key, w.id);
       if (previewHost) {
         previewHost.textContent = personalizeWorkflowPrompt(
           w,
@@ -1622,6 +1956,22 @@ function refreshOpenWorkflowPanels() {
   }
 }
 
+function refreshPanelMcpHint(panelKey, workflowId) {
+  const form = document.getElementById('setup-form');
+  const hintId = panelKey === 'review' ? 'review-mcp-hint' : panelKey === 'evolve' ? 'evolve-mcp-hint' : null;
+  const el = hintId ? document.getElementById(hintId) : null;
+  if (!el || !form) return;
+  const isMcp = readSessionMode(form) === 'mcp';
+  if (!isMcp || !workflowId) {
+    el.hidden = true;
+    el.replaceChildren();
+    return;
+  }
+  el.hidden = false;
+  el.innerHTML = `<strong>MCP path:</strong> copy MCP request → new chat → <code>agm_trigger_workflow</code> with <code>${workflowId}</code>.`;
+  setJourneyHighlight(panelKey === 'review' ? 'verify' : 'evolve');
+}
+
 function initCopyButtons() {
   document.querySelectorAll('.mode-copy').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1636,6 +1986,22 @@ function initCopyButtons() {
           document.getElementById(`${key}-inputs`)
         )
       );
+      setJourneyHighlight(key === 'review' ? 'verify' : 'evolve');
+    });
+  });
+  document.querySelectorAll('.mode-copy-mcp').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.panel;
+      const w = panelState[key];
+      if (!w) return;
+      copy(
+        buildMcpWorkflowRequest(
+          w.id,
+          loadParams() || { docRoot: 'docs/architecture/' },
+          inputState[key][w.id] || {}
+        )
+      );
+      setJourneyHighlight(key === 'review' ? 'verify' : 'evolve');
     });
   });
 }
@@ -1650,6 +2016,7 @@ async function loadAdoptPrompt() {
 
 async function main() {
   initTabs();
+  initJourneyNav();
 
   let workflows;
   let adoptBase = '';
@@ -1676,16 +2043,7 @@ async function main() {
     'evolve-label',
     'evolve-note'
   );
-  initModeGrid(workflows, 'work', ARCHITECTURE_WORK_MODES_GOLDEN, 'work-grid', 'work-panel', 'work-label', 'work-note');
-  initModeGrid(
-    workflows,
-    'work',
-    ARCHITECTURE_WORK_MODES_ADVANCED,
-    'work-advanced-grid',
-    'work-panel',
-    'work-label',
-    'work-note'
-  );
+  initModeGrid(workflows, 'work', ARCHITECTURE_WORK_MODES, 'work-grid', 'work-panel', 'work-label', 'work-note');
   initModeGrid(workflows, 'domain', DOMAIN_WORK_MODES, 'domain-grid', 'domain-panel', 'domain-label', 'domain-note');
   initModeGrid(workflows, 'review', REVIEW_MODES_GOLDEN, 'review-grid', 'review-panel', 'review-label', 'review-note');
   initModeGrid(

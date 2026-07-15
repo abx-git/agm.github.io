@@ -7,16 +7,49 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Architecture Graph Method (AGM)</title>
-  <link rel="stylesheet" href="app.css?v=38" />
+  <link rel="stylesheet" href="app.css?v=40" />
 </head>
 <body>
   <main class="app">
     <header class="head">
       <h1>Architecture Graph Method (AGM)</h1>
-      <p class="tagline">Living architecture graph in your repo — orchestrated via <code>blueprint.md</code>. <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/quickstart.md">Quickstart</a> (~10 min).</p>
+      <p class="tagline">Living architecture docs in your repo — one guided path from install to review.</p>
     </header>
 
-    <details class="glossary" open>
+    <section class="start-here" aria-labelledby="start-here-title">
+      <h2 id="start-here-title" class="start-here-title">Start here — you do not need to know AGM yet</h2>
+      <p class="start-here-lead">Fill in your project once below. This assistant generates everything you need for each step. Always work in a <strong>new chat</strong> per session (except dialog interviews).</p>
+      <ol class="journey-strip" aria-label="Golden path">
+        <li class="journey-step journey-step--active" data-journey="install">
+          <span class="journey-n">1</span>
+          <span class="journey-label">Install</span>
+          <span class="journey-hint">Once per repo</span>
+        </li>
+        <li class="journey-step" data-journey="adopt">
+          <span class="journey-n">2</span>
+          <span class="journey-label">Adopt</span>
+          <span class="journey-hint">First docs</span>
+        </li>
+        <li class="journey-step" data-journey="continue">
+          <span class="journey-n">3</span>
+          <span class="journey-label">Continue</span>
+          <span class="journey-hint">Next chapter</span>
+        </li>
+        <li class="journey-step" data-journey="evolve">
+          <span class="journey-n">4</span>
+          <span class="journey-label">Evolve</span>
+          <span class="journey-hint">After code changes</span>
+        </li>
+        <li class="journey-step" data-journey="verify">
+          <span class="journey-n">5</span>
+          <span class="journey-label">Verify</span>
+          <span class="journey-hint">Fresh chat only</span>
+        </li>
+      </ol>
+      <p id="journey-banner" class="journey-banner" aria-live="polite"></p>
+    </section>
+
+    <details class="glossary">
       <summary>Core files (read once)</summary>
       <p class="glossary-lead">Architecture content lives in your chosen template folder (<code>c4-light/</code>, <code>adr-first/</code>, …). Three files orchestrate the graph:</p>
       <table class="role-table">
@@ -57,9 +90,49 @@
       </nav>
 
       <section id="phase-build" class="phase active" role="tabpanel">
-        <p class="phase-intro"><strong>Build:</strong> install once, adopt in one chat, continue chapter by chapter. See <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/quickstart.md">quickstart</a>.</p>
+        <p class="phase-intro"><strong>Build</strong> — steps 1–4 below. Do them in order the first time. <a href="https://github.com/abx-git/agm/blob/main/docs/quickstart.md">Quickstart</a>.</p>
 
         <div class="setup-shared">
+          <fieldset class="session-mode-fieldset">
+            <legend>How you run AGM sessions</legend>
+            <p class="field-hint session-mode-hint">Both paths use the same workflows. Pick what fits your IDE setup.</p>
+            <div class="session-mode-options">
+              <label class="session-mode-option">
+                <input type="radio" name="sessionMode" value="copy" checked />
+                <span class="session-mode-card">
+                  <strong>Copy prompt</strong>
+                  <small>Paste a generated prompt into a new chat — works everywhere, no setup.</small>
+                </span>
+              </label>
+              <label class="session-mode-option">
+                <input type="radio" name="sessionMode" value="mcp" />
+                <span class="session-mode-card">
+                  <strong>MCP in IDE</strong>
+                  <small>Agent calls <code>agm_trigger_workflow</code> — one-time MCP config in Cursor / Claude Desktop.</small>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div id="mcp-setup-panel" class="mcp-setup-panel" hidden>
+            <h3 class="mcp-setup-title">One-time MCP setup</h3>
+            <p class="mcp-setup-lead">Add the AGM MCP server to your IDE, then restart the IDE. Run sessions from your <strong>application repo</strong> (where <code>.agm/config.json</code> lives after install).</p>
+            <p id="mcp-config-path" class="mcp-config-path"></p>
+            <details class="prompt-preview" open>
+              <summary>MCP config (merge into your IDE settings)</summary>
+              <pre id="mcp-config-preview" class="preview-box install-box" aria-live="polite"></pre>
+            </details>
+            <div class="cmd-row mcp-setup-actions">
+              <button type="button" class="btn primary" id="copy-mcp-config">Copy MCP config</button>
+            </div>
+            <ol class="mcp-verify-steps">
+              <li>Restart IDE after saving config</li>
+              <li>Open your application repo in the IDE</li>
+              <li>In chat, ask: <em>Call <code>agm_prompt_pack_status</code></em> — expect <code>"tier": "starter"</code></li>
+            </ol>
+            <p class="mcp-setup-foot"><a href="https://github.com/abx-git/agm/blob/main/docs/reference/agm-mcp-install.md">Full MCP install reference</a></p>
+          </div>
+
           <label class="field">
             <span>Project name <em>(required)</em></span>
             <input type="text" name="appName" required placeholder="e.g. Order Service" autocomplete="organization" />
@@ -116,15 +189,19 @@
                   </select>
                 </label>
               </div>
+              <label class="field field--checkbox" style="margin-top:0.75rem">
+                <input type="checkbox" name="installPack" value="full" />
+                <span>Include Architect + Domain packs (<code>--full</code>) — only if you need Advanced workflows immediately</span>
+              </label>
             </div>
             <div class="install-hint" role="note">
               <p class="install-hint-title">Where to run the script</p>
               <p>Run it in the <strong>root of your application repository</strong> — the project you document (where your source code and <code>.git</code> live).</p>
-              <p class="install-hint-not">Not in the blueprint-pattern repository. Not from the Assistant URL folder.</p>
+              <p class="install-hint-not">Not in the agm repository. Not from the Assistant URL folder.</p>
               <ol class="install-hint-steps">
                 <li><code>cd /path/to/your-app</code> (repo root)</li>
-                <li>Copy script → save as <code>bp-install-run.sh</code></li>
-                <li><code>chmod +x bp-install-run.sh && ./bp-install-run.sh</code> (macOS/Linux) or follow the Windows note in the script</li>
+                <li>Copy script → save as <code>agm-install-run.sh</code></li>
+                <li><code>chmod +x agm-install-run.sh && ./agm-install-run.sh</code> (macOS/Linux) or follow the Windows note in the script</li>
               </ol>
               <p class="install-hint-foot">After success you should see <code>prompts/</code> and your documentation root (e.g. <code>docs/architecture/</code>) in that repo.</p>
             </div>
@@ -132,7 +209,9 @@
               <summary>Generated install script</summary>
               <pre id="install-script-preview" class="preview-box install-box" aria-live="polite"></pre>
             </details>
+            <div id="install-mcp-hint" class="step-action-hint" hidden></div>
             <button type="button" class="btn primary btn-install" id="copy-install">Copy install script</button>
+            <button type="button" class="btn btn-install-mcp" id="copy-install-mcp" hidden>Copy MCP install request</button>
           </li>
 
           <li class="step step-hero" id="doc-areas-step">
@@ -191,7 +270,9 @@
               <summary>Preview adoption parameters</summary>
               <pre id="prompt-preview" class="preview-box" aria-live="polite"></pre>
             </details>
+            <div id="adopt-mcp-hint" class="step-action-hint" hidden></div>
             <button type="submit" class="btn primary btn-adopt" id="copy-adopt">Copy adoption prompt</button>
+            <button type="button" class="btn btn-adopt-mcp" id="copy-adopt-mcp" hidden>Copy MCP adopt request</button>
           </li>
 
           <li class="step" data-workflow="bootstrap-continue">
@@ -199,18 +280,20 @@
               <span class="step-n">4</span>
               <div>
                 <strong>Continue — next chapter</strong>
-                <p>Next open row in <code>blueprint.md</code> → copy prompt → new chat. Sync <code>entry-point.md</code> when sections appear.</p>
+                <p>After adopt: open <code>blueprint.md</code>, find the next open phase, start a <strong>new chat</strong>, run Continue.</p>
               </div>
             </div>
+            <div id="continue-mcp-hint" class="step-action-hint" hidden></div>
             <div class="cmd-row">
-              <button type="button" class="btn primary btn-prompt">Copy prompt</button>
+              <button type="button" class="btn primary btn-prompt" id="copy-continue">Copy prompt</button>
+              <button type="button" class="btn btn-prompt-mcp" id="copy-continue-mcp" hidden>Copy MCP request</button>
             </div>
           </li>
         </ol>
       </section>
 
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Evolve:</strong> sync docs after code changes or deepen one section. Always start a <strong>new chat</strong>.</p>
+        <p class="phase-intro"><strong>Evolve</strong> (step 4) — after code merged or when one section needs more depth. Pick an intent → copy or MCP → <strong>new chat</strong>.</p>
 
         <h2 class="evolve-workflows-title">Choose intent</h2>
         <div class="modes" id="evolve-grid"></div>
@@ -225,15 +308,17 @@
             <summary>Preview prompt</summary>
             <pre id="evolve-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
           </details>
-          <div class="cmd-row">
+          <div id="evolve-mcp-hint" class="step-action-hint" hidden></div>
+          <div class="cmd-row mode-actions">
             <button type="button" class="btn primary mode-copy" data-panel="evolve">Copy prompt</button>
+            <button type="button" class="btn mode-copy-mcp" data-panel="evolve" hidden>Copy MCP request</button>
           </div>
           <p class="mode-note" id="evolve-note" hidden></p>
         </div>
       </section>
 
       <section id="phase-verify" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Verify:</strong> report-only — never the same chat as write or sync. Pick intent, copy prompt, <strong>new chat</strong>.</p>
+        <p class="phase-intro"><strong>Verify</strong> (step 5) — quality check only. <strong>Never</strong> the same chat that wrote or synced docs. Pick intent → copy or MCP → <strong>new chat</strong>.</p>
         <div class="modes" id="review-grid"></div>
         <details class="advanced-workflows">
           <summary>More verify options</summary>
@@ -246,22 +331,20 @@
             <summary>Preview prompt</summary>
             <pre id="review-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
           </details>
-          <div class="cmd-row">
+          <div id="review-mcp-hint" class="step-action-hint" hidden></div>
+          <div class="cmd-row mode-actions">
             <button type="button" class="btn primary mode-copy" data-panel="review">Copy prompt</button>
+            <button type="button" class="btn mode-copy-mcp" data-panel="review" hidden>Copy MCP request</button>
           </div>
           <p class="mode-note" id="review-note" hidden></p>
         </div>
       </section>
 
       <section id="phase-advanced" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Advanced:</strong> architecture and domain (DDD) work on an established graph — not part of the golden path.</p>
+        <p class="phase-intro"><strong>Advanced:</strong> architecture and domain (DDD) work on an established graph — not Day-1. Install with <code>--full</code> (or re-run install) for role files and Domain scaffold. Public MCP starter covers golden path only.</p>
 
         <h2 class="advanced-track-title">Architecture</h2>
         <div class="modes" id="work-grid"></div>
-        <details class="advanced-workflows">
-          <summary>More architecture options</summary>
-          <div class="modes" id="work-advanced-grid"></div>
-        </details>
         <div id="work-panel" class="mode-panel" hidden>
           <div id="work-dialog-hint" class="dialog-hint" hidden>
             <strong>Dialog mode:</strong> paste the prompt into a <strong>new Cursor Chat</strong> (not Agent/Composer).
@@ -279,36 +362,38 @@
           <p class="mode-note" id="work-note" hidden></p>
         </div>
 
-        <h2 class="advanced-track-title">Domain (DDD)</h2>
-        <p class="phase-intro phase-intro--compact">Strategic and tactical domain modeling — updates <code>domain/</code> and <code>work/</code>.</p>
-        <div class="modes" id="domain-grid"></div>
-        <div id="domain-panel" class="mode-panel" hidden>
-          <div id="domain-dialog-hint" class="dialog-hint" hidden>
-            <strong>Event storm:</strong> paste into a <strong>new Cursor Chat</strong>. One question per reply until "end interview".
+        <details class="advanced-workflows" id="domain-pack-details">
+          <summary>Domain (DDD) pack</summary>
+          <p class="phase-intro phase-intro--compact">Strategic and tactical domain modeling — updates <code>domain/</code> and <code>work/</code>. Needs install <code>--domain</code> or <code>--full</code>.</p>
+          <div class="modes" id="domain-grid"></div>
+          <div id="domain-panel" class="mode-panel" hidden>
+            <div id="domain-dialog-hint" class="dialog-hint" hidden>
+              <strong>Event storm:</strong> paste into a <strong>new Cursor Chat</strong>. One question per reply until "end interview".
+            </div>
+            <p class="mode-label" id="domain-label"></p>
+            <div id="domain-inputs" class="workflow-inputs" hidden></div>
+            <details class="prompt-preview">
+              <summary>Preview prompt</summary>
+              <pre id="domain-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
+            </details>
+            <div class="cmd-row">
+              <button type="button" class="btn primary mode-copy" data-panel="domain">Copy prompt</button>
+            </div>
+            <p class="mode-note" id="domain-note" hidden></p>
           </div>
-          <p class="mode-label" id="domain-label"></p>
-          <div id="domain-inputs" class="workflow-inputs" hidden></div>
-          <details class="prompt-preview">
-            <summary>Preview prompt</summary>
-            <pre id="domain-prompt-preview" class="preview-box preview-box--short" aria-live="polite"></pre>
-          </details>
-          <div class="cmd-row">
-            <button type="button" class="btn primary mode-copy" data-panel="domain">Copy prompt</button>
-          </div>
-          <p class="mode-note" id="domain-note" hidden></p>
-        </div>
+        </details>
       </section>
     </form>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v38</span>
-      · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/quickstart.md">Quickstart</a>
-      · <a href="https://github.com/abx-git/blueprint-pattern/blob/main/docs/guide.md">Guide</a>
-      · <a href="https://github.com/abx-git/blueprint-pattern">Repository</a>
+      <span class="deploy-id">Lifecycle · v40</span>
+      · <a href="https://github.com/abx-git/agm/blob/main/docs/quickstart.md">Quickstart</a>
+      · <a href="https://github.com/abx-git/agm/blob/main/docs/guide.md">Guide</a>
+      · <a href="https://github.com/abx-git/agm">Repository</a>
     </footer>
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=38" type="module"></script>
+  <script src="app.js?v=40" type="module"></script>
 </body>
 </html>
