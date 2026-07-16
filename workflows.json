@@ -355,6 +355,45 @@
     "prompt": "AGM — Build · Init\nWorkflow: bootstrap-init\nRole: bootstrap\n\nBootstrap AGM documentation for this application.\n\nFollow docs/architecture/prompts/role-bootstrap.md (copy from docs/templates/architecture/prompts/ if missing).\nRead prompts/core/system-prompt.md rules. Create docs/architecture/ structure from the chosen template.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
+    "id": "content-ingest",
+    "track": "Evolve",
+    "activity": "Import",
+    "mode": "Direct",
+    "role": "bootstrap",
+    "group": "Evolve",
+    "when": "Incorporate pasted external material (Confluence, Markdown, specs, use cases, internal notes) into the architecture graph",
+    "prerequisite": "",
+    "freshChat": false,
+    "freshNote": "Optional",
+    "anchors": [
+      "CHANGED_FILES",
+      "INGEST_SUMMARY",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS"
+    ],
+    "steps": [
+      "Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-bootstrap.md → prompts/reference/content-ingest.md.",
+      "Redact secrets, credentials, and PII from pasted content before writing files; ask the human if confidentiality is unclear.",
+      "Create <doc-root>sources/ if missing (index.md, log.md). Persist the import in <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance frontmatter; update sources/index.md and sources/log.md.",
+      "Extract structured facts into scoped architecture sections — e.g. use-cases/, <template>/introduction.md, context.md, glossary, interfaces/imports.md, constraints, context/on-demand.md, domain/ when installed. Link every extracted claim back to the source-ingest file.",
+      "When paste describes scenarios, create or update <doc-root>use-cases/<slug>.md (type: use-case) with source link.",
+      "Cross-check code via always-on.md source map when claims imply implementation; record conflicts as open assumptions.",
+      "Update entry-point.md links and blueprint.md session log; adjust relevant blueprint phase rows when new areas are populated.",
+      "If **Architecture documentation areas (evolve)** is present, prioritize those areas when placing extracted content."
+    ],
+    "placeholders": [
+      "doc-root",
+      "goal",
+      "pasted-content",
+      "scope",
+      "slug",
+      "source-label",
+      "source-type",
+      "template"
+    ],
+    "prompt": "AGM — Evolve · Import content\nWorkflow: content-ingest\nRole: bootstrap\n\nSource label: <source-label>\nSource type: <source-type>\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md body except always-on external-systems table when relevant)\n\nPasted content:\n<pasted-content>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-bootstrap.md → prompts/reference/content-ingest.md.\n2. Redact secrets, credentials, and PII from pasted content before writing files; ask the human if confidentiality is unclear.\n3. Create <doc-root>sources/ if missing (index.md, log.md). Persist the import in <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance frontmatter; update sources/index.md and sources/log.md.\n4. Extract structured facts into scoped architecture sections — e.g. use-cases/, <template>/introduction.md, context.md, glossary, interfaces/imports.md, constraints, context/on-demand.md, domain/ when installed. Link every extracted claim back to the source-ingest file.\n5. When paste describes scenarios, create or update <doc-root>use-cases/<slug>.md (type: use-case) with source link.\n6. Cross-check code via always-on.md source map when claims imply implementation; record conflicts as open assumptions.\n7. Update entry-point.md links and blueprint.md session log; adjust relevant blueprint phase rows when new areas are populated.\n8. If **Architecture documentation areas (evolve)** is present, prioritize those areas when placing extracted content.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
     "id": "domain-work-context-map",
     "track": "Domain",
     "activity": "Design",

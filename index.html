@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Architecture Graph Method (AGM)</title>
-  <link rel="stylesheet" href="app.css?v=40" />
+  <link rel="stylesheet" href="app.css?v=42" />
 </head>
 <body>
   <main class="app">
@@ -193,6 +193,11 @@
                 <input type="checkbox" name="installPack" value="full" />
                 <span>Include Architect + Domain packs (<code>--full</code>) — only if you need Advanced workflows immediately</span>
               </label>
+              <label class="field" style="margin-top:0.75rem">
+                <span>External work directory (optional)</span>
+                <input type="text" name="workDir" placeholder="$HOME/agm-work/my-app/work" autocomplete="off" />
+                <span class="field-hint">Keeps <code>work/</code> outside Git via symlink — each developer prepares drafts locally. Leave empty for in-repo <code>work/</code>.</span>
+              </label>
             </div>
             <div class="install-hint" role="note">
               <p class="install-hint-title">Where to run the script</p>
@@ -212,6 +217,15 @@
             <div id="install-mcp-hint" class="step-action-hint" hidden></div>
             <button type="button" class="btn primary btn-install" id="copy-install">Copy install script</button>
             <button type="button" class="btn btn-install-mcp" id="copy-install-mcp" hidden>Copy MCP install request</button>
+            <details class="upgrade-block">
+              <summary>Already installed? Upgrade AGM (keeps your docs)</summary>
+              <p class="field-hint">Refreshes <code>prompts/workflows/</code>, reference docs, and role files — never <code>blueprint.md</code>, template chapters, or <code>work/</code>. Adds <code>sources/</code> if missing.</p>
+              <details class="prompt-preview">
+                <summary>Generated upgrade script</summary>
+                <pre id="upgrade-script-preview" class="preview-box install-box" aria-live="polite"></pre>
+              </details>
+              <button type="button" class="btn" id="copy-upgrade">Copy upgrade script</button>
+            </details>
           </li>
 
           <li class="step step-hero" id="doc-areas-step">
@@ -293,7 +307,7 @@
       </section>
 
       <section id="phase-evolve" class="phase" role="tabpanel" hidden>
-        <p class="phase-intro"><strong>Evolve</strong> (step 4) — after code merged or when one section needs more depth. Pick an intent → copy or MCP → <strong>new chat</strong>.</p>
+        <p class="phase-intro"><strong>Evolve</strong> (step 4) — after code merged, when importing pasted wiki/spec content, or when one section needs more depth. Pick an intent → copy or MCP → <strong>new chat</strong>.</p>
 
         <h2 class="evolve-workflows-title">Choose intent</h2>
         <div class="modes" id="evolve-grid"></div>
@@ -386,7 +400,7 @@
     </form>
 
     <footer class="foot">
-      <span class="deploy-id">Lifecycle · v40</span>
+      <span class="deploy-id">Lifecycle · v42</span>
       · <a href="https://github.com/abx-git/agm/blob/main/docs/quickstart.md">Quickstart</a>
       · <a href="https://github.com/abx-git/agm/blob/main/docs/guide.md">Guide</a>
       · <a href="https://github.com/abx-git/agm">Repository</a>
@@ -394,6 +408,6 @@
   </main>
 
   <div id="toast" class="toast" hidden>Copied</div>
-  <script src="app.js?v=40" type="module"></script>
+  <script src="app.js?v=42" type="module"></script>
 </body>
 </html>
