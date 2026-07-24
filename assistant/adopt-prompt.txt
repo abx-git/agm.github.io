@@ -1,5 +1,4 @@
 AGM — Adopt (standalone session).
-Workflow: bootstrap-adopt
 Role: bootstrap
 
 Adopt the Architecture Graph Method (AGM) into this application repository.
@@ -11,7 +10,7 @@ Prerequisites: application repository open in the IDE; scaffold present under th
 Use the **Documentation root** from Project parameters for every architecture path — never hardcode another docs folder.
 
 Instructions:
-1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.
+1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the **Continue** session prompt (Build · Continue) from AGM Studio Run in a new chat instead.
 2. Verify Phase A: <doc-root>/prompts/role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to finish Install in AGM Studio (or run `agm scaffold` / install script) with the same documentation root.
 3. If an **Adoption parameters** / **Project parameters** block is present (with file roles or Documentation root), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.
 4. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in <doc-root>/blueprint.md, navigation in <doc-root>/entry-point.md, first evidence-based template section under <doc-root>.
