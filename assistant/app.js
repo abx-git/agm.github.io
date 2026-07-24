@@ -346,6 +346,11 @@ const DOMAIN_WORK_MODES = [
     note: 'Event storm — one question per reply. Cursor Chat. Write after "end interview".',
     dialog: true,
   },
+  {
+    id: 'domain-board-ingest',
+    intent: 'Import E2 board snapshot',
+    note: 'Project board-snapshot-v2 into domain/ via Projection Manifest (human gate).',
+  },
   { id: 'domain-work-context-map', intent: 'Context map', note: 'Bounded contexts and strategic relationships.' },
   { id: 'domain-work-subdomain-classification', intent: 'Classify subdomains', note: 'Core / supporting / generic subdomains.' },
   { id: 'domain-work-integration-review', intent: 'Review integrations', note: 'ACL, OHS, conformist patterns vs interfaces/.' },
@@ -733,6 +738,40 @@ const WORKFLOW_INPUTS = {
     },
     { name: 'slug', label: 'Work file slug', placeholder: 'e.g. checkout-event-storm', required: true },
   ],
+  'domain-board-ingest': [
+    {
+      name: 'sourceLabel',
+      label: 'Source label',
+      placeholder: 'e.g. Checkout workshop board 2026-07-22',
+      required: true,
+    },
+    {
+      name: 'goal',
+      label: 'Goal',
+      placeholder: 'e.g. Checkout process → events + BC-ORD model',
+      required: true,
+    },
+    {
+      name: 'intentViews',
+      label: 'Intent views',
+      placeholder: 'all Tier A — or modelingMode list',
+      required: false,
+    },
+    {
+      name: 'boardPathOrPaste',
+      label: 'Board path or paste',
+      type: 'textarea',
+      placeholder: 'Path to .storm.json or paste JSON',
+      required: true,
+    },
+    {
+      name: 'codeCrossCheck',
+      label: 'Code cross-check',
+      type: 'checkbox',
+      defaultChecked: true,
+    },
+    { name: 'slug', label: 'Work file slug', placeholder: 'e.g. checkout-order-board', required: true },
+  ],
   'domain-work-context-map': [
     {
       name: 'scope',
@@ -911,8 +950,30 @@ function showToast(message = 'Copied') {
 }
 
 async function copy(text) {
-  await navigator.clipboard.writeText(text);
-  showToast();
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      showToast();
+      return;
+    }
+  } catch {
+    /* fall through to textarea fallback (common in iframes / denied permissions) */
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    const ok = document.execCommand('copy');
+    showToast(ok ? 'Copied' : 'Copy failed — select text manually');
+  } catch {
+    showToast('Copy failed — select text manually');
+  } finally {
+    ta.remove();
+  }
 }
 
 function byId(workflows, id) {
@@ -1306,7 +1367,8 @@ function buildInstallScriptWindows({ docRoot, template, project, aiTool, docFocu
   const focus = (docFocus || []).join(',');
   const packArgs =
     installPack === 'full' ? ' `\n  --full' : installPack === 'domain' ? ' `\n  --domain' : '';
-  const workArgs = workDir ? ` `\n  --work-dir $WorkDir` : '';
+  // PowerShell line-continuation backtick must be in a quoted string (not a broken template literal).
+  const workArgs = workDir ? ' `\n  --work-dir $WorkDir' : '';
   const lines = [
     '# AGM — generated install script (Windows)',
     '# Run in PowerShell from your application repository root.',
