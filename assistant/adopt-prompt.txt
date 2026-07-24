@@ -2,15 +2,106 @@ AGM — Adopt (standalone session).
 Workflow: bootstrap-adopt
 Role: bootstrap
 
-Adopt the Architecture Graph Method (AGM) into this application repository. The human has already run `agm-install.sh`. Execute Phase B–C in prompts/reference/adopt-procedure.md (bundled below).
+Adopt the Architecture Graph Method (AGM) into this application repository.
+The human installed the scaffold via AGM Studio (browser write) or `agm scaffold` / `agm-install.sh`.
+Execute Phase B–C in the bundled adopt-procedure (or prompts/reference/adopt-procedure.md).
 
-Prerequisites: install script completed; application repository open in the IDE; human available for a short interview.
+Prerequisites: application repository open in the IDE; scaffold present under the documentation root below; human available for a short interview.
+
+Use the **Documentation root** from Project parameters (or <doc-root>) for every architecture path — do not assume docs/architecture/ if a different root was configured.
 
 Instructions:
-1. If docs/architecture/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.
-2. Verify Phase A in adopt-procedure.md: docs/architecture/prompts/role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to run the install script.
-3. If an **Adoption parameters** block is present (with **File roles**), create always-on.md, blueprint.md, and entry-point.md as separate files; interview only for missing facts.
-4. Bootstrap: follow docs/architecture/prompts/role-bootstrap.md — construction plan in blueprint.md, navigation in entry-point.md, first evidence-based template section.
-5. Verify relative links. Append a session log entry to blueprint.md.
+1. If <doc-root>/blueprint.md already exists, stop and tell the human to paste the bootstrap-continue session prompt in a new chat instead.
+2. Verify Phase A: <doc-root>/prompts/role-bootstrap.md and prompts/core/system-prompt.md must exist. If missing, stop — ask the human to finish Install in AGM Studio (or run `agm scaffold` / install script) with the same documentation root.
+3. If an **Adoption parameters** / **Project parameters** block is present (with file roles or Documentation root), create always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.
+4. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in <doc-root>/blueprint.md, navigation in <doc-root>/entry-point.md, first evidence-based template section under <doc-root>.
+5. Ensure <doc-root>/spikes/ exists (README + _template/ if missing). Prefer spikes for explorations, not flat work/ files.
+6. Verify relative links. Append a session log entry to <doc-root>/blueprint.md.
 
 Output [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop.
+
+---
+
+# Adoption procedure (agent reference)
+
+Bundled into the standalone adoption prompt. **Preparation:** human installs the scaffold (AGM Studio browser write, or CLI). **Adoption session:** agent executes Phase B–C only.
+
+## Phase 0 — Install (human, before first chat)
+
+Install the scaffold **before** the first adoption chat. Use the **same documentation root** you will pass in Project parameters / `--doc-root` (default `docs/architecture/`).
+
+**AGM Studio (preferred):** open the Studio URL → Connect → bind the architecture folder with write access → Install → Write starter into folder. Then open the app repo in your AI tool and paste the Adopt prompt.
+
+**CLI alternatives:**
+
+```bash
+npx @abx-hh/agm-cli scaffold --project "Order Service" --template arc42 --ai-tool cursor --doc-root docs/architecture/
+```
+
+```bash
+./agm-install.sh --project "Order Service" --doc-root docs/architecture/ --template arc42 --ai-tool cursor
+```
+
+Install should provide:
+
+- `prompts/core/system-prompt.md`, `prompts/reference/` (when using full CLI install)
+- `${docRoot}/` scaffold: context, role prompts, template stubs, `spikes/` (+ optional legacy `work/` templates)
+- AI tool rules when using CLI install (Cursor `.cursor/rules/`, etc.) — Studio browser starter may omit IDE rules; remind the human if missing
+
+Optional `--work-dir`: symlink `${docRoot}/spikes` (preferred) or legacy `${docRoot}/work` outside Git — [external-work.md](./external-work.md).
+
+Do **not** invent a second documentation root. Always write under the configured `${docRoot}/`.
+
+`blueprint.md` / `entry-point.md` may already exist as stubs from Studio; the adoption session owns filling them.
+
+## Phase A — Verify scaffold (agent)
+
+Confirm `${docRoot}/prompts/role-bootstrap.md` exists. Prefer `prompts/core/system-prompt.md` at repo root when present. If role-bootstrap is missing, stop and ask the human to finish Install with the same documentation root.
+
+Do not re-download, clone, or duplicate files already installed.
+
+## Phase B — Configure
+
+If the session prompt includes **Architecture documentation areas (bootstrap)**, extend `blueprint.md` with phase rows and stubs for each selected area (see [doc-extensions.md](./doc-extensions.md)). Do not skip areas the human selected.
+
+If the session prompt includes **Project parameters** or **Adoption parameters** (with **File roles** / Documentation root), create or fill three separate files under `${docRoot}/` — do not merge:
+
+| File | Write |
+|------|-------|
+| `context/always-on.md` | Session context from parameters; interview only for gaps |
+| `blueprint.md` | Construction plan: phase rows for selected template, Spike register, initial `[ ]` / `[~]` states |
+| `entry-point.md` | Overview stub, navigation table, links to template sections, `spikes/`, and source paths |
+
+Remind the human only if IDE rules are missing.
+
+## Phase C — Bootstrap
+
+Follow `${docRoot}/prompts/role-bootstrap.md`:
+
+- Record template in `entry-point.md`.
+- Populate `blueprint.md` phase table; mark first in-progress phase.
+- Populate interfaces/ and the first high-value section from evidence only.
+- Keep blueprint (plan/progress) and entry-point (navigation) in sync.
+- Ensure `${docRoot}/spikes/` is ready for later SPK items.
+- Session log + required anchors at end.
+
+## Lifecycle after Build (phase 1)
+
+| Phase | Action |
+|-------|--------|
+| **1 · Build** (continue) | `bootstrap-continue` until phases done → `review-milestone` |
+| **2 · Evolve** | `refinement`, `maintenance` (+ git diff) |
+| **3 · Spike** | Architecture/Domain spikes (`architecture-work-*`, `domain-work-*`) under `spikes/` |
+| **Review** (any phase) | `review-phase`, `review-maintenance` — report-only, new chat |
+
+Session prompts: [AGM Studio](https://abx-git.github.io/agm.github.io/) Run phase, or (if installed) `prompts/workflows/<id>.md` / MCP.
+
+---
+
+## Appendix A — Core prompt (installed to `prompts/core/system-prompt.md`)
+
+See [system-prompt.md](../../prompts/core/system-prompt.md) in the pattern repository. CLI install copies it; Studio browser starter may not — do not duplicate in the adoption chat unless the file is missing and the human asks.
+
+## Appendix B — Role prompt shape
+
+Each `${docRoot}/prompts/role-*.md` file uses: `[SA:ROLE]`, `[SA:INPUTS]`, `[SA:STEPS]`, `[SA:QUALITY_GATES]`, `[SA:OUTPUT_CONTRACT]`, `[SA:STOP]` when installed from full templates. Studio starter roles may be shorter; still follow the session prompt and core rules.
