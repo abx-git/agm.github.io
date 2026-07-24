@@ -1144,6 +1144,8 @@ function substituteDocRoot(text, docRoot) {
   const norm = normDocRoot(docRoot);
   const noSlash = norm.replace(/\/$/, '');
   return text
+    .replace(/\$\{docRoot\}\//g, norm)
+    .replace(/\$\{docRoot\}/g, noSlash)
     .replace(/docs\/architecture\//g, norm)
     .replace(/docs\/architecture(?![/\w])/g, noSlash)
     .replace(/<doc-root>\//g, norm)
