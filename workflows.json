@@ -299,16 +299,16 @@
     "steps": [
       "If <doc-root>/blueprint.md already exists and is already filled (not just a Studio stub), stop and tell the human to paste the **Continue** session prompt (Build · Continue) from AGM Studio Run in a new chat instead.",
       "Verify Phase A: <doc-root>/prompts/role-bootstrap.md must exist. Prefer prompts/core/system-prompt.md when present. If role-bootstrap is missing, stop — ask the human to finish Install in AGM Studio or run `agm scaffold` / install with the same --doc-root.",
-      "If an **Adoption parameters** / **Project parameters** block is present, create or fill always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.",
-      "If **Architecture documentation areas (bootstrap)** is present, add blueprint phases and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).",
-      "Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in <doc-root>/blueprint.md, navigation in <doc-root>/entry-point.md, first evidence-based template section under <doc-root>.",
+      "If an **Adoption parameters** / **Project parameters** block is present, fill entry-point.md and blueprint.md under <doc-root>; interview only for missing facts. Do not invent a third source of truth in always-on.",
+      "If **Architecture documentation areas (bootstrap)** is present, add blueprint checklist rows and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).",
+      "Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — facts + links in entry-point.md, checklist in blueprint.md, first evidence-based template section under <doc-root>.",
       "Ensure <doc-root>/process/spikes/ and <doc-root>/process/reviews/ are ready (README / _template). Prefer process/ for lifecycle artifacts.",
-      "Verify relative links. Append a session log entry to <doc-root>/blueprint.md."
+      "Verify relative links. Append a short session note to <doc-root>/blueprint.md."
     ],
     "placeholders": [
       "doc-root"
     ],
-    "prompt": "AGM — Build · Adopt\nRole: bootstrap\n\nAdopt the Architecture Graph Method (AGM) into this application repository.\nThe human installed the scaffold via AGM Studio (browser write) or `agm scaffold` / `agm-install.sh`.\nExecute Phase B–C in prompts/reference/adopt-procedure.md (or the bundled adopt-procedure).\n\nPrerequisites: application repository open in the IDE; scaffold under the configured documentation root; human available for a short interview.\n\nUse **Documentation root** / <doc-root> for every architecture path — do not hardcode docs/architecture/ if another root was set.\n\nInstructions:\n1. If <doc-root>/blueprint.md already exists and is already filled (not just a Studio stub), stop and tell the human to paste the **Continue** session prompt (Build · Continue) from AGM Studio Run in a new chat instead.\n2. Verify Phase A: <doc-root>/prompts/role-bootstrap.md must exist. Prefer prompts/core/system-prompt.md when present. If role-bootstrap is missing, stop — ask the human to finish Install in AGM Studio or run `agm scaffold` / install with the same --doc-root.\n3. If an **Adoption parameters** / **Project parameters** block is present, create or fill always-on.md, blueprint.md, and entry-point.md as separate files under <doc-root>; interview only for missing facts.\n4. If **Architecture documentation areas (bootstrap)** is present, add blueprint phases and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).\n5. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — construction plan in <doc-root>/blueprint.md, navigation in <doc-root>/entry-point.md, first evidence-based template section under <doc-root>.\n6. Ensure <doc-root>/process/spikes/ and <doc-root>/process/reviews/ are ready (README / _template). Prefer process/ for lifecycle artifacts.\n7. Verify relative links. Append a session log entry to <doc-root>/blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Build · Adopt\nRole: bootstrap\n\nAdopt the Architecture Graph Method (AGM) into this application repository.\nThe human installed the scaffold via AGM Studio (browser write) or `agm scaffold` / `agm-install.sh`.\nExecute Phase B–C in prompts/reference/adopt-procedure.md (or the bundled adopt-procedure).\n\nPrerequisites: application repository open in the IDE; scaffold under the configured documentation root; human available for a short interview.\n\nUse **Documentation root** / <doc-root> for every architecture path — do not hardcode docs/architecture/ if another root was set.\n\nCore files (keep simple):\n- <doc-root>/entry-point.md — start here (short facts + links). Put this in AI context.\n- <doc-root>/blueprint.md — what's next (checklist + short session notes).\n- <doc-root>/context/always-on.md — legacy only; merge leftover facts into entry-point.\n\nInstructions:\n1. If <doc-root>/blueprint.md already exists and is already filled (not just a Studio stub), stop and tell the human to paste the **Continue** session prompt (Build · Continue) from AGM Studio Run in a new chat instead.\n2. Verify Phase A: <doc-root>/prompts/role-bootstrap.md must exist. Prefer prompts/core/system-prompt.md when present. If role-bootstrap is missing, stop — ask the human to finish Install in AGM Studio or run `agm scaffold` / install with the same --doc-root.\n3. If an **Adoption parameters** / **Project parameters** block is present, fill entry-point.md and blueprint.md under <doc-root>; interview only for missing facts. Do not invent a third source of truth in always-on.\n4. If **Architecture documentation areas (bootstrap)** is present, add blueprint checklist rows and doc stubs for each selected area per prompts/reference/doc-extensions.md (your Markdown only).\n5. Bootstrap: follow <doc-root>/prompts/role-bootstrap.md — facts + links in entry-point.md, checklist in blueprint.md, first evidence-based template section under <doc-root>.\n6. Ensure <doc-root>/process/spikes/ and <doc-root>/process/reviews/ are ready (README / _template). Prefer process/ for lifecycle artifacts.\n7. Verify relative links. Append a short session note to <doc-root>/blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",
@@ -317,7 +317,7 @@
     "mode": "Direct",
     "role": "bootstrap",
     "group": "Build",
-    "when": "Resume blueprint phases after Bootstrap phase 0 is `[x] done`",
+    "when": "Resume blueprint checklist after Adopt has a usable entry-point",
     "prerequisite": "",
     "freshChat": false,
     "freshNote": "Optional",
@@ -328,13 +328,13 @@
     ],
     "steps": [
       "Follow the AGM core prompt and <doc-root>/prompts/role-bootstrap.md.",
-      "Read <doc-root>/context/always-on.md → <doc-root>/blueprint.md.",
-      "Resume the next [~] or [ ] phase."
+      "Start with <doc-root>/entry-point.md (facts + links) → <doc-root>/blueprint.md (what's next).",
+      "Resume the next [~] or [ ] checklist item. Keep entry-point links current."
     ],
     "placeholders": [
       "doc-root"
     ],
-    "prompt": "AGM — Build · Continue\nRole: bootstrap\n\nFollow the AGM core prompt and <doc-root>/prompts/role-bootstrap.md.\nRead <doc-root>/context/always-on.md → <doc-root>/blueprint.md.\nResume the next [~] or [ ] phase.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Build · Continue\nRole: bootstrap\n\nFollow the AGM core prompt and <doc-root>/prompts/role-bootstrap.md.\nStart with <doc-root>/entry-point.md (facts + links) → <doc-root>/blueprint.md (what's next).\nResume the next [~] or [ ] checklist item. Keep entry-point links current.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-init",
@@ -382,7 +382,7 @@
       "OPEN_QUESTIONS"
     ],
     "steps": [
-      "Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-bootstrap.md → prompts/reference/content-ingest.md.",
+      "Start with <doc-root>entry-point.md → <doc-root>blueprint.md → <doc-root>prompts/role-bootstrap.md → prompts/reference/content-ingest.md.",
       "Redact secrets, credentials, and PII from pasted content before writing files; ask the human if confidentiality is unclear.",
       "Create <doc-root>sources/ if missing (index.md, log.md). Persist the import in <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance frontmatter; update sources/index.md and sources/log.md.",
       "Extract structured facts into scoped architecture sections — e.g. use-cases/, <template>/introduction.md, context.md, glossary, interfaces/imports.md, constraints, context/on-demand.md, domain/ when installed. Link every extracted claim back to the source-ingest file.",
@@ -401,7 +401,7 @@
       "source-type",
       "template"
     ],
-    "prompt": "AGM — Evolve · Import content\nRole: bootstrap\n\nSource label: <source-label>\nSource type: <source-type>\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md body except always-on external-systems table when relevant)\n\nPasted content:\n<pasted-content>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-bootstrap.md → prompts/reference/content-ingest.md.\n2. Redact secrets, credentials, and PII from pasted content before writing files; ask the human if confidentiality is unclear.\n3. Create <doc-root>sources/ if missing (index.md, log.md). Persist the import in <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance frontmatter; update sources/index.md and sources/log.md.\n4. Extract structured facts into scoped architecture sections — e.g. use-cases/, <template>/introduction.md, context.md, glossary, interfaces/imports.md, constraints, context/on-demand.md, domain/ when installed. Link every extracted claim back to the source-ingest file.\n5. When paste describes scenarios, create or update <doc-root>use-cases/<slug>.md (type: use-case) with source link.\n6. Cross-check code via always-on.md source map when claims imply implementation; record conflicts as open assumptions.\n7. Update entry-point.md links and blueprint.md session log; adjust relevant blueprint phase rows when new areas are populated.\n8. If **Architecture documentation areas (evolve)** is present, prioritize those areas when placing extracted content.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Import content\nRole: bootstrap\n\nSource label: <source-label>\nSource type: <source-type>\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md body except always-on external-systems table when relevant)\n\nPasted content:\n<pasted-content>\n\nInstructions:\n1. Start with <doc-root>entry-point.md → <doc-root>blueprint.md → <doc-root>prompts/role-bootstrap.md → prompts/reference/content-ingest.md.\n2. Redact secrets, credentials, and PII from pasted content before writing files; ask the human if confidentiality is unclear.\n3. Create <doc-root>sources/ if missing (index.md, log.md). Persist the import in <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance frontmatter; update sources/index.md and sources/log.md.\n4. Extract structured facts into scoped architecture sections — e.g. use-cases/, <template>/introduction.md, context.md, glossary, interfaces/imports.md, constraints, context/on-demand.md, domain/ when installed. Link every extracted claim back to the source-ingest file.\n5. When paste describes scenarios, create or update <doc-root>use-cases/<slug>.md (type: use-case) with source link.\n6. Cross-check code via always-on.md source map when claims imply implementation; record conflicts as open assumptions.\n7. Update entry-point.md links and blueprint.md session log; adjust relevant blueprint phase rows when new areas are populated.\n8. If **Architecture documentation areas (evolve)** is present, prioritize those areas when placing extracted content.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-board-ingest",
@@ -433,7 +433,7 @@
       "═══════════════════════════════════════════════════════",
       "PHASE 1 — PROVENANCE (no domain graph mutation yet)",
       "═══════════════════════════════════════════════════════",
-      "1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-domain-work.md → prompts/reference/e2-board-projection.md → prompts/reference/content-ingest.md.",
+      "1. Start with <doc-root>entry-point.md → <doc-root>blueprint.md → <doc-root>prompts/role-domain-work.md → prompts/reference/e2-board-projection.md → prompts/reference/content-ingest.md.",
       "2. Validate snapshot: format \"event-storming-tool\", version 2 (or note v1→v2 migration). Schema: https://abx-git.github.io/E2/schemas/board-snapshot-v2.schema.json",
       "3. Redact secrets, credentials, and PII from labels/descriptions before writing files.",
       "4. Create <doc-root>sources/ if missing. Persist:",
@@ -465,7 +465,7 @@
       "source-label",
       "yes | no"
     ],
-    "prompt": "AGM — Domain · Import board snapshot\nRole: domain-work\n\nSource label: <source-label>\nGoal: <e.g. Checkout process → events + BC-ORD model>\nIntent views: <modelingMode list or \"all Tier A\">\nBoard path or paste: <path-to-.storm.json or pasted JSON>\nCode cross-check: <yes | no>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Board ingest\nProjection rules: prompts/reference/e2-board-projection.md\n\n═══════════════════════════════════════════════════════\nPHASE 1 — PROVENANCE (no domain graph mutation yet)\n═══════════════════════════════════════════════════════\n\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-domain-work.md → prompts/reference/e2-board-projection.md → prompts/reference/content-ingest.md.\n2. Validate snapshot: format \"event-storming-tool\", version 2 (or note v1→v2 migration). Schema: https://abx-git.github.io/E2/schemas/board-snapshot-v2.schema.json\n3. Redact secrets, credentials, and PII from labels/descriptions before writing files.\n4. Create <doc-root>sources/ if missing. Persist:\n   - Raw board: <doc-root>sources/YYYY-MM-DD-<slug>.storm.json\n   - Ingest note: <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest, sourceType: e2-board-snapshot)\n5. Update sources/index.md and sources/log.md. Do not update domain/ yet.\n\n═══════════════════════════════════════════════════════\nPHASE 2 — PROJECTION MANIFEST (proposal only)\n═══════════════════════════════════════════════════════\n\n6. Apply Intent / Tier / Graph / Maturity filters from e2-board-projection.md.\n7. Emit Projection Manifest table: elementId | type | label | target file | action (create|update|skip) | reason.\n8. STOP for human gate unless the session prompt already says \"approved\" or lists explicit create/update IDs.\n9. Ask human to confirm or adjust the manifest (one concise question if unclear).\n\n═══════════════════════════════════════════════════════\nPHASE 3 — WRITE (after human approval)\n═══════════════════════════════════════════════════════\n\n10. Apply approved manifest rows only. Route per e2-board-projection.md mapping table.\n11. Write <doc-root>/process/spikes/YYYY-MM-DD-<slug>/notes.md (type: domain-discovery or domain-analysis) with timeline, manifest summary, conflicts.\n12. Link every graph row to the source-ingest file and board element id.\n13. If Code cross-check = yes: compare claims to always-on source map / packages (DDD-G02); record conflicts as open assumptions / hotspots — code wins.\n14. Register SPK in blueprint ## Spike register (Track: domain). Update entry-point.md links if new domain files. Verify relative links.\n\nOutput [[ANCHOR:SPIKE]] (alias WORK_ITEM), [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:PROJECTION_MANIFEST]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Domain · Import board snapshot\nRole: domain-work\n\nSource label: <source-label>\nGoal: <e.g. Checkout process → events + BC-ORD model>\nIntent views: <modelingMode list or \"all Tier A\">\nBoard path or paste: <path-to-.storm.json or pasted JSON>\nCode cross-check: <yes | no>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Board ingest\nProjection rules: prompts/reference/e2-board-projection.md\n\n═══════════════════════════════════════════════════════\nPHASE 1 — PROVENANCE (no domain graph mutation yet)\n═══════════════════════════════════════════════════════\n\n1. Start with <doc-root>entry-point.md → <doc-root>blueprint.md → <doc-root>prompts/role-domain-work.md → prompts/reference/e2-board-projection.md → prompts/reference/content-ingest.md.\n2. Validate snapshot: format \"event-storming-tool\", version 2 (or note v1→v2 migration). Schema: https://abx-git.github.io/E2/schemas/board-snapshot-v2.schema.json\n3. Redact secrets, credentials, and PII from labels/descriptions before writing files.\n4. Create <doc-root>sources/ if missing. Persist:\n   - Raw board: <doc-root>sources/YYYY-MM-DD-<slug>.storm.json\n   - Ingest note: <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest, sourceType: e2-board-snapshot)\n5. Update sources/index.md and sources/log.md. Do not update domain/ yet.\n\n═══════════════════════════════════════════════════════\nPHASE 2 — PROJECTION MANIFEST (proposal only)\n═══════════════════════════════════════════════════════\n\n6. Apply Intent / Tier / Graph / Maturity filters from e2-board-projection.md.\n7. Emit Projection Manifest table: elementId | type | label | target file | action (create|update|skip) | reason.\n8. STOP for human gate unless the session prompt already says \"approved\" or lists explicit create/update IDs.\n9. Ask human to confirm or adjust the manifest (one concise question if unclear).\n\n═══════════════════════════════════════════════════════\nPHASE 3 — WRITE (after human approval)\n═══════════════════════════════════════════════════════\n\n10. Apply approved manifest rows only. Route per e2-board-projection.md mapping table.\n11. Write <doc-root>/process/spikes/YYYY-MM-DD-<slug>/notes.md (type: domain-discovery or domain-analysis) with timeline, manifest summary, conflicts.\n12. Link every graph row to the source-ingest file and board element id.\n13. If Code cross-check = yes: compare claims to always-on source map / packages (DDD-G02); record conflicts as open assumptions / hotspots — code wins.\n14. Register SPK in blueprint ## Spike register (Track: domain). Update entry-point.md links if new domain files. Verify relative links.\n\nOutput [[ANCHOR:SPIKE]] (alias WORK_ITEM), [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:PROJECTION_MANIFEST]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "domain-work-context-map",
@@ -808,7 +808,7 @@
       "OPEN_QUESTIONS"
     ],
     "steps": [
-      "Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.",
+      "Start with <doc-root>entry-point.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.",
       "Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it: a) If a Git MCP server is connected, use its diff/compare tool with the same refs. b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO} c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}",
       "If the diff is empty, stop and report; do not update architecture docs.",
       "Classify changes and update only architecture docs impacted by this diff.",
@@ -819,7 +819,7 @@
       "diff-to",
       "doc-root"
     ],
-    "prompt": "AGM — Evolve · Sync (git range)\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Read <doc-root>context/always-on.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n5. If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Sync (git range)\nRole: maintenance\n\n## Diff range (substitute before run — pipeline: env DIFF_FROM / DIFF_TO)\nDIFF_FROM=<diff-from>\nDIFF_TO=<diff-to>\n\nInstructions:\n1. Start with <doc-root>entry-point.md → <doc-root>blueprint.md → <doc-root>prompts/role-maintenance.md.\n2. Obtain the code diff between DIFF_FROM and DIFF_TO yourself — do not ask the human to paste it:\n   a) If a Git MCP server is connected, use its diff/compare tool with the same refs.\n   b) Otherwise run at repository root: git diff ${DIFF_FROM}..${DIFF_TO}\n   c) If the range is a PR merge base, use three-dot when appropriate: git diff ${DIFF_FROM}...${DIFF_TO}\n3. If the diff is empty, stop and report; do not update architecture docs.\n4. Classify changes and update only architecture docs impacted by this diff.\n5. If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "maintenance",
@@ -840,7 +840,7 @@
       "OPEN_QUESTIONS"
     ],
     "steps": [
-      "Read <doc-root>/context/always-on.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-maintenance.md.",
+      "Start with <doc-root>/entry-point.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-maintenance.md.",
       "<paste git diff or PR diff summary>",
       "Update only architecture docs impacted by this diff.",
       "If **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them."
@@ -849,7 +849,7 @@
       "doc-root",
       "paste git diff or PR diff summary"
     ],
-    "prompt": "AGM — Evolve · Sync\nRole: maintenance\n\nRead <doc-root>/context/always-on.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\nIf **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Sync\nRole: maintenance\n\nStart with <doc-root>/entry-point.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-maintenance.md.\n\nGit diff:\n<paste git diff or PR diff summary>\n\nUpdate only architecture docs impacted by this diff.\nIf **Architecture documentation areas (evolve)** is present, update those architecture Markdown files when the diff affects them.\n\nOutput [[ANCHOR:CHANGE_CLASSIFICATION]], [[ANCHOR:CHANGED_DOCS]], [[ANCHOR:INTERFACE_IMPACT]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "refinement",
@@ -872,7 +872,7 @@
       "Goal: <goal>",
       "Scope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md)",
       "Follow <doc-root>prompts/role-bootstrap.md for evidence and link rules.",
-      "Read always-on.md → blueprint.md. Update only the scoped sections and blueprint states.",
+      "Start with entry-point.md → blueprint.md. Update only the scoped sections and blueprint states.",
       "If **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).",
       "Do not restart unrelated phases."
     ],
@@ -881,7 +881,7 @@
       "goal",
       "scope"
     ],
-    "prompt": "AGM — Evolve · Refine\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md)\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nRead always-on.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Refine\nRole: bootstrap\n\nGoal: <goal>\n\nScope: <scope> (from documentation focus checkboxes or optional text — architecture content only; never entry-point.md, blueprint.md, or always-on.md)\n\nFollow <doc-root>prompts/role-bootstrap.md for evidence and link rules.\nStart with entry-point.md → blueprint.md. Update only the scoped sections and blueprint states.\nIf **Architecture documentation areas (evolve)** is present, update those Markdown areas within the stated scope (not prompts/ or workflows).\nDo not restart unrelated phases.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "review-maintenance",
@@ -964,7 +964,7 @@
       "VERDICT"
     ],
     "steps": [
-      "Read <doc-root>/context/always-on.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-review.md.",
+      "Start with <doc-root>/entry-point.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-review.md.",
       "Select next unreviewed phase in ## Reviews. Report-only — do not fix files.",
       "Create <doc-root>/process/reviews/YYYY-MM-DD-<slug>/ from process/reviews/_template/ (index.md, report.md, findings.md). Assign next REV-NNN. Update ## Reviews and ## Guardrail findings in blueprint.md."
     ],
@@ -972,6 +972,6 @@
       "doc-root",
       "slug"
     ],
-    "prompt": "AGM — Verify · Evaluate\nRole: review\n\nRead <doc-root>/context/always-on.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-review.md.\nSelect next unreviewed phase in ## Reviews. Report-only — do not fix files.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop.\nCreate <doc-root>/process/reviews/YYYY-MM-DD-<slug>/ from process/reviews/_template/ (index.md, report.md, findings.md). Assign next REV-NNN. Update ## Reviews and ## Guardrail findings in blueprint.md."
+    "prompt": "AGM — Verify · Evaluate\nRole: review\n\nStart with <doc-root>/entry-point.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-review.md.\nSelect next unreviewed phase in ## Reviews. Report-only — do not fix files.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop.\nCreate <doc-root>/process/reviews/YYYY-MM-DD-<slug>/ from process/reviews/_template/ (index.md, report.md, findings.md). Assign next REV-NNN. Update ## Reviews and ## Guardrail findings in blueprint.md."
   }
 ]

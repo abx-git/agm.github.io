@@ -452,17 +452,17 @@ const DOC_EXTENSIONS = [
     label: '<template>/ — structure & implementation',
     userLabel: 'Software structure & implementation',
     userHint: 'Modules, components, runtime behaviour — traced to source code',
-    docPaths: '<template>/ (building blocks, runtime), always-on.md source map, work/',
+    docPaths: '<template>/ (building blocks, runtime), entry-point.md source map, process/spikes/',
     hint: 'Document how the software is built and behaves, with evidence from the codebase',
     bootstrap: [
-      'blueprint.md: prioritize template phases for structure/building blocks, runtime/solution (per template) early in the plan.',
-      'always-on.md: ## Source code map — table module/service → repository path (keep current when code moves).',
-      'entry-point.md: link structure and runtime sections plus primary source paths from always-on.',
+      'blueprint.md: prioritize template phases for structure/building blocks, runtime/solution (per template) early in the checklist.',
+      'entry-point.md: ## Source code map — table module/service → repository path (keep current when code moves).',
+      'entry-point.md: link structure and runtime sections plus primary source paths.',
       'Template sections: populate building blocks / components / runtime from code inspection (not guesswork).',
-      'work/: use for analysis/design items that precede ADRs when exploring implementation changes.',
+      'process/spikes/: use for analysis/design items that precede ADRs when exploring implementation changes.',
     ],
     evolve: [
-      'Maintenance: when packages, modules, or runtime flows change — update structure/runtime template sections, always-on source map, and cross-links from entry-point.',
+      'Maintenance: when packages, modules, or runtime flows change — update structure/runtime template sections, entry-point source map, and cross-links.',
       'Refinement: deepen implementation docs with diagrams and traceability to code paths.',
     ],
   },
@@ -703,7 +703,7 @@ const WORKFLOW_INPUTS = {
     {
       name: 'sourcePaths',
       label: 'Source paths (optional)',
-      placeholder: 'e.g. src/services/order/ — defaults to always-on.md source map',
+      placeholder: 'e.g. src/services/order/ — defaults to entry-point.md source map',
       required: false,
     },
     {
@@ -1036,7 +1036,7 @@ function buildSessionScopeText(params, sessionDetail) {
   if (detail) return detail;
   const ids = params.docFocus || [];
   if (!ids.length) {
-    return 'Next open row in blueprint.md (agent picks content section from construction plan)';
+    return 'Next open row in blueprint.md (agent picks content section from the checklist)';
   }
   const labels = ids.map((id) => DOC_EXTENSIONS.find((e) => e.id === id)?.userLabel || id);
   return `Documentation focus: ${labels.join('; ')} — update matching architecture content with code evidence.`;
@@ -1157,18 +1157,17 @@ function workflowRole(workflow) {
   return r.split('`')[0].split('(')[0].trim() || 'bootstrap';
 }
 
-/** entry-point, blueprint, always-on — never human-selected; agent maintains always. */
-function buildAgentGraphDutiesBlock(docRoot) {
+/** entry-point + blueprint — keep simple; always-on is legacy. */
+function buildCoreFilesBlock(docRoot) {
   const r = normDocRoot(docRoot);
   return [
-    '## Agent-maintained graph (always — not in documentation areas)',
+    '## Core files (keep simple)',
     '',
-    'The human does not select these; you create and maintain them every session:',
-    `- ${r}entry-point.md — graph index (links to all content docs and sources)`,
-    `- ${r}blueprint.md — construction plan, phase status, session log`,
-    `- ${r}context/always-on.md — session context and source code map`,
+    `- ${r}entry-point.md — **start here** (short facts + links). Put this in AI context; keep it current.`,
+    `- ${r}blueprint.md — **what's next** (checklist + short session notes). Tick items when a chapter moves forward.`,
+    `- ${r}context/always-on.md — legacy only. If it still has unique facts, merge them into entry-point; do not maintain a third source of truth.`,
     '',
-    'When content areas change, update entry-point links and blueprint phases without being asked.',
+    'When chapters or links change, update entry-point. When work progresses, update blueprint checkmarks.',
     '',
   ].join('\n');
 }
@@ -1180,7 +1179,7 @@ function buildDocFocusBlock(params) {
   const lines = [
     '## Architecture documentation areas (bootstrap)',
     '',
-    'Create or extend **architecture content** only (template sections, interfaces/, ops/, ADRs, …) — not prompts/ or graph files (entry-point, blueprint, always-on are agent duties above). Implement all selected areas (see prompts/reference/doc-extensions.md):',
+    'Create or extend **architecture content** only (template sections, interfaces/, ops/, ADRs, …) — not prompts/. Keep entry-point and blueprint current (see Core files above). Implement all selected areas (see prompts/reference/doc-extensions.md):',
     '',
   ];
   for (const ext of DOC_EXTENSIONS) {
@@ -1238,13 +1237,13 @@ function buildParameterBlock(params) {
     lines.push(`- Architecture documentation areas: ${params.docFocus.join(', ')}`);
   }
   lines.push('');
-  lines.push(buildAgentGraphDutiesBlock(docRoot).trimEnd(), '');
+  lines.push(buildCoreFilesBlock(docRoot).trimEnd(), '');
   const focusBlock = buildDocFocusBlock(params);
   if (focusBlock) lines.push(focusBlock.trimEnd(), '');
-  lines.push('## File roles (agent creates all three at adopt — do not merge)');
-  lines.push(`- ${docRoot}context/always-on.md — session context (name, stack, source map)`);
-  lines.push(`- ${docRoot}blueprint.md — construction plan: phase rows → target files, status, WRK, reviews, session log`);
-  lines.push(`- ${docRoot}entry-point.md — graph index: links only; you maintain, human does not select as a documentation area`);
+  lines.push('## File roles');
+  lines.push(`- ${docRoot}entry-point.md — start here: short facts + links (put in AI context)`);
+  lines.push(`- ${docRoot}blueprint.md — what's next: checklist + short session notes`);
+  lines.push(`- ${docRoot}context/always-on.md — legacy; merge leftover facts into entry-point`);
   lines.push('');
   lines.push(`Template folder: "${template}/" under ${docRoot}. Interview only for missing facts.`);
   lines.push('');
@@ -1559,7 +1558,7 @@ function applyWorkflowInputs(prompt, workflowId, values, inputsContainer) {
       /Focus dimensions: <focus-dimensions>/,
       `Focus dimensions: ${values.focusDimensions || '<unspecified>'}`
     );
-    const src = values.sourcePaths?.trim() || '<from always-on.md source map>';
+    const src = values.sourcePaths?.trim() || '<from entry-point.md source map>';
     out = out.replace(/Source paths \(optional\): <source-paths>/, `Source paths (optional): ${src}`);
     out = out.replace(
       /Compare to documented architecture: <compare-documentation>/,
@@ -1634,7 +1633,7 @@ function appendDocFocusUnified(container, form, gridKey) {
   const hint = document.createElement('p');
   hint.className = 'field-hint doc-focus-unified-hint';
   hint.textContent =
-    'Check topics to document (install, adopt, improve). Optional text overrides checkboxes for this prompt. Graph files (entry-point, blueprint, always-on) are always agent-maintained.';
+    'Check topics to document (install, adopt, improve). Optional text overrides checkboxes for this prompt. Keep entry-point and blueprint current.';
   fieldset.appendChild(hint);
 
   const grid = document.createElement('div');
@@ -1706,7 +1705,7 @@ function personalizeWorkflowPrompt(workflow, params, inputValues = {}, inputsCon
     roleLine,
     `- Workflow reference: prompts/workflows/${workflow.id}.md`,
     '',
-    buildAgentGraphDutiesBlock(docRoot).trimEnd(),
+    buildCoreFilesBlock(docRoot).trimEnd(),
     '',
   ]
     .filter(Boolean)
