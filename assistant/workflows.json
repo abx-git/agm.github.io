@@ -790,6 +790,103 @@
     "prompt": "AGM — Domain · Evaluate\nRole: domain-work\n\nBounded context: <context name>\nScope: <source paths for this context>\nCompare to model doc: <yes | no>\n\nReport format: prompts/reference/ddd-work-report-formats.md § Tactical review\n\nInstructions:\n1. Read domain/contexts/<context>/model.md and language.md if present; traverse from entry-point.md.\n2. Inspect source under Scope for aggregate roots, entities, VOs, repositories, domain services, events.\n3. Check: consistency boundaries, anemic model, repository scope, domain vs integration events.\n4. Map findings to ddd-guardrails.md tactical IDs (DDD-T01–T08).\n5. Propose updates to model.md and events.md where evidence supports.\n6. Write work report (type: domain-analysis).\n7. Register SPK (Track: domain). Verify links.\n\nOutput [[ANCHOR:SPIKE]] (alias WORK_ITEM), [[ANCHOR:DDD_GRAPH_UPDATED]], [[ANCHOR:TRACEABILITY_COVERAGE]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
+    "id": "inbox-analyze",
+    "track": "Evolve",
+    "activity": "Inbox",
+    "mode": "Direct",
+    "role": "bootstrap",
+    "group": "Evolve",
+    "when": "New files or pastes landed in `inbox/raw/` and need structuring into a reviewable proposal (no merge yet)",
+    "prerequisite": "Documentation root bound; raw material under `<doc-root>inbox/raw/` (Studio paste or dropped files)",
+    "freshChat": false,
+    "freshNote": "Optional",
+    "anchors": [
+      "CHANGED_FILES",
+      "INGEST_SUMMARY",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS"
+    ],
+    "steps": [
+      "Read <doc-root>entry-point.md and <doc-root>blueprint.md first (keep context small). Then read prompts/reference/inbox-pipeline.md (or the bundled Inbox procedure) and the routing tables in prompts/reference/content-ingest.md / docs/reference/content-ingest.md.",
+      "Ensure <doc-root>inbox/ exists with raw/, proposals/, done/, index.md, log.md — create missing pieces only as needed. Do not create empty architecture chapter stubs.",
+      "List files under <doc-root>inbox/raw/. Prefer paths listed in Raw paths; otherwise take new/unprocessed raw files (not yet referenced by a proposal under proposals/ or done/).",
+      "Redact secrets, credentials, and PII before writing. Ask the human if classification is unclear.",
+      "For each logical intake, write <doc-root>inbox/proposals/YYYY-MM-DD-<slug>.md with type: inbox-proposal, status: draft, raw: [relative links to raw files], targets: [planned paths]. Body MUST include: Summary; Structured content; Integration & linking instructions; Open questions.",
+      "Route targets across Architecture, Knowledge (domain/), Concepts/Analyses (process/spikes/), extensions/, ops/, use-cases/ as appropriate — do NOT apply those writes in this session.",
+      "Update inbox/index.md and append inbox/log.md. Add a short blueprint.md session note that Analyze produced proposal(s). Link inbox/ from entry-point.md if missing.",
+      "Stop. Do not merge into template chapters, domain/, or sources/ in this session."
+    ],
+    "placeholders": [
+      "doc-root",
+      "optional focus, e.g. route domain terms only",
+      "raw-paths",
+      "slug"
+    ],
+    "prompt": "AGM — Evolve · Inbox · Analyze\nRole: bootstrap\n\nGoal: <optional focus, e.g. route domain terms only>\nRaw paths (optional; default = unprocessed files in inbox/raw/): <raw-paths>\nSlug hint: <slug>\n\nInstructions:\n1. Read <doc-root>entry-point.md and <doc-root>blueprint.md first (keep context small). Then read prompts/reference/inbox-pipeline.md (or the bundled Inbox procedure) and the routing tables in prompts/reference/content-ingest.md / docs/reference/content-ingest.md.\n2. Ensure <doc-root>inbox/ exists with raw/, proposals/, done/, index.md, log.md — create missing pieces only as needed. Do not create empty architecture chapter stubs.\n3. List files under <doc-root>inbox/raw/. Prefer paths listed in Raw paths; otherwise take new/unprocessed raw files (not yet referenced by a proposal under proposals/ or done/).\n4. Redact secrets, credentials, and PII before writing. Ask the human if classification is unclear.\n5. For each logical intake, write <doc-root>inbox/proposals/YYYY-MM-DD-<slug>.md with type: inbox-proposal, status: draft, raw: [relative links to raw files], targets: [planned paths]. Body MUST include: Summary; Structured content; Integration & linking instructions; Open questions.\n6. Route targets across Architecture, Knowledge (domain/), Concepts/Analyses (process/spikes/), extensions/, ops/, use-cases/ as appropriate — do NOT apply those writes in this session.\n7. Update inbox/index.md and append inbox/log.md. Add a short blueprint.md session note that Analyze produced proposal(s). Link inbox/ from entry-point.md if missing.\n8. Stop. Do not merge into template chapters, domain/, or sources/ in this session.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "inbox-merge",
+    "track": "Evolve",
+    "activity": "Inbox",
+    "mode": "Direct",
+    "role": "bootstrap",
+    "group": "Evolve",
+    "when": "One or more `inbox/proposals/` files are `status: ready` and should be merged into the AGM graph",
+    "prerequisite": "Proposal(s) with `status: ready`; human confirmed merge scope",
+    "freshChat": false,
+    "freshNote": "Recommended",
+    "anchors": [
+      "CHANGED_FILES",
+      "INGEST_SUMMARY",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS"
+    ],
+    "steps": [
+      "Read <doc-root>entry-point.md → <doc-root>blueprint.md → inbox-pipeline procedure → content-ingest routing tables.",
+      "Select proposals under <doc-root>inbox/proposals/ with status: ready (or only <proposal-paths>). Skip draft/blocked. If none ready, stop and tell the human.",
+      "For each selected proposal: a. Apply Integration & linking instructions: create/update target files (architecture chapters, domain/, spikes, extensions/, ops/, use-cases/, …). Prefer relative links. Do not invent empty stubs beyond what the plan requires. b. Create or update <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance pointing to inbox/raw/… and the proposal; update sources/index.md and sources/log.md (create sources/ if missing). c. Move the proposal to <doc-root>inbox/done/ (same basename). Record merge in inbox/log.md. Update inbox/index.md. d. Link every extracted claim back to the sources/ file where practical.",
+      "Update entry-point.md links and blueprint.md checklist/session log for areas touched.",
+      "Cross-check code via entry-point / always-on source map when claims imply implementation; leave unresolved conflicts as open assumptions in the sources/ note or a spike — do not silently overwrite code-backed facts.",
+      "Verify relative links for files you changed."
+    ],
+    "placeholders": [
+      "doc-root",
+      "optional limits",
+      "proposal-paths",
+      "slug"
+    ],
+    "prompt": "AGM — Evolve · Inbox · Merge\nRole: bootstrap\n\nProposal paths (optional; default = all inbox/proposals with status: ready): <proposal-paths>\nScope note: <optional limits>\n\nInstructions:\n1. Read <doc-root>entry-point.md → <doc-root>blueprint.md → inbox-pipeline procedure → content-ingest routing tables.\n2. Select proposals under <doc-root>inbox/proposals/ with status: ready (or only <proposal-paths>). Skip draft/blocked. If none ready, stop and tell the human.\n3. For each selected proposal:\n   a. Apply Integration & linking instructions: create/update target files (architecture chapters, domain/, spikes, extensions/, ops/, use-cases/, …). Prefer relative links. Do not invent empty stubs beyond what the plan requires.\n   b. Create or update <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance pointing to inbox/raw/… and the proposal; update sources/index.md and sources/log.md (create sources/ if missing).\n   c. Move the proposal to <doc-root>inbox/done/ (same basename). Record merge in inbox/log.md. Update inbox/index.md.\n   d. Link every extracted claim back to the sources/ file where practical.\n4. Update entry-point.md links and blueprint.md checklist/session log for areas touched.\n5. Cross-check code via entry-point / always-on source map when claims imply implementation; leave unresolved conflicts as open assumptions in the sources/ note or a spike — do not silently overwrite code-backed facts.\n6. Verify relative links for files you changed.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
+    "id": "inbox-refine",
+    "track": "Evolve",
+    "activity": "Inbox",
+    "mode": "Dialog",
+    "role": "bootstrap",
+    "group": "Evolve",
+    "when": "A proposal under `inbox/proposals/` needs clarification or restructuring before merge",
+    "prerequisite": "At least one `inbox/proposals/*.md` (`type: inbox-proposal`)",
+    "freshChat": false,
+    "freshNote": "Optional",
+    "anchors": [
+      "CHANGED_FILES",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS"
+    ],
+    "steps": [
+      "Read <doc-root>entry-point.md → blueprint.md → the proposal at <proposal-path> → inbox-pipeline procedure.",
+      "Update only that proposal (and inbox/log.md + brief blueprint note). Improve Structured content and Integration & linking instructions.",
+      "Set status to draft, ready, or blocked exactly as the human directed. Default remains draft if unclear.",
+      "Do not merge targets."
+    ],
+    "placeholders": [
+      "doc-root",
+      "notes",
+      "proposal-path"
+    ],
+    "prompt": "AGM — Evolve · Inbox · Refine (dialog)\nRole: bootstrap\n\nProposal path: <proposal-path>\nHuman notes: <notes>\n\n═══════════════════════════════════════════════════════\nPHASE 1 — REVIEW DIALOG (until human says \"ready to write\" or \"end refine\")\n═══════════════════════════════════════════════════════\n\nFORBIDDEN until Phase 2:\n- Do not merge into architecture/domain/spikes/sources\n- Do not move the proposal to inbox/done/\n- Do not set status: ready unless the human explicitly asks\n\nClarify: missing targets, wrong workspace routing, link plan gaps, open questions, confidentiality.\n\n═══════════════════════════════════════════════════════\nPHASE 2 — WRITE PROPOSAL (after human confirms)\n═══════════════════════════════════════════════════════\n\nInstructions:\n1. Read <doc-root>entry-point.md → blueprint.md → the proposal at <proposal-path> → inbox-pipeline procedure.\n2. Update only that proposal (and inbox/log.md + brief blueprint note). Improve Structured content and Integration & linking instructions.\n3. Set status to draft, ready, or blocked exactly as the human directed. Default remains draft if unclear.\n4. Do not merge targets.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+  },
+  {
     "id": "maintenance-diff-range",
     "track": "Evolve",
     "activity": "Sync",
