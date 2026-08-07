@@ -303,12 +303,13 @@
       "If **Architecture documentation areas (bootstrap)** is present, add blueprint checklist rows for each selected area (planned paths only — create each file when that work runs, not empty stubs).",
       "Bootstrap (inline role): facts + links in entry-point.md, checklist in blueprint.md, then create and fill the first high-value template section from evidence only.",
       "Do not pre-create empty domain/, process/_template/, or unused chapter files.",
+      "Hard rule — non-durable sources: Do **not** read or promote <doc-root>notes/ unless the human explicitly asks. Do **not** treat Concepts/Analyses (process/spikes/) as established architecture truth unless the human explicitly asks to promote specific findings.",
       "Verify relative links among files that exist. Append a short session note to <doc-root>/blueprint.md."
     ],
     "placeholders": [
       "doc-root"
     ],
-    "prompt": "AGM — Build · Adopt\nRole: bootstrap\n\nAdopt the Architecture Graph Method (AGM) into this application repository.\nThe human installed a minimal starter via AGM Studio (entry-point.md + blueprint.md) or a fuller CLI scaffold.\nExecute Phase B–C in prompts/reference/adopt-procedure.md (or the bundled adopt-procedure).\n\nPrerequisites: application repository open in the IDE; documentation root present; human available for a short interview.\n\nUse **Documentation root** / <doc-root> for every architecture path — do not hardcode docs/architecture/ if another root was set.\n\nCore files (keep simple):\n- <doc-root>/entry-point.md — start here (short facts + links). Put this in AI context.\n- <doc-root>/blueprint.md — what's next (checklist + short session notes).\n- <doc-root>/context/always-on.md — legacy only; merge leftover facts into entry-point if present.\n\nStudio note: Session/role instructions are in this prompt. Do not require prompts/role-*.md or prompts/core/system-prompt.md (Studio does not install them).\n\nInstructions:\n1. Treat existing entry-point.md / blueprint.md from Studio Install as expected stubs — fill and enrich them. Stop and tell the human to paste **Extend docs** (Build · Continue) from AGM Studio only if adoption is already done: a template chapter already has real evidence-based content and the blueprint shows meaningful progress beyond the Install stub.\n2. Phase A (Studio path): if Project parameters / Studio notes are present, skip on-disk role/system-prompt checks. Use prompts/role-bootstrap.md only when it already exists (CLI install).\n3. If an **Adoption parameters** / **Project parameters** block is present, fill entry-point.md and blueprint.md under <doc-root>; interview only for missing facts. Do not invent a third source of truth in always-on.\n4. If **Architecture documentation areas (bootstrap)** is present, add blueprint checklist rows for each selected area (planned paths only — create each file when that work runs, not empty stubs).\n5. Bootstrap (inline role): facts + links in entry-point.md, checklist in blueprint.md, then create and fill the first high-value template section from evidence only.\n6. Do not pre-create empty domain/, process/_template/, or unused chapter files.\n7. Verify relative links among files that exist. Append a short session note to <doc-root>/blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Build · Adopt\nRole: bootstrap\n\nAdopt the Architecture Graph Method (AGM) into this application repository.\nThe human installed a minimal starter via AGM Studio (entry-point.md + blueprint.md) or a fuller CLI scaffold.\nExecute Phase B–C in prompts/reference/adopt-procedure.md (or the bundled adopt-procedure).\n\nPrerequisites: application repository open in the IDE; documentation root present; human available for a short interview.\n\nUse **Documentation root** / <doc-root> for every architecture path — do not hardcode docs/architecture/ if another root was set.\n\nCore files (keep simple):\n- <doc-root>/entry-point.md — start here (short facts + links). Put this in AI context.\n- <doc-root>/blueprint.md — what's next (checklist + short session notes).\n- <doc-root>/context/always-on.md — legacy only; merge leftover facts into entry-point if present.\n\nStudio note: Session/role instructions are in this prompt. Do not require prompts/role-*.md or prompts/core/system-prompt.md (Studio does not install them).\n\nInstructions:\n1. Treat existing entry-point.md / blueprint.md from Studio Install as expected stubs — fill and enrich them. Stop and tell the human to paste **Extend docs** (Build · Continue) from AGM Studio only if adoption is already done: a template chapter already has real evidence-based content and the blueprint shows meaningful progress beyond the Install stub.\n2. Phase A (Studio path): if Project parameters / Studio notes are present, skip on-disk role/system-prompt checks. Use prompts/role-bootstrap.md only when it already exists (CLI install).\n3. If an **Adoption parameters** / **Project parameters** block is present, fill entry-point.md and blueprint.md under <doc-root>; interview only for missing facts. Do not invent a third source of truth in always-on.\n4. If **Architecture documentation areas (bootstrap)** is present, add blueprint checklist rows for each selected area (planned paths only — create each file when that work runs, not empty stubs).\n5. Bootstrap (inline role): facts + links in entry-point.md, checklist in blueprint.md, then create and fill the first high-value template section from evidence only.\n6. Do not pre-create empty domain/, process/_template/, or unused chapter files.\n7. Hard rule — non-durable sources: Do **not** read or promote <doc-root>notes/ unless the human explicitly asks. Do **not** treat Concepts/Analyses (process/spikes/) as established architecture truth unless the human explicitly asks to promote specific findings.\n8. Verify relative links among files that exist. Append a short session note to <doc-root>/blueprint.md.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:TEMPLATE_SELECTED]], [[ANCHOR:PHASE_STATUS]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-continue",
@@ -329,12 +330,15 @@
     "steps": [
       "Follow the AGM core prompt and <doc-root>/prompts/role-bootstrap.md.",
       "Start with <doc-root>/entry-point.md (facts + links) → <doc-root>/blueprint.md (what's next).",
-      "Resume the next [~] or [ ] checklist item. Keep entry-point links current."
+      "Resume the next [~] or [ ] checklist item. Keep entry-point links current.",
+      "- Do **not** read or promote <doc-root>notes/ unless the human explicitly asks in this session.",
+      "- Do **not** treat Concepts/Analyses under process/spikes/ as established architecture truth unless the human explicitly asks to promote specific findings.",
+      "- Prefer code, lasting Architecture/Knowledge chapters, and approved Inbox proposals."
     ],
     "placeholders": [
       "doc-root"
     ],
-    "prompt": "AGM — Build · Continue\nRole: bootstrap\n\nFollow the AGM core prompt and <doc-root>/prompts/role-bootstrap.md.\nStart with <doc-root>/entry-point.md (facts + links) → <doc-root>/blueprint.md (what's next).\nResume the next [~] or [ ] checklist item. Keep entry-point links current.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Build · Continue\nRole: bootstrap\n\nFollow the AGM core prompt and <doc-root>/prompts/role-bootstrap.md.\nStart with <doc-root>/entry-point.md (facts + links) → <doc-root>/blueprint.md (what's next).\nResume the next [~] or [ ] checklist item. Keep entry-point links current.\n\nHard rule — non-durable sources:\n- Do **not** read or promote <doc-root>notes/ unless the human explicitly asks in this session.\n- Do **not** treat Concepts/Analyses under process/spikes/ as established architecture truth unless the human explicitly asks to promote specific findings.\n- Prefer code, lasting Architecture/Knowledge chapters, and approved Inbox proposals.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "bootstrap-init",
@@ -847,6 +851,7 @@
       "For each selected proposal: a. Apply Integration & linking instructions: create/update target files (architecture chapters, domain/, spikes, extensions/, ops/, use-cases/, …). Prefer relative links. Do not invent empty stubs beyond what the plan requires. b. Create or update <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance pointing to inbox/raw/… and the proposal; update sources/index.md and sources/log.md (create sources/ if missing). c. Move the proposal to <doc-root>inbox/done/ (same basename). Record merge in inbox/log.md. Update inbox/index.md. d. Link every extracted claim back to the sources/ file where practical.",
       "Update entry-point.md links and blueprint.md checklist/session log for areas touched.",
       "Cross-check code via entry-point / always-on source map when claims imply implementation; leave unresolved conflicts as open assumptions in the sources/ note or a spike — do not silently overwrite code-backed facts.",
+      "Hard rule — non-durable sources: Do **not** read or merge <doc-root>notes/ unless the human explicitly asks. Do **not** treat existing Concepts/Analyses spikes as established truth when writing lasting chapters — only apply what the **approved proposal** plans (spikes as targets are OK when the proposal says so).",
       "Verify relative links for files you changed."
     ],
     "placeholders": [
@@ -855,7 +860,7 @@
       "proposal-paths",
       "slug"
     ],
-    "prompt": "AGM — Evolve · Inbox · Merge\nRole: bootstrap\n\nProposal paths (optional; default = all inbox/proposals with status: ready): <proposal-paths>\nScope note: <optional limits>\n\nInstructions:\n1. Read <doc-root>entry-point.md → <doc-root>blueprint.md → inbox-pipeline procedure → content-ingest routing tables.\n2. Select proposals under <doc-root>inbox/proposals/ with status: ready (or only <proposal-paths>). Skip draft/blocked. If none ready, stop and tell the human.\n3. For each selected proposal:\n   a. Apply Integration & linking instructions: create/update target files (architecture chapters, domain/, spikes, extensions/, ops/, use-cases/, …). Prefer relative links. Do not invent empty stubs beyond what the plan requires.\n   b. Create or update <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance pointing to inbox/raw/… and the proposal; update sources/index.md and sources/log.md (create sources/ if missing).\n   c. Move the proposal to <doc-root>inbox/done/ (same basename). Record merge in inbox/log.md. Update inbox/index.md.\n   d. Link every extracted claim back to the sources/ file where practical.\n4. Update entry-point.md links and blueprint.md checklist/session log for areas touched.\n5. Cross-check code via entry-point / always-on source map when claims imply implementation; leave unresolved conflicts as open assumptions in the sources/ note or a spike — do not silently overwrite code-backed facts.\n6. Verify relative links for files you changed.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
+    "prompt": "AGM — Evolve · Inbox · Merge\nRole: bootstrap\n\nProposal paths (optional; default = all inbox/proposals with status: ready): <proposal-paths>\nScope note: <optional limits>\n\nInstructions:\n1. Read <doc-root>entry-point.md → <doc-root>blueprint.md → inbox-pipeline procedure → content-ingest routing tables.\n2. Select proposals under <doc-root>inbox/proposals/ with status: ready (or only <proposal-paths>). Skip draft/blocked. If none ready, stop and tell the human.\n3. For each selected proposal:\n   a. Apply Integration & linking instructions: create/update target files (architecture chapters, domain/, spikes, extensions/, ops/, use-cases/, …). Prefer relative links. Do not invent empty stubs beyond what the plan requires.\n   b. Create or update <doc-root>sources/YYYY-MM-DD-<slug>.md (type: source-ingest) with provenance pointing to inbox/raw/… and the proposal; update sources/index.md and sources/log.md (create sources/ if missing).\n   c. Move the proposal to <doc-root>inbox/done/ (same basename). Record merge in inbox/log.md. Update inbox/index.md.\n   d. Link every extracted claim back to the sources/ file where practical.\n4. Update entry-point.md links and blueprint.md checklist/session log for areas touched.\n5. Cross-check code via entry-point / always-on source map when claims imply implementation; leave unresolved conflicts as open assumptions in the sources/ note or a spike — do not silently overwrite code-backed facts.\n6. Hard rule — non-durable sources: Do **not** read or merge <doc-root>notes/ unless the human explicitly asks. Do **not** treat existing Concepts/Analyses spikes as established truth when writing lasting chapters — only apply what the **approved proposal** plans (spikes as targets are OK when the proposal says so).\n7. Verify relative links for files you changed.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   },
   {
     "id": "inbox-refine",
@@ -1070,5 +1075,98 @@
       "slug"
     ],
     "prompt": "AGM — Verify · Evaluate\nRole: review\n\nStart with <doc-root>/entry-point.md → <doc-root>/blueprint.md → <doc-root>/prompts/role-review.md.\nSelect next unreviewed phase in ## Reviews. Report-only — do not fix files.\n\nOutput [[ANCHOR:REVIEW_SCOPE]], [[ANCHOR:VERDICT]], [[ANCHOR:FINDINGS]], [[ANCHOR:TOP_RISKS]], [[ANCHOR:LINK_CHECK]] before stop.\nCreate <doc-root>/process/reviews/YYYY-MM-DD-<slug>/ from process/reviews/_template/ (index.md, report.md, findings.md). Assign next REV-NNN. Update ## Reviews and ## Guardrail findings in blueprint.md."
+  },
+  {
+    "id": "studio-align-structure",
+    "track": "Evolve",
+    "activity": "Align",
+    "mode": "Direct",
+    "role": "bootstrap",
+    "group": "Evolve",
+    "when": "Existing architecture Markdown does not match AGM Studio’s expected folder layout / naming (workspaces empty or wrong, missing entry-point/blueprint, legacy always-on-only layout, reviews under Concepts, etc.)",
+    "prerequisite": "Documentation root bound in AGM Studio; human available to approve destructive moves",
+    "freshChat": false,
+    "freshNote": "Recommended",
+    "anchors": [
+      "CHANGED_FILES",
+      "INGEST_SUMMARY",
+      "LINK_CHECK",
+      "OPEN_QUESTIONS"
+    ],
+    "steps": [
+      "Goal: Inventory this documentation root, explain gaps vs AGM Studio’s current IA, then reformat / relocate so Studio workspaces work correctly — without inventing architecture facts.",
+      "Human notes: <notes>",
+      "Template preference (if known): <template>",
+      "Dry-run only (yes/no; default no — apply after proposing): <dry-run>",
+      "## Why this session exists",
+      "## Target structure (Studio contract — authoritative)",
+      "Documentation root = <doc-root> (every path below is relative to it).",
+      "### A. State files (required — Studio “meta”)",
+      "- entry-point.md — short always-on facts + link map; OKF YAML frontmatter with non-empty `type`. Put this in AI context first.",
+      "- blueprint.md — checklist of what’s next ([ ] / [~] / [x]), SPK/REV registers, short session notes; OKF `type`.",
+      "- Optional: context/on-demand.md — extra tables only when needed.",
+      "- Legacy: context/always-on.md — if present with unique facts, **merge into entry-point** and stop treating it as a second source of truth. Do not invent a third always-on file.",
+      "### B. Architecture (Studio → Architecture · Docs)",
+      "- Template chapters under the chosen template folder, e.g. arc42/, c4-light/, lean-service/, adr-first/, or custom/ — **create a chapter file only when it has real content** (no empty stub mass-create).",
+      "- Supporting trees as used: interfaces/, ops/, use-cases/, sources/, extensions/<slug>/ (each extension needs index.md with OKF `type`, linked from entry-point, blueprint row).",
+      "- Prefer **relative Markdown links only**.",
+      "### C. Knowledge (Studio → Knowledge)",
+      "- domain/ — domain language & model (appears when domain work creates it; do not invent empty domain stubs).",
+      "### D. Inbox (Studio → Inbox)",
+      "- inbox/raw/ — received material (not yet applied)",
+      "- inbox/proposals/ — reviewable plans (`type: inbox-proposal`, `status: draft|ready|blocked|merged`)",
+      "- inbox/done/ — applied plans",
+      "- inbox/index.md + inbox/log.md",
+      "Create the inbox tree only if missing **and** you are aligning for Studio use (or human asked). Do not invent raw content.",
+      "### E. Concepts & Analyses (Studio → Concepts / Analyses)",
+      "- process/spikes/YYYY-MM-DD-<slug>/ — drafts",
+      "- Concepts filter spike types such as: question, design, domain-question, domain-design, …",
+      "- Analyses filter type: analysis",
+      "- Do **not** require a separate process/analyses/ tree for Day-1.",
+      "### F. Check docs / Verify reports (Studio → Architecture · Check docs)",
+      "- process/reviews/<folder>/ with report.md + findings.md (report-only)",
+      "- REV rows in blueprint.md",
+      "- Must **not** live under Concepts; relocate if found under spikes or elsewhere.",
+      "### G. Progressive disclosure",
+      "- At each major structure level that is a concept folder: index.md + log.md when that subtree exists.",
+      "- Every durable Markdown artifact: OKF frontmatter bounded by --- with mandatory non-empty `type`.",
+      "### H. Local notes (Studio → Notes)",
+      "- notes/ — **local user scratch** (gitignored content via notes/.gitignore)",
+      "- Not durable architecture truth; agents must not read/promote unless the human explicitly asks",
+      "- Align may ensure notes/.gitignore exists; do **not** invent note files or move lasting chapters into notes/",
+      "### I. What Studio does *not* expect on Day-1",
+      "- Mass empty chapter stubs",
+      "- prompts/role-*.md under the doc root (Studio embeds roles in the copied prompt)",
+      "- Reviews as “Concepts”",
+      "- Inbox material applied straight into chapters without a proposal + human ready status",
+      "- Treating notes/ or spikes as lasting Architecture truth without explicit human promotion",
+      "## Instructions",
+      "1. Read <doc-root>entry-point.md and <doc-root>blueprint.md if they exist. If missing, create them as thin but valid OKF state files (facts you can evidence from the tree; checklist reflecting real planned chapters — do not invent product claims).",
+      "2. Inventory the documentation root: list top-level dirs/files and classify each against the Target structure (A–H). Note mismatches (wrong names, reviews under spikes, domain content outside domain/, Confluence dumps in chapter folders, always-on-only layout, absolute/external wiki links that break the graph, missing frontmatter `type`, etc.).",
+      "3. Write a short **alignment plan** in the chat (and optionally as a session note in blueprint.md): keep / move / rename / merge / leave-as-legacy. Prefer moves + link updates over rewriting chapter prose.",
+      "4. If <dry-run> is yes: stop after the plan + [[ANCHOR:OPEN_QUESTIONS]]. Do not move files.",
+      "5. Otherwise apply the plan with human-in-the-loop judgment:",
+      "- Move/rename files to the Target structure; fix relative links and entry-point link map.",
+      "- Add OKF `type` where missing (infer from path/role; ask if unclear).",
+      "- Relocate Verify reports into process/reviews/ and register REV rows.",
+      "- Ensure Inbox folders exist if Studio Inbox will be used; do not fabricate raw notes.",
+      "- Ensure notes/.gitignore exists if Notes workspace will be used; do not invent note content; do not commit note files.",
+      "- Merge leftover context/always-on.md facts into entry-point when thin/duplicative.",
+      "- Update blueprint checklist to match files that actually exist or are genuinely next; tick only what is done.",
+      "- Maintain index.md / log.md at structure levels you touch.",
+      "6. Do **not** invent architecture decisions, diagrams, or domain terms. Do **not** delete content without moving it to a sensible path (or asking). Do **not** run Adopt/Extend chapter fills in this session unless a state file is empty and must be bootstrapped minimally.",
+      "7. Do **not** promote notes/ or spike drafts into lasting chapters during Align unless the human explicitly asked to.",
+      "8. Append a blueprint.md session note: “Align structure for Studio” + what changed.",
+      "9. Stop. Tell the human to **Reload folder** in AGM Studio and verify Architecture / Knowledge / Inbox / Notes / Concepts / Analyses / Check docs."
+    ],
+    "placeholders": [
+      "doc-root",
+      "dry-run",
+      "folder",
+      "notes",
+      "slug",
+      "template"
+    ],
+    "prompt": "AGM — Evolve · Align structure for AGM Studio\nRole: bootstrap\n\nGoal: Inventory this documentation root, explain gaps vs AGM Studio’s current IA, then reformat / relocate so Studio workspaces work correctly — without inventing architecture facts.\n\nHuman notes: <notes>\nTemplate preference (if known): <template>\nDry-run only (yes/no; default no — apply after proposing): <dry-run>\n\n## Why this session exists\n\nAGM Studio’s UI maps **paths and conventions** to workspaces (Architecture, Knowledge, Inbox, Concepts, Analyses, Ask AI). If the folder uses an older or ad-hoc layout, Studio looks empty, puts reviews in the wrong place, or cannot drive Inbox / Check docs. Your job is to make the **on-disk structure** match Studio’s current understanding.\n\n## Target structure (Studio contract — authoritative)\n\nDocumentation root = <doc-root> (every path below is relative to it).\n\n### A. State files (required — Studio “meta”)\n- entry-point.md — short always-on facts + link map; OKF YAML frontmatter with non-empty `type`. Put this in AI context first.\n- blueprint.md — checklist of what’s next ([ ] / [~] / [x]), SPK/REV registers, short session notes; OKF `type`.\n- Optional: context/on-demand.md — extra tables only when needed.\n- Legacy: context/always-on.md — if present with unique facts, **merge into entry-point** and stop treating it as a second source of truth. Do not invent a third always-on file.\n\n### B. Architecture (Studio → Architecture · Docs)\n- Template chapters under the chosen template folder, e.g. arc42/, c4-light/, lean-service/, adr-first/, or custom/ — **create a chapter file only when it has real content** (no empty stub mass-create).\n- Supporting trees as used: interfaces/, ops/, use-cases/, sources/, extensions/<slug>/ (each extension needs index.md with OKF `type`, linked from entry-point, blueprint row).\n- Prefer **relative Markdown links only**.\n\n### C. Knowledge (Studio → Knowledge)\n- domain/ — domain language & model (appears when domain work creates it; do not invent empty domain stubs).\n\n### D. Inbox (Studio → Inbox)\n- inbox/raw/ — received material (not yet applied)\n- inbox/proposals/ — reviewable plans (`type: inbox-proposal`, `status: draft|ready|blocked|merged`)\n- inbox/done/ — applied plans\n- inbox/index.md + inbox/log.md\nCreate the inbox tree only if missing **and** you are aligning for Studio use (or human asked). Do not invent raw content.\n\n### E. Concepts & Analyses (Studio → Concepts / Analyses)\n- process/spikes/YYYY-MM-DD-<slug>/ — drafts\n- Concepts filter spike types such as: question, design, domain-question, domain-design, …\n- Analyses filter type: analysis\n- Do **not** require a separate process/analyses/ tree for Day-1.\n\n### F. Check docs / Verify reports (Studio → Architecture · Check docs)\n- process/reviews/<folder>/ with report.md + findings.md (report-only)\n- REV rows in blueprint.md\n- Must **not** live under Concepts; relocate if found under spikes or elsewhere.\n\n### G. Progressive disclosure\n- At each major structure level that is a concept folder: index.md + log.md when that subtree exists.\n- Every durable Markdown artifact: OKF frontmatter bounded by --- with mandatory non-empty `type`.\n\n### H. Local notes (Studio → Notes)\n- notes/ — **local user scratch** (gitignored content via notes/.gitignore)\n- Not durable architecture truth; agents must not read/promote unless the human explicitly asks\n- Align may ensure notes/.gitignore exists; do **not** invent note files or move lasting chapters into notes/\n\n### I. What Studio does *not* expect on Day-1\n- Mass empty chapter stubs\n- prompts/role-*.md under the doc root (Studio embeds roles in the copied prompt)\n- Reviews as “Concepts”\n- Inbox material applied straight into chapters without a proposal + human ready status\n- Treating notes/ or spikes as lasting Architecture truth without explicit human promotion\n\n## Instructions\n\n1. Read <doc-root>entry-point.md and <doc-root>blueprint.md if they exist. If missing, create them as thin but valid OKF state files (facts you can evidence from the tree; checklist reflecting real planned chapters — do not invent product claims).\n2. Inventory the documentation root: list top-level dirs/files and classify each against the Target structure (A–H). Note mismatches (wrong names, reviews under spikes, domain content outside domain/, Confluence dumps in chapter folders, always-on-only layout, absolute/external wiki links that break the graph, missing frontmatter `type`, etc.).\n3. Write a short **alignment plan** in the chat (and optionally as a session note in blueprint.md): keep / move / rename / merge / leave-as-legacy. Prefer moves + link updates over rewriting chapter prose.\n4. If <dry-run> is yes: stop after the plan + [[ANCHOR:OPEN_QUESTIONS]]. Do not move files.\n5. Otherwise apply the plan with human-in-the-loop judgment:\n   - Move/rename files to the Target structure; fix relative links and entry-point link map.\n   - Add OKF `type` where missing (infer from path/role; ask if unclear).\n   - Relocate Verify reports into process/reviews/ and register REV rows.\n   - Ensure Inbox folders exist if Studio Inbox will be used; do not fabricate raw notes.\n   - Ensure notes/.gitignore exists if Notes workspace will be used; do not invent note content; do not commit note files.\n   - Merge leftover context/always-on.md facts into entry-point when thin/duplicative.\n   - Update blueprint checklist to match files that actually exist or are genuinely next; tick only what is done.\n   - Maintain index.md / log.md at structure levels you touch.\n6. Do **not** invent architecture decisions, diagrams, or domain terms. Do **not** delete content without moving it to a sensible path (or asking). Do **not** run Adopt/Extend chapter fills in this session unless a state file is empty and must be bootstrapped minimally.\n7. Do **not** promote notes/ or spike drafts into lasting chapters during Align unless the human explicitly asked to.\n8. Append a blueprint.md session note: “Align structure for Studio” + what changed.\n9. Stop. Tell the human to **Reload folder** in AGM Studio and verify Architecture / Knowledge / Inbox / Notes / Concepts / Analyses / Check docs.\n\nOutput [[ANCHOR:CHANGED_FILES]], [[ANCHOR:INGEST_SUMMARY]], [[ANCHOR:OPEN_QUESTIONS]], [[ANCHOR:LINK_CHECK]] before stop."
   }
 ]
